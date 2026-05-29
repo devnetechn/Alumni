@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm -v)",
+      "Bash(psql --version)",
+      "Bash(PGPASSWORD=123 psql:*)",
+      "Bash(npx --yes create-next-app@latest alumni-backend --js --app --no-tailwind --no-eslint --no-src-dir --import-alias \"@/*\" --use-npm --yes)",
+      "Bash(npm install:*)",
+      "Bash(node scripts/init-db.js)",
+      "Bash(npm create:*)",
+      "Bash(npm run:*)",
+      "Bash(curl:*)",
+      "Bash(taskkill:*)",
+      "Bash(netstat -ano)",
+      "Bash(node scripts/seed-demo.js)",
+      "Bash(node scripts/migrate.js)",
+      "Bash(ls C:/xampp/htdocs/alumni/alumni-backend/.env*)",
+      "Read(//c/Users/EDP_MARVZ/.claude/skills/playwright-skill/**)",
+      "Bash(node run.js /c/Users/EDP_MARVZ/AppData/Local/Temp/playwright-test-alumni.js)",
+      "Bash(node -e \"import\\('pg'\\).then\\(async \\({Pool}\\) => { const dotenv = await import\\('dotenv'\\); dotenv.config\\({path:'./.env.local'}\\); const p = new Pool\\({connectionString: process.env.DATABASE_URL}\\); await p.query\\('INSERT INTO rsvps \\(event_id, alumni_id, status\\) VALUES \\(1, 5, \\\\'going\\\\'\\) ON CONFLICT \\(event_id, alumni_id\\) DO UPDATE SET status=\\\\'going\\\\', paid=false, approved=false'\\); await p.end\\(\\); console.log\\('seeded rsvp'\\); }\\)\")",
+      "Bash(node run.js /c/Users/EDP_MARVZ/AppData/Local/Temp/playwright-test-regflow.js)",
+      "Bash(node -e \"import\\('pg'\\).then\\(async \\({Pool}\\) => { const dotenv = await import\\('dotenv'\\); dotenv.config\\({path:'./.env.local'}\\); const p = new Pool\\({connectionString: process.env.DATABASE_URL}\\); await p.query\\('UPDATE rsvps SET paid=false WHERE event_id=1 AND alumni_id=5'\\); await p.query\\('DELETE FROM attendance WHERE event_id=1 AND alumni_id=5'\\); await p.end\\(\\); console.log\\('reset'\\); }\\)\")",
+      "Bash(node scripts/reset-ana.js)",
+      "Bash(ipconfig)",
+      "Bash(ngrok version:*)",
+      "Bash(ngrok http:*)"
+    ]
+  }
+}
