@@ -8,6 +8,9 @@ app.use(express.json());
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
 
+const meRoutes = require('./routes/me');
+app.use('/api', meRoutes);
+
 app.get('/api/health', (req, res) => {
   res.json({ ok: true });
 });
