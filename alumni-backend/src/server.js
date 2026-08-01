@@ -20,6 +20,9 @@ app.use('/api/events', eventsRoutes);
 const jobsRoutes = require('./routes/jobs');
 app.use('/api/jobs', jobsRoutes);
 
+const announcementsRoutes = require('./routes/announcements');
+app.use('/api/announcements', announcementsRoutes);
+
 app.get('/api/health', (req, res) => {
   res.json({ ok: true });
 });
