@@ -23,6 +23,9 @@ app.use('/api/jobs', jobsRoutes);
 const announcementsRoutes = require('./routes/announcements');
 app.use('/api/announcements', announcementsRoutes);
 
+const messagesRoutes = require('./routes/messages');
+app.use('/api/messages', messagesRoutes);
+
 app.get('/api/health', (req, res) => {
   res.json({ ok: true });
 });
