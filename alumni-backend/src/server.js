@@ -11,6 +11,9 @@ app.use('/api/auth', authRoutes);
 const meRoutes = require('./routes/me');
 app.use('/api', meRoutes);
 
+const alumniRoutes = require('./routes/alumni');
+app.use('/api', alumniRoutes);
+
 app.get('/api/health', (req, res) => {
   res.json({ ok: true });
 });
