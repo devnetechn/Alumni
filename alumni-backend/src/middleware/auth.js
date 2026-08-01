@@ -13,13 +13,17 @@ async function requireAuth(req, res, next) {
     return res.status(401).json({ error: 'Invalid or expired token' });
   }
 
-  const rows = await query('SELECT * FROM users WHERE id = $1', [payload.id]);
-  if (rows.length === 0) return res.status(401).json({ error: 'User not found' });
+  try {
+    const rows = await query('SELECT * FROM users WHERE id = $1', [payload.id]);
+    if (rows.length === 0) return res.status(401).json({ error: 'User not found' });
 
-  const user = rows[0];
-  delete user.password_hash;
-  req.user = user;
-  next();
+    const user = rows[0];
+    delete user.password_hash;
+    req.user = user;
+    next();
+  } catch (err) {
+    return res.status(500).json({ error: 'Internal server error' });
+  }
 }
 
 function requireAdmin(req, res, next) {
