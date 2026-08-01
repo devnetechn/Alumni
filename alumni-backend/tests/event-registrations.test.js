@@ -93,3 +93,39 @@ test('GET /export returns CSV content', async () => {
   expect(res.headers['content-type']).toMatch(/text\/csv/);
   expect(res.text).toContain('Attendee One');
 });
+
+test('GET /export properly escapes CSV fields with commas and quotes', async () => {
+  const admin = await insertUser({ role: 'admin' });
+  const alumni = await insertUser({ full_name: 'Smith, John "JJ" Jr.', nfc_uid: 'NFC999', course: 'Eng, Comp' });
+  const create = await request(app)
+    .post('/api/events')
+    .set('Authorization', authHeader(admin))
+    .send({ title: 'Gala', event_date: '2026-12-01T18:00:00Z' });
+  const eventId = create.body.event.id;
+  await request(app)
+    .post(`/api/events/${eventId}/rsvp`)
+    .set('Authorization', authHeader(alumni))
+    .send({ status: 'going' });
+  await request(app)
+    .patch(`/api/events/${eventId}/registrations/${alumni.id}`)
+    .set('Authorization', authHeader(admin))
+    .send({ paid: true });
+  await request(app)
+    .post(`/api/events/${eventId}/checkin`)
+    .set('Authorization', authHeader(admin))
+    .send({ code: alumni.nfc_uid });
+
+  const res = await request(app).get(`/api/events/${eventId}/export`).set('Authorization', authHeader(admin));
+  expect(res.status).toBe(200);
+  expect(res.headers['content-type']).toMatch(/text\/csv/);
+
+  // Verify field is properly quoted and escaped
+  expect(res.text).toContain('"Smith, John ""JJ"" Jr."');
+  // Verify course field is also properly escaped
+  expect(res.text).toContain('"Eng, Comp"');
+
+  // Verify the CSV structure is intact (header line should have 4 columns)
+  const lines = res.text.trim().split('\n');
+  expect(lines.length).toBe(2); // header + 1 data row
+  expect(lines[0]).toMatch(/Name,Batch,Course,Checked In At/);
+});

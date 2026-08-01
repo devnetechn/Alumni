@@ -124,6 +124,15 @@ router.get('/:id/checkin', requireAuth, async (req, res) => {
   }
 });
 
+function csvField(value) {
+  if (value === null || value === undefined) return '';
+  const str = String(value);
+  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+  return str;
+}
+
 async function resolveAlumniFromCode(code) {
   try {
     const match = /^ALUMNI:(\d+)$/.exec(code || '');
@@ -175,9 +184,9 @@ router.get('/:id/export', requireAuth, requireOfficer, async (req, res) => {
        ORDER BY c.checked_in_at ASC`,
       [req.params.id]
     );
-    const header = 'Name,Batch,Course,Checked In At\n';
+    const header = `${csvField('Name')},${csvField('Batch')},${csvField('Course')},${csvField('Checked In At')}\n`;
     const body = rows
-      .map((r) => `${r.full_name},${r.batch_year || ''},${r.course || ''},${r.checked_in_at.toISOString()}`)
+      .map((r) => `${csvField(r.full_name)},${csvField(r.batch_year || '')},${csvField(r.course || '')},${csvField(r.checked_in_at.toISOString())}`)
       .join('\n');
     res.set('Content-Type', 'text/csv').send(header + body);
   } catch (err) {
