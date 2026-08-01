@@ -14,6 +14,9 @@ app.use('/api', meRoutes);
 const alumniRoutes = require('./routes/alumni');
 app.use('/api', alumniRoutes);
 
+const eventsRoutes = require('./routes/events');
+app.use('/api/events', eventsRoutes);
+
 app.get('/api/health', (req, res) => {
   res.json({ ok: true });
 });
