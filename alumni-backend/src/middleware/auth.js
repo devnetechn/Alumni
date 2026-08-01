@@ -1,0 +1,37 @@
+const { verifyToken } = require('../lib/token');
+const { query } = require('../db');
+
+async function requireAuth(req, res, next) {
+  const header = req.headers.authorization || '';
+  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
+  if (!token) return res.status(401).json({ error: 'Missing token' });
+
+  let payload;
+  try {
+    payload = verifyToken(token);
+  } catch {
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
+
+  const rows = await query('SELECT * FROM users WHERE id = $1', [payload.id]);
+  if (rows.length === 0) return res.status(401).json({ error: 'User not found' });
+
+  const user = rows[0];
+  delete user.password_hash;
+  req.user = user;
+  next();
+}
+
+function requireAdmin(req, res, next) {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin access required' });
+  next();
+}
+
+function requireOfficer(req, res, next) {
+  if (req.user.role !== 'admin' && !req.user.is_batch_leader) {
+    return res.status(403).json({ error: 'Officer access required' });
+  }
+  next();
+}
+
+module.exports = { requireAuth, requireAdmin, requireOfficer };
