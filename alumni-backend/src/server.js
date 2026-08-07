@@ -48,14 +48,18 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
+const http = require('http');
+const { initSocket } = require('./lib/socket');
+
+const server = http.createServer(app);
+initSocket(server);
+
 const PORT = process.env.PORT || 4000;
 
 if (require.main === module) {
-  const http = require('http');
-  const server = http.createServer(app);
   server.listen(PORT, () => {
     console.log(`alumni-backend listening on port ${PORT}`);
   });
 }
 
-module.exports = { app };
+module.exports = { app, server };

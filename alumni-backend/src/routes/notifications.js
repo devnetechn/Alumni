@@ -2,6 +2,7 @@ const express = require('express');
 const { query } = require('../db');
 const { requireAuth } = require('../middleware/auth');
 const { asyncHandler } = require('../lib/asyncHandler');
+const { emitToUser } = require('../lib/socket');
 
 const router = express.Router();
 
@@ -24,7 +25,9 @@ async function createNotification({ userId, type, title, body, link }) {
     `INSERT INTO notifications (user_id, type, title, body, link) VALUES ($1,$2,$3,$4,$5) RETURNING *`,
     [userId, type, title, body || null, link || null]
   );
-  return rows[0];
+  const notification = rows[0];
+  emitToUser(userId, 'notification:new', notification);
+  return notification;
 }
 
 module.exports = router;

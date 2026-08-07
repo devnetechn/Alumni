@@ -1,6 +1,7 @@
 const express = require('express');
 const { query } = require('../db');
 const { requireAuth } = require('../middleware/auth');
+const { emitToUser } = require('../lib/socket');
 
 const router = express.Router();
 
@@ -67,7 +68,9 @@ router.post('/', requireAuth, async (req, res) => {
       `INSERT INTO messages (sender_id, receiver_id, body) VALUES ($1,$2,$3) RETURNING *`,
       [req.user.id, receiver_id, body]
     );
-    res.status(201).json({ message: rows[0] });
+    const message = rows[0];
+    emitToUser(receiver_id, 'message:new', message);
+    res.status(201).json({ message: message });
   } catch (err) {
     console.error('Error sending message:', err);
     res.status(500).json({ error: 'Internal server error' });
