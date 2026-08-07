@@ -34,6 +34,14 @@ test('GET /api/alumni filters by search text across name/company/position', asyn
   expect(res.body.alumni.some((a) => a.full_name === 'Someone Else')).toBe(false);
 });
 
+test('GET /api/alumni excludes deactivated users', async () => {
+  const me = await insertUser();
+  await insertUser({ full_name: 'Deactivated Person', active: false });
+  const res = await request(app).get('/api/alumni').set('Authorization', authHeader(me));
+  expect(res.status).toBe(200);
+  expect(res.body.alumni.some((a) => a.full_name === 'Deactivated Person')).toBe(false);
+});
+
 test('GET /api/alumni filters by mentor=1', async () => {
   const me = await insertUser();
   await insertUser({ full_name: 'Mentor Person', mentor_available: true });

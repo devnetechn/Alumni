@@ -1,6 +1,7 @@
 const express = require('express');
 const { query } = require('../db');
 const { requireAuth } = require('../middleware/auth');
+const { asyncHandler } = require('../lib/asyncHandler');
 
 const router = express.Router();
 
@@ -13,7 +14,7 @@ router.get('/me', requireAuth, (req, res) => {
   res.json({ me: req.user });
 });
 
-router.put('/me', requireAuth, async (req, res) => {
+router.put('/me', requireAuth, asyncHandler(async (req, res) => {
   const updates = {};
   for (const field of EDITABLE_FIELDS) {
     if (field in req.body) updates[field] = req.body[field];
@@ -24,17 +25,13 @@ router.put('/me', requireAuth, async (req, res) => {
   const setClause = columns.map((col, i) => `${col} = $${i + 1}`).join(', ');
   const values = columns.map((col) => updates[col]);
 
-  try {
-    const rows = await query(
-      `UPDATE users SET ${setClause} WHERE id = $${columns.length + 1} RETURNING *`,
-      [...values, req.user.id]
-    );
-    const me = rows[0];
-    delete me.password_hash;
-    res.json({ me });
-  } catch (err) {
-    return res.status(500).json({ error: 'Internal server error' });
-  }
-});
+  const rows = await query(
+    `UPDATE users SET ${setClause} WHERE id = $${columns.length + 1} RETURNING *`,
+    [...values, req.user.id]
+  );
+  const me = rows[0];
+  delete me.password_hash;
+  res.json({ me });
+}));
 
 module.exports = router;

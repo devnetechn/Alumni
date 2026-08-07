@@ -2,6 +2,7 @@ const express = require('express');
 const { query } = require('../db');
 const { requireAuth } = require('../middleware/auth');
 const { emitToUser } = require('../lib/socket');
+const { createNotification } = require('./notifications');
 
 const router = express.Router();
 
@@ -70,6 +71,13 @@ router.post('/', requireAuth, async (req, res) => {
     );
     const message = rows[0];
     emitToUser(receiver_id, 'message:new', message);
+    await createNotification({
+      userId: receiver_id,
+      type: 'message',
+      title: `New message from ${req.user.full_name || req.user.email}`,
+      body: body.length > 100 ? body.slice(0, 100) + '...' : body,
+      link: `/messages?to=${req.user.id}`,
+    });
     res.status(201).json({ message: message });
   } catch (err) {
     console.error('Error sending message:', err);

@@ -1,12 +1,13 @@
 const express = require('express');
 const { query } = require('../db');
 const { requireAuth } = require('../middleware/auth');
+const { asyncHandler } = require('../lib/asyncHandler');
 
 const router = express.Router();
 
-router.get('/alumni', requireAuth, async (req, res) => {
+router.get('/alumni', requireAuth, asyncHandler(async (req, res) => {
   const { search, batch, course, industry, company, location, mentor } = req.query;
-  const conditions = [];
+  const conditions = ['active = true'];
   const values = [];
 
   if (search) {
@@ -37,19 +38,15 @@ router.get('/alumni', requireAuth, async (req, res) => {
     conditions.push(`mentor_available = true`);
   }
 
-  const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+  const where = `WHERE ${conditions.join(' AND ')}`;
 
-  try {
-    const rows = await query(
-      `SELECT id, id AS user_id, email, full_name, batch_year, course, contact, address,
-              company, position, industry, bio, profile_pic, mentor_available, nfc_uid, role
-       FROM users ${where} ORDER BY full_name NULLS LAST`,
-      values
-    );
-    res.json({ alumni: rows });
-  } catch (err) {
-    return res.status(500).json({ error: 'Internal server error' });
-  }
-});
+  const rows = await query(
+    `SELECT id, id AS user_id, email, full_name, batch_year, course, contact, address,
+            company, position, industry, bio, profile_pic, mentor_available, nfc_uid, role
+     FROM users ${where} ORDER BY full_name NULLS LAST`,
+    values
+  );
+  res.json({ alumni: rows });
+}));
 
 module.exports = router;

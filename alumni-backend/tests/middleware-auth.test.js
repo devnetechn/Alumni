@@ -34,3 +34,9 @@ test('requireAdmin accepts admin users', async () => {
   const res = await request(app).get('/admin-only').set('Authorization', authHeader(admin));
   expect(res.status).toBe(200);
 });
+
+test('rejects a valid token for a deactivated user', async () => {
+  const user = await insertUser({ active: false });
+  const res = await request(app).get('/protected').set('Authorization', authHeader(user));
+  expect(res.status).toBe(403);
+});

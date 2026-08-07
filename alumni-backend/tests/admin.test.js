@@ -1,6 +1,6 @@
 const request = require('supertest');
 const { app } = require('../src/server');
-const { pool } = require('../src/db');
+const { pool, query } = require('../src/db');
 const { resetDb, insertUser, authHeader } = require('./helpers');
 
 beforeEach(() => resetDb());
@@ -43,4 +43,41 @@ test('admin cannot delete their own account', async () => {
   const admin = await insertUser({ role: 'admin' });
   const res = await request(app).delete(`/api/admin/users/${admin.id}`).set('Authorization', authHeader(admin));
   expect(res.status).toBe(400);
+});
+
+test('deleting a user who owns an event/job/announcement succeeds and nulls out the ownership columns', async () => {
+  const admin = await insertUser({ role: 'admin' });
+  const owner = await insertUser({ role: 'admin' });
+
+  const event = await request(app)
+    .post('/api/events')
+    .set('Authorization', authHeader(owner))
+    .send({ title: 'Owned Event', event_date: '2026-12-01T18:00:00Z' });
+  expect(event.status).toBe(201);
+
+  const job = await request(app)
+    .post('/api/jobs')
+    .set('Authorization', authHeader(owner))
+    .send({ title: 'Owned Job' });
+  expect(job.status).toBe(201);
+
+  const announcement = await request(app)
+    .post('/api/announcements')
+    .set('Authorization', authHeader(owner))
+    .send({ title: 'Owned Announcement' });
+  expect(announcement.status).toBe(201);
+
+  const del = await request(app)
+    .delete(`/api/admin/users/${owner.id}`)
+    .set('Authorization', authHeader(admin));
+  expect(del.status).toBe(204);
+
+  const eventRows = await query('SELECT created_by FROM events WHERE id = $1', [event.body.event.id]);
+  expect(eventRows[0].created_by).toBeNull();
+
+  const jobRows = await query('SELECT posted_by FROM jobs WHERE id = $1', [job.body.job.id]);
+  expect(jobRows[0].posted_by).toBeNull();
+
+  const announcementRows = await query('SELECT posted_by FROM announcements WHERE id = $1', [announcement.body.announcement.id]);
+  expect(announcementRows[0].posted_by).toBeNull();
 });

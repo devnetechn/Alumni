@@ -12,11 +12,17 @@ function monthLabel(date) {
   return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
 }
 
-async function monthlyTrend(table, dateColumn) {
+async function monthlyTrend(table, dateColumn, monthsBack = 11) {
+  // Lower bound uses a 1-month safety buffer so day-of-month offsets in
+  // `now()` never clip rows that fall in the earliest displayed month
+  // (matches the original behavior, which used a fixed 12-month buffer
+  // for an 11-months-back window). No upper bound is applied — future
+  // rows are fetched and grouped, but only ones whose month falls inside
+  // the displayed window (see cursor loop below) actually get shown.
   const rows = await query(
     `SELECT to_char(date_trunc('month', ${dateColumn} AT TIME ZONE 'UTC'), 'YYYY-MM') AS month_key, COUNT(*)::int AS value
      FROM ${table}
-     WHERE ${dateColumn} >= now() - interval '12 months'
+     WHERE ${dateColumn} >= now() - interval '${monthsBack + 1} months'
      GROUP BY month_key`
   );
   const byMonth = new Map(rows.map((r) => [r.month_key, r.value]));
@@ -25,7 +31,7 @@ async function monthlyTrend(table, dateColumn) {
   const cursor = new Date();
   cursor.setUTCDate(1);
   cursor.setUTCHours(0, 0, 0, 0);
-  cursor.setUTCMonth(cursor.getUTCMonth() - 11);
+  cursor.setUTCMonth(cursor.getUTCMonth() - monthsBack);
   for (let i = 0; i < 12; i++) {
     result.push({ label: monthLabel(cursor), value: byMonth.get(monthKey(cursor)) || 0 });
     cursor.setUTCMonth(cursor.getUTCMonth() + 1);
@@ -53,7 +59,7 @@ router.get('/stats', asyncHandler(async (req, res) => {
 
   const registrationsTrend = await monthlyTrend('users', 'created_at');
   const checkinsTrend = await monthlyTrend('event_checkins', 'checked_in_at');
-  const eventsByMonthRaw = await monthlyTrend('events', 'event_date');
+  const eventsByMonthRaw = await monthlyTrend('events', 'event_date', 5);
 
   const byBatch = await groupCount('users', 'batch_year');
   const byIndustry = await groupCount('users', 'industry');

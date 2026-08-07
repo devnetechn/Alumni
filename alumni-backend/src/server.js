@@ -3,7 +3,7 @@ const cors = require('cors');
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '2mb' }));
 
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
@@ -45,11 +45,12 @@ app.get('/api/health', (req, res) => {
 // Global error-handling middleware
 app.use((err, req, res, next) => {
   console.error(err);
-  res.status(500).json({ error: 'Internal server error' });
+  res.status(err.status || err.statusCode || 500).json({ error: 'Internal server error' });
 });
 
 const http = require('http');
 const { initSocket } = require('./lib/socket');
+const { pool } = require('./db');
 
 const server = http.createServer(app);
 initSocket(server);
@@ -57,6 +58,12 @@ initSocket(server);
 const PORT = process.env.PORT || 4000;
 
 if (require.main === module) {
+  pool.query('SELECT 1 FROM users LIMIT 1').catch((err) => {
+    console.error('Database not migrated or unreachable. Run: npm run migrate');
+    console.error(err.message);
+    process.exit(1);
+  });
+
   server.listen(PORT, () => {
     console.log(`alumni-backend listening on port ${PORT}`);
   });

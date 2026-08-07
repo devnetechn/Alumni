@@ -57,3 +57,12 @@ test('POST /api/auth/login rejects wrong password', async () => {
   });
   expect(res.status).toBe(401);
 });
+
+test('POST /api/auth/login rejects a deactivated user even with correct credentials', async () => {
+  await insertUser({ email: 'deactivated@test.com', active: false });
+  const res = await request(app).post('/api/auth/login').send({
+    email: 'deactivated@test.com',
+    password: 'password123',
+  });
+  expect(res.status).toBe(403);
+});

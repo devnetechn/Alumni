@@ -30,3 +30,19 @@ test('GET /api/stats returns all expected aggregate shapes', async () => {
   expect(res.body.byCourse.some((c) => c.label === 'BSIT')).toBe(true);
   expect(Array.isArray(res.body.eventsByMonth)).toBe(true);
 });
+
+test('GET /api/stats eventsByMonth includes future events, not just past ones', async () => {
+  const admin = await insertUser({ role: 'admin' });
+  const future = new Date();
+  future.setUTCMonth(future.getUTCMonth() + 3);
+  await request(app)
+    .post('/api/events')
+    .set('Authorization', authHeader(admin))
+    .send({ title: 'Future Event', event_date: future.toISOString() });
+
+  const res = await request(app).get('/api/stats');
+  expect(res.status).toBe(200);
+  expect(res.body.eventsByMonth.length).toBe(12);
+  const total = res.body.eventsByMonth.reduce((sum, m) => sum + m.value, 0);
+  expect(total).toBeGreaterThan(0);
+});

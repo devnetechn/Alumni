@@ -1,44 +1,47 @@
 const express = require('express');
 const { query } = require('../db');
 const { requireAuth, requireAdmin } = require('../middleware/auth');
+const { asyncHandler } = require('../lib/asyncHandler');
+const { createNotification } = require('./notifications');
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
-  try {
-    const rows = await query(
-      `SELECT a.*, u.full_name AS poster_name, u.email AS poster_email, u.profile_pic AS poster_pic,
-              u.role AS poster_role, u.position AS poster_position
-       FROM announcements a LEFT JOIN users u ON u.id = a.posted_by
-       ORDER BY a.created_at DESC`
-    );
-    res.json({ announcements: rows });
-  } catch (err) {
-    return res.status(500).json({ error: 'Internal server error' });
-  }
-});
+router.get('/', asyncHandler(async (req, res) => {
+  const rows = await query(
+    `SELECT a.*, u.full_name AS poster_name, u.email AS poster_email, u.profile_pic AS poster_pic,
+            u.role AS poster_role, u.position AS poster_position
+     FROM announcements a LEFT JOIN users u ON u.id = a.posted_by
+     ORDER BY a.created_at DESC`
+  );
+  res.json({ announcements: rows });
+}));
 
-router.post('/', requireAuth, requireAdmin, async (req, res) => {
-  try {
-    const { title, body } = req.body;
-    if (!title) return res.status(400).json({ error: 'title is required' });
-    const rows = await query(
-      `INSERT INTO announcements (title, body, posted_by) VALUES ($1,$2,$3) RETURNING *`,
-      [title, body || null, req.user.id]
-    );
-    res.status(201).json({ announcement: rows[0] });
-  } catch (err) {
-    return res.status(500).json({ error: 'Internal server error' });
-  }
-});
+router.post('/', requireAuth, requireAdmin, asyncHandler(async (req, res) => {
+  const { title, body } = req.body;
+  if (!title) return res.status(400).json({ error: 'title is required' });
+  const rows = await query(
+    `INSERT INTO announcements (title, body, posted_by) VALUES ($1,$2,$3) RETURNING *`,
+    [title, body || null, req.user.id]
+  );
+  const announcement = rows[0];
 
-router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
-  try {
-    await query('DELETE FROM announcements WHERE id = $1', [req.params.id]);
-    res.status(204).end();
-  } catch (err) {
-    return res.status(500).json({ error: 'Internal server error' });
+  const others = await query('SELECT id FROM users WHERE id != $1 AND active = true', [req.user.id]);
+  for (const u of others) {
+    await createNotification({
+      userId: u.id,
+      type: 'announcement',
+      title: 'New announcement',
+      body: title,
+      link: '/announcements',
+    });
   }
-});
+
+  res.status(201).json({ announcement });
+}));
+
+router.delete('/:id', requireAuth, requireAdmin, asyncHandler(async (req, res) => {
+  await query('DELETE FROM announcements WHERE id = $1', [req.params.id]);
+  res.status(204).end();
+}));
 
 module.exports = router;

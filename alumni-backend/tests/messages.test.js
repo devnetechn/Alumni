@@ -1,6 +1,6 @@
 const request = require('supertest');
 const { app } = require('../src/server');
-const { pool } = require('../src/db');
+const { pool, query } = require('../src/db');
 const { resetDb, insertUser, authHeader } = require('./helpers');
 
 beforeEach(() => resetDb());
@@ -15,6 +15,20 @@ test('POST /api/messages sends a message', async () => {
     .send({ receiver_id: b.id, body: 'Hey Bob!' });
   expect(res.status).toBe(201);
   expect(res.body.message.body).toBe('Hey Bob!');
+});
+
+test('POST /api/messages creates a notification for the recipient', async () => {
+  const a = await insertUser({ full_name: 'Alice' });
+  const b = await insertUser({ full_name: 'Bob' });
+  await request(app)
+    .post('/api/messages')
+    .set('Authorization', authHeader(a))
+    .send({ receiver_id: b.id, body: 'Hey Bob!' });
+
+  const rows = await query('SELECT * FROM notifications WHERE user_id = $1', [b.id]);
+  expect(rows.length).toBe(1);
+  expect(rows[0].type).toBe('message');
+  expect(rows[0].title).toContain('Alice');
 });
 
 test('GET /api/messages lists conversations with last message and unread count', async () => {

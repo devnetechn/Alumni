@@ -1,6 +1,6 @@
 const request = require('supertest');
 const { app } = require('../src/server');
-const { pool } = require('../src/db');
+const { pool, query } = require('../src/db');
 const { resetDb, insertUser, authHeader } = require('./helpers');
 
 beforeEach(() => resetDb());
@@ -38,6 +38,23 @@ test('admin can create an event, anyone can list and get it', async () => {
   const detail = await request(app).get(`/api/events/${eventId}`).set('Authorization', authHeader(alumni));
   expect(detail.status).toBe(200);
   expect(detail.body.event.title).toBe('Reunion 2026');
+});
+
+test('POST /api/events notifies all active users', async () => {
+  const admin = await insertUser({ role: 'admin' });
+  const alumni = await insertUser({ role: 'alumni' });
+
+  await request(app)
+    .post('/api/events')
+    .set('Authorization', authHeader(admin))
+    .send({ title: 'New Meetup', event_date: '2026-12-01T18:00:00Z' });
+
+  const alumniRows = await query('SELECT * FROM notifications WHERE user_id = $1', [alumni.id]);
+  expect(alumniRows.length).toBe(1);
+  expect(alumniRows[0].type).toBe('event');
+
+  const adminRows = await query('SELECT * FROM notifications WHERE user_id = $1', [admin.id]);
+  expect(adminRows.length).toBe(1);
 });
 
 test('alumni can RSVP and see counts + their own status', async () => {

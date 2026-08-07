@@ -1,6 +1,6 @@
 const request = require('supertest');
 const { app } = require('../src/server');
-const { pool } = require('../src/db');
+const { pool, query } = require('../src/db');
 const { resetDb, insertUser, authHeader } = require('./helpers');
 
 beforeEach(() => resetDb());
@@ -37,4 +37,21 @@ test('admin can create and delete an announcement', async () => {
     .delete(`/api/announcements/${create.body.announcement.id}`)
     .set('Authorization', authHeader(admin));
   expect(del.status).toBe(204);
+});
+
+test('POST /api/announcements notifies all other active users but not the poster', async () => {
+  const admin = await insertUser({ role: 'admin' });
+  const other = await insertUser();
+
+  await request(app)
+    .post('/api/announcements')
+    .set('Authorization', authHeader(admin))
+    .send({ title: 'Big News', body: 'Details here' });
+
+  const otherRows = await query('SELECT * FROM notifications WHERE user_id = $1', [other.id]);
+  expect(otherRows.length).toBe(1);
+  expect(otherRows[0].type).toBe('announcement');
+
+  const adminRows = await query('SELECT * FROM notifications WHERE user_id = $1', [admin.id]);
+  expect(adminRows.length).toBe(0);
 });

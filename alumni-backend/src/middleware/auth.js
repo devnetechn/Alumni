@@ -19,6 +19,7 @@ async function requireAuth(req, res, next) {
 
     const user = rows[0];
     delete user.password_hash;
+    if (!user.active) return res.status(403).json({ error: 'Account is deactivated' });
     req.user = user;
     next();
   } catch (err) {
