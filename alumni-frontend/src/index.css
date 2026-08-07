@@ -1,19 +1,30 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap');
 @import "tailwindcss";
 
 :root {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Brand tokens — placeholder warm palette until the real school logo/colors
+     are supplied. Swap these four values to re-theme the whole public site. */
+  --brand-primary: #2b2118;
+  --brand-secondary: #7a3b2e;
+  --brand-accent: #c99a4a;
+  --brand-cream: #f6efe4;
 }
 
 body {
   margin: 0;
-  background: #f8fafc;
+  background: var(--brand-cream);
   color: #0f172a;
   -webkit-font-smoothing: antialiased;
 }
 
 * {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.font-display {
+  font-family: 'Fraunces', Georgia, serif;
 }
 
 html {
