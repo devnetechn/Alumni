@@ -26,6 +26,9 @@ app.use('/api/announcements', announcementsRoutes);
 const messagesRoutes = require('./routes/messages');
 app.use('/api/messages', messagesRoutes);
 
+const groupsRoutes = require('./routes/groups');
+app.use('/api/groups', groupsRoutes);
+
 app.get('/api/health', (req, res) => {
   res.json({ ok: true });
 });
