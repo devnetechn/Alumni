@@ -1,15 +1,22 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { GraduationCap, Users, Calendar, CheckCircle2, Megaphone, MapPin, ArrowRight, Sparkles } from 'lucide-react';
+import { GraduationCap, Megaphone, Calendar, MapPin, ArrowRight } from 'lucide-react';
 import { api } from '../api';
 import { useAuth } from '../auth';
 import PosterBadge from '../components/PosterBadge';
+import Hero from '../components/Hero';
+
+// Swap point: once the real school logo is supplied, save it as
+// src/assets/logo.svg and uncomment the two lines below.
+// import logo from '../assets/logo.svg';
+const logo = null;
 
 export default function PublicHome() {
   const { user } = useAuth();
   const [announcements, setAnnouncements] = useState([]);
   const [events, setEvents] = useState([]);
   const [stats, setStats] = useState(null);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     api.get('/announcements').then((r) => setAnnouncements(r.data.announcements));
@@ -17,28 +24,55 @@ export default function PublicHome() {
     api.get('/stats').then((r) => setStats(r.data));
   }, []);
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen" style={{ background: 'var(--brand-cream)' }}>
       {/* Top bar */}
-      <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-lg border-b border-slate-200">
+      <header
+        className={`fixed top-0 left-0 right-0 z-20 transition-colors duration-300 border-b ${
+          scrolled ? 'backdrop-blur-lg' : 'border-transparent'
+        }`}
+        style={
+          scrolled
+            ? { background: 'rgba(43,33,24,0.75)', borderColor: 'rgba(255,255,255,0.1)' }
+            : undefined
+        }
+      >
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-2">
-            <div className="bg-gradient-to-br from-indigo-600 to-purple-600 p-2 rounded-lg">
-              <GraduationCap className="text-white" size={22} />
-            </div>
-            <span className="font-bold text-slate-900">Alumni System</span>
+            {logo ? (
+              <img src={logo} alt="Alumni logo" className="h-9 w-9 rounded-lg object-contain" />
+            ) : (
+              <div className="p-2 rounded-lg" style={{ background: 'var(--brand-secondary)' }}>
+                <GraduationCap className="text-white" size={22} />
+              </div>
+            )}
+            <span className="font-display font-semibold text-white">Alumni System</span>
           </Link>
           <div className="flex gap-2">
             {user ? (
-              <Link to="/dashboard" className="px-5 py-2 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition-colors text-sm">
+              <Link
+                to="/dashboard"
+                className="px-5 py-2 text-white rounded-lg font-semibold hover:opacity-90 transition-opacity text-sm"
+                style={{ background: 'var(--brand-secondary)' }}
+              >
                 Dashboard →
               </Link>
             ) : (
               <>
-                <Link to="/login" className="px-5 py-2 text-slate-700 hover:text-slate-900 font-semibold text-sm">
+                <Link to="/login" className="px-5 py-2 text-white/90 hover:text-white font-semibold text-sm">
                   Login
                 </Link>
-                <Link to="/register" className="px-5 py-2 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition-colors text-sm">
+                <Link
+                  to="/register"
+                  className="px-5 py-2 rounded-lg font-semibold hover:opacity-90 transition-opacity text-sm"
+                  style={{ background: 'var(--brand-accent)', color: 'var(--brand-primary)' }}
+                >
                   Register
                 </Link>
               </>
@@ -47,34 +81,7 @@ export default function PublicHome() {
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600" />
-        <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 80%, white 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-        <div className="relative max-w-7xl mx-auto px-6 py-24 text-center text-white">
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/20 px-4 py-1.5 rounded-full text-sm font-medium mb-6">
-            <Sparkles size={14} />
-            Reconnect. Network. Grow.
-          </div>
-          <h1 className="text-5xl md:text-6xl font-extrabold mb-6 leading-tight">
-            Welcome home,<br />
-            <span className="bg-gradient-to-r from-amber-200 to-pink-200 bg-clip-text text-transparent">
-              fellow alumni.
-            </span>
-          </h1>
-          <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-10">
-            Stay connected with your batchmates, discover upcoming events, and explore career opportunities — all in one place.
-          </p>
-
-          {stats && (
-            <div className="grid grid-cols-3 gap-4 max-w-2xl mx-auto">
-              <StatBox icon={Users} label="Alumni" value={stats.totalAlumni} />
-              <StatBox icon={Calendar} label="Events" value={stats.totalEvents} />
-              <StatBox icon={CheckCircle2} label="Check-ins" value={stats.totalCheckins} />
-            </div>
-          )}
-        </div>
-      </section>
+      <Hero stats={stats} />
 
       {/* Announcements */}
       <section className="max-w-7xl mx-auto px-6 py-16">
@@ -169,16 +176,6 @@ export default function PublicHome() {
           © {new Date().getFullYear()} Alumni Management System. Built with ❤️ for lifelong connections.
         </div>
       </footer>
-    </div>
-  );
-}
-
-function StatBox({ icon: Icon, label, value }) {
-  return (
-    <div className="bg-white/10 backdrop-blur border border-white/20 rounded-2xl p-5">
-      <Icon className="mx-auto mb-2 opacity-80" size={20} />
-      <p className="text-3xl font-bold">{value}</p>
-      <p className="text-xs opacity-80 uppercase tracking-wider">{label}</p>
     </div>
   );
 }
