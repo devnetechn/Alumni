@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { GraduationCap, Megaphone, Calendar, MapPin, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { api } from '../api';
 import { useAuth } from '../auth';
 import PosterBadge from '../components/PosterBadge';
@@ -10,6 +11,20 @@ import Hero from '../components/Hero';
 // src/assets/logo.svg and uncomment the two lines below.
 // import logo from '../assets/logo.svg';
 const logo = null;
+
+const sectionFade = {
+  hidden: { opacity: 0, y: 32 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+};
+
+const cardFade = {
+  hidden: { opacity: 0, y: 24 },
+  visible: (i = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, delay: i * 0.08, ease: 'easeOut' },
+  }),
+};
 
 export default function PublicHome() {
   const { user } = useAuth();
@@ -84,19 +99,38 @@ export default function PublicHome() {
       <Hero stats={stats} />
 
       {/* Announcements */}
-      <section className="max-w-7xl mx-auto px-6 py-16">
+      <motion.section
+        className="max-w-7xl mx-auto px-6 py-16"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={sectionFade}
+      >
         <div className="flex items-center gap-3 mb-8">
-          <div className="bg-indigo-100 p-2 rounded-lg">
-            <Megaphone className="text-indigo-600" size={22} />
+          <div
+            className="p-2 rounded-lg"
+            style={{ background: 'color-mix(in srgb, var(--brand-accent) 18%, white)' }}
+          >
+            <Megaphone style={{ color: 'var(--brand-secondary)' }} size={22} />
           </div>
-          <h2 className="text-3xl font-bold text-slate-900">Latest Announcements</h2>
+          <h2 className="font-display text-3xl font-semibold" style={{ color: 'var(--brand-primary)' }}>
+            Latest Announcements
+          </h2>
         </div>
         {announcements.length === 0 ? (
           <p className="text-slate-500 bg-white p-8 rounded-2xl border border-slate-200">No announcements yet.</p>
         ) : (
           <div className="grid md:grid-cols-2 gap-5">
-            {announcements.map((a) => (
-              <article key={a.id} className="group bg-white p-6 rounded-2xl border border-slate-200 hover:border-indigo-300 hover:shadow-lg transition-all">
+            {announcements.map((a, i) => (
+              <motion.article
+                key={a.id}
+                custom={i}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.3 }}
+                variants={cardFade}
+                className="group bg-white p-6 rounded-2xl border border-[#e8ddc8] hover:shadow-lg transition-shadow"
+              >
                 <div className="mb-4">
                   <PosterBadge
                     name={a.poster_name}
@@ -108,33 +142,57 @@ export default function PublicHome() {
                     size="sm"
                   />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-indigo-600 transition-colors">{a.title}</h3>
+                <h3 className="font-display text-xl font-semibold mb-2" style={{ color: 'var(--brand-primary)' }}>
+                  {a.title}
+                </h3>
                 <p className="text-slate-600 leading-relaxed">{a.body}</p>
-              </article>
+              </motion.article>
             ))}
           </div>
         )}
-      </section>
+      </motion.section>
 
       {/* Events */}
-      <section className="max-w-7xl mx-auto px-6 py-16">
+      <motion.section
+        className="max-w-7xl mx-auto px-6 py-16"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={sectionFade}
+      >
         <div className="flex items-center gap-3 mb-8">
-          <div className="bg-purple-100 p-2 rounded-lg">
-            <Calendar className="text-purple-600" size={22} />
+          <div
+            className="p-2 rounded-lg"
+            style={{ background: 'color-mix(in srgb, var(--brand-secondary) 15%, white)' }}
+          >
+            <Calendar style={{ color: 'var(--brand-secondary)' }} size={22} />
           </div>
-          <h2 className="text-3xl font-bold text-slate-900">Upcoming Events</h2>
+          <h2 className="font-display text-3xl font-semibold" style={{ color: 'var(--brand-primary)' }}>
+            Upcoming Events
+          </h2>
         </div>
         {events.length === 0 ? (
           <p className="text-slate-500 bg-white p-8 rounded-2xl border border-slate-200">No events scheduled yet.</p>
         ) : (
           <div className="grid md:grid-cols-3 gap-5">
-            {events.map((ev) => (
-              <div key={ev.id} className="group bg-white rounded-2xl overflow-hidden border border-slate-200 hover:shadow-xl transition-all">
-                <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-6 text-white">
+            {events.map((ev, i) => (
+              <motion.div
+                key={ev.id}
+                custom={i}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.3 }}
+                variants={cardFade}
+                className="group bg-white rounded-2xl overflow-hidden border border-[#e8ddc8] hover:shadow-xl transition-shadow"
+              >
+                <div
+                  className="p-6 text-white"
+                  style={{ background: 'linear-gradient(135deg, var(--brand-secondary), var(--brand-primary))' }}
+                >
                   <div className="text-xs uppercase tracking-wider opacity-80 mb-1">
                     {new Date(ev.event_date).toLocaleDateString('en-US', { weekday: 'long' })}
                   </div>
-                  <div className="text-3xl font-bold">
+                  <div className="text-3xl font-display font-semibold">
                     {new Date(ev.event_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   </div>
                   <div className="text-sm opacity-80">
@@ -142,7 +200,9 @@ export default function PublicHome() {
                   </div>
                 </div>
                 <div className="p-5">
-                  <h3 className="font-bold text-lg text-slate-900 mb-2 group-hover:text-indigo-600 transition-colors">{ev.title}</h3>
+                  <h3 className="font-semibold text-lg mb-2" style={{ color: 'var(--brand-primary)' }}>
+                    {ev.title}
+                  </h3>
                   {ev.location && (
                     <div className="flex items-center gap-1.5 text-sm text-slate-500 mb-3">
                       <MapPin size={14} />
@@ -151,11 +211,11 @@ export default function PublicHome() {
                   )}
                   <p className="text-sm text-slate-600 line-clamp-2">{ev.description}</p>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}
-      </section>
+      </motion.section>
 
       {/* CTA */}
       {!user && (
