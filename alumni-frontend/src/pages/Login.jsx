@@ -6,7 +6,7 @@ import { useAuth } from '../auth';
 export default function Login() {
   const { login } = useAuth();
   const nav = useNavigate();
-  const [email, setEmail] = useState('admin');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('admin123');
   const [err, setErr] = useState('');
   const [loading, setLoading] = useState(false);
@@ -111,7 +111,7 @@ export default function Login() {
 
           <div className="mt-8 p-4 bg-slate-100 rounded-lg text-xs text-slate-600">
             <p className="font-semibold mb-1">Demo credentials:</p>
-            <p>Admin: <code className="bg-white px-1 rounded">admin</code> / <code className="bg-white px-1 rounded">admin123</code></p>
+            <p>Admin: <code className="bg-white px-1 rounded">admin@alumni.local</code> / <code className="bg-white px-1 rounded">admin123</code></p>
             <p>Alumni: <code className="bg-white px-1 rounded">juan@alumni.com</code> / <code className="bg-white px-1 rounded">password123</code></p>
           </div>
         </form>

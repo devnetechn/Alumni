@@ -4,7 +4,7 @@ const { requireAuth, requireAdmin, requireOfficer } = require('../middleware/aut
 
 const router = express.Router();
 
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const events = await query('SELECT * FROM events ORDER BY event_date ASC');
     res.json({ events });

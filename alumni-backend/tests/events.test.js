@@ -15,6 +15,11 @@ test('POST /api/events requires admin', async () => {
   expect(res.status).toBe(403);
 });
 
+test('GET /api/events is public (no auth required)', async () => {
+  const res = await request(app).get('/api/events');
+  expect(res.status).toBe(200);
+});
+
 test('admin can create an event, anyone can list and get it', async () => {
   const admin = await insertUser({ role: 'admin' });
   const alumni = await insertUser({ role: 'alumni' });
