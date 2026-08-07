@@ -61,3 +61,10 @@ test('only members can post; posts include author name', async () => {
   const posts = await request(app).get(`/api/groups/${groupId}/posts`).set('Authorization', authHeader(creator));
   expect(posts.body.posts[0].author_name).toBe('Creator Name');
 });
+
+test('GET /api/groups/:id with a non-numeric id returns 500, not a crash', async () => {
+  const user = await insertUser();
+  const res = await request(app).get('/api/groups/not-a-number').set('Authorization', authHeader(user));
+  expect(res.status).toBe(500);
+  expect(res.body.error).toBeTruthy();
+});

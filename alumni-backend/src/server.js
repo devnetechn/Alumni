@@ -33,6 +33,12 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true });
 });
 
+// Global error-handling middleware
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
 const PORT = process.env.PORT || 4000;
 
 if (require.main === module) {

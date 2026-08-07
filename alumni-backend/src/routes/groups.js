@@ -1,10 +1,11 @@
 const express = require('express');
 const { query } = require('../db');
 const { requireAuth } = require('../middleware/auth');
+const { asyncHandler } = require('../lib/asyncHandler');
 
 const router = express.Router();
 
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', requireAuth, asyncHandler(async (req, res) => {
   const rows = await query(
     `SELECT g.*,
             (SELECT COUNT(*) FROM group_members gm WHERE gm.group_id = g.id)::int AS member_count,
@@ -14,9 +15,9 @@ router.get('/', requireAuth, async (req, res) => {
     [req.user.id]
   );
   res.json({ groups: rows });
-});
+}));
 
-router.get('/:id', requireAuth, async (req, res) => {
+router.get('/:id', requireAuth, asyncHandler(async (req, res) => {
   const groupRows = await query('SELECT * FROM groups WHERE id = $1', [req.params.id]);
   if (groupRows.length === 0) return res.status(404).json({ error: 'Group not found' });
 
@@ -26,9 +27,9 @@ router.get('/:id', requireAuth, async (req, res) => {
   );
   const isMember = members.some((m) => m.id === req.user.id);
   res.json({ group: groupRows[0], members, isMember });
-});
+}));
 
-router.get('/:id/posts', requireAuth, async (req, res) => {
+router.get('/:id/posts', requireAuth, asyncHandler(async (req, res) => {
   const rows = await query(
     `SELECT p.*, u.full_name AS author_name, u.email AS author_email
      FROM group_posts p JOIN users u ON u.id = p.author_id
@@ -37,9 +38,9 @@ router.get('/:id/posts', requireAuth, async (req, res) => {
     [req.params.id]
   );
   res.json({ posts: rows });
-});
+}));
 
-router.post('/', requireAuth, async (req, res) => {
+router.post('/', requireAuth, asyncHandler(async (req, res) => {
   const { name, description, kind } = req.body;
   if (!name) return res.status(400).json({ error: 'name is required' });
   const rows = await query(
@@ -49,22 +50,22 @@ router.post('/', requireAuth, async (req, res) => {
   const group = rows[0];
   await query(`INSERT INTO group_members (group_id, user_id) VALUES ($1,$2)`, [group.id, req.user.id]);
   res.status(201).json({ group });
-});
+}));
 
-router.post('/:id/join', requireAuth, async (req, res) => {
+router.post('/:id/join', requireAuth, asyncHandler(async (req, res) => {
   await query(
     `INSERT INTO group_members (group_id, user_id) VALUES ($1,$2) ON CONFLICT DO NOTHING`,
     [req.params.id, req.user.id]
   );
   res.status(204).end();
-});
+}));
 
-router.delete('/:id/join', requireAuth, async (req, res) => {
+router.delete('/:id/join', requireAuth, asyncHandler(async (req, res) => {
   await query(`DELETE FROM group_members WHERE group_id = $1 AND user_id = $2`, [req.params.id, req.user.id]);
   res.status(204).end();
-});
+}));
 
-router.post('/:id/posts', requireAuth, async (req, res) => {
+router.post('/:id/posts', requireAuth, asyncHandler(async (req, res) => {
   const membership = await query(
     `SELECT 1 FROM group_members WHERE group_id = $1 AND user_id = $2`,
     [req.params.id, req.user.id]
@@ -78,6 +79,6 @@ router.post('/:id/posts', requireAuth, async (req, res) => {
     [req.params.id, req.user.id, body]
   );
   res.status(201).json({ post: rows[0] });
-});
+}));
 
 module.exports = router;
