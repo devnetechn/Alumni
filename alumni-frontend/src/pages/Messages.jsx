@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Send, MessageSquare, Search } from 'lucide-react';
 import { api } from '../api';
+import { getSocket } from '../socket';
 
 export default function Messages() {
   const [conversations, setConversations] = useState([]);
@@ -22,6 +23,19 @@ export default function Messages() {
     const to = searchParams.get('to');
     if (to) openThread(parseInt(to));
   }, [searchParams]);
+
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket) return;
+    const onNewMessage = (message) => {
+      loadConvos();
+      if (active && (message.sender_id === active || message.receiver_id === active)) {
+        openThread(active);
+      }
+    };
+    socket.on('message:new', onNewMessage);
+    return () => socket.off('message:new', onNewMessage);
+  }, [active]);
 
   const openThread = async (userId) => {
     setActive(userId);
