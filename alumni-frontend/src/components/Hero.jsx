@@ -3,7 +3,8 @@ import { Users, Calendar, CheckCircle2, Sparkles } from 'lucide-react';
 import heroPoster from '../assets/hero.png';
 
 // Swap point: once the real hero video is supplied, save it as
-// src/assets/hero.mp4 and uncomment the two lines below.
+// src/assets/hero.mp4, then uncomment the import below and delete the
+// `const heroVideoSrc = null;` line.
 // import heroVideoSrc from '../assets/hero.mp4';
 const heroVideoSrc = null;
 
@@ -37,7 +38,7 @@ export default function Hero({ stats }) {
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(to bottom, rgba(43,33,24,0.55) 0%, rgba(43,33,24,0.75) 60%, rgba(43,33,24,0.92) 100%)',
+              'linear-gradient(to bottom, color-mix(in srgb, var(--brand-primary) 55%, transparent) 0%, color-mix(in srgb, var(--brand-primary) 75%, transparent) 60%, color-mix(in srgb, var(--brand-primary) 92%, transparent) 100%)',
           }}
         />
       </div>

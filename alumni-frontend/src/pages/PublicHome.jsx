@@ -8,7 +8,8 @@ import PosterBadge from '../components/PosterBadge';
 import Hero from '../components/Hero';
 
 // Swap point: once the real school logo is supplied, save it as
-// src/assets/logo.svg and uncomment the two lines below.
+// src/assets/logo.svg, then uncomment the import below and delete the
+// `const logo = null;` line.
 // import logo from '../assets/logo.svg';
 const logo = null;
 
@@ -41,7 +42,8 @@ export default function PublicHome() {
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener('scroll', onScroll);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
@@ -54,7 +56,7 @@ export default function PublicHome() {
         }`}
         style={
           scrolled
-            ? { background: 'rgba(43,33,24,0.75)', borderColor: 'rgba(255,255,255,0.1)' }
+            ? { background: 'color-mix(in srgb, var(--brand-primary) 75%, transparent)', borderColor: 'rgba(255,255,255,0.1)' }
             : undefined
         }
       >
@@ -118,7 +120,7 @@ export default function PublicHome() {
           </h2>
         </div>
         {announcements.length === 0 ? (
-          <p className="text-slate-500 bg-white p-8 rounded-2xl border border-slate-200">No announcements yet.</p>
+          <p className="text-slate-500 bg-white p-8 rounded-2xl border" style={{ borderColor: 'color-mix(in srgb, var(--brand-accent) 30%, white)' }}>No announcements yet.</p>
         ) : (
           <div className="grid md:grid-cols-2 gap-5">
             {announcements.map((a, i) => (
@@ -173,7 +175,7 @@ export default function PublicHome() {
           </h2>
         </div>
         {events.length === 0 ? (
-          <p className="text-slate-500 bg-white p-8 rounded-2xl border border-slate-200">No events scheduled yet.</p>
+          <p className="text-slate-500 bg-white p-8 rounded-2xl border" style={{ borderColor: 'color-mix(in srgb, var(--brand-accent) 30%, white)' }}>No events scheduled yet.</p>
         ) : (
           <div className="grid md:grid-cols-3 gap-5">
             {events.map((ev, i) => (
@@ -247,7 +249,7 @@ export default function PublicHome() {
       )}
 
       <footer className="border-t py-8 mt-8" style={{ borderColor: 'color-mix(in srgb, var(--brand-accent) 30%, white)' }}>
-        <div className="max-w-7xl mx-auto px-6 text-center text-sm text-slate-500">
+        <div className="max-w-7xl mx-auto px-6 text-center text-sm" style={{ color: 'color-mix(in srgb, var(--brand-primary) 55%, transparent)' }}>
           © {new Date().getFullYear()} Alumni Management System. Built with ❤️ for lifelong connections.
         </div>
       </footer>
