@@ -129,7 +129,8 @@ export default function PublicHome() {
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.3 }}
                 variants={cardFade}
-                className="group bg-white p-6 rounded-2xl border border-[#e8ddc8] hover:shadow-lg transition-shadow"
+                className="group bg-white p-6 rounded-2xl border hover:shadow-lg transition-shadow"
+                style={{ borderColor: 'color-mix(in srgb, var(--brand-accent) 30%, white)' }}
               >
                 <div className="mb-4">
                   <PosterBadge
@@ -183,7 +184,8 @@ export default function PublicHome() {
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.3 }}
                 variants={cardFade}
-                className="group bg-white rounded-2xl overflow-hidden border border-[#e8ddc8] hover:shadow-xl transition-shadow"
+                className="group bg-white rounded-2xl overflow-hidden border hover:shadow-xl transition-shadow"
+                style={{ borderColor: 'color-mix(in srgb, var(--brand-accent) 30%, white)' }}
               >
                 <div
                   className="p-6 text-white"
