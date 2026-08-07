@@ -2404,27 +2404,31 @@ const { asyncHandler } = require('../lib/asyncHandler');
 
 const router = express.Router();
 
+function monthKey(date) {
+  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`;
+}
+
 function monthLabel(date) {
-  return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' });
 }
 
 async function monthlyTrend(table, dateColumn) {
   const rows = await query(
-    `SELECT date_trunc('month', ${dateColumn}) AS month, COUNT(*)::int AS value
+    `SELECT to_char(date_trunc('month', ${dateColumn} AT TIME ZONE 'UTC'), 'YYYY-MM') AS month_key, COUNT(*)::int AS value
      FROM ${table}
      WHERE ${dateColumn} >= now() - interval '12 months'
-     GROUP BY month`
+     GROUP BY month_key`
   );
-  const byMonth = new Map(rows.map((r) => [r.month.toISOString().slice(0, 7), r.value]));
+  const byMonth = new Map(rows.map((r) => [r.month_key, r.value]));
 
   const result = [];
   const cursor = new Date();
-  cursor.setDate(1);
-  cursor.setMonth(cursor.getMonth() - 11);
+  cursor.setUTCDate(1);
+  cursor.setUTCHours(0, 0, 0, 0);
+  cursor.setUTCMonth(cursor.getUTCMonth() - 11);
   for (let i = 0; i < 12; i++) {
-    const key = cursor.toISOString().slice(0, 7);
-    result.push({ label: monthLabel(cursor), value: byMonth.get(key) || 0 });
-    cursor.setMonth(cursor.getMonth() + 1);
+    result.push({ label: monthLabel(cursor), value: byMonth.get(monthKey(cursor)) || 0 });
+    cursor.setUTCMonth(cursor.getUTCMonth() + 1);
   }
   return result;
 }
