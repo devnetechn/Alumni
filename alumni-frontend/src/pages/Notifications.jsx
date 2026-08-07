@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Bell, CheckCheck } from 'lucide-react';
 import { api } from '../api';
+import { getSocket } from '../socket';
 
 export default function Notifications() {
   const [items, setItems] = useState([]);
@@ -19,6 +20,14 @@ export default function Notifications() {
   };
 
   useEffect(() => { load(); }, []);
+
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket) return;
+    const onNewNotification = () => load();
+    socket.on('notification:new', onNewNotification);
+    return () => socket.off('notification:new', onNewNotification);
+  }, []);
 
   return (
     <div className="p-6 lg:p-10 max-w-3xl mx-auto">
