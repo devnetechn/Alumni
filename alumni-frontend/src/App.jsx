@@ -58,8 +58,8 @@ function Sidebar({ open, onClose }) {
             <GraduationCap className="text-white" size={22} />
           </div>
           <div>
-            <h1 className="font-bold text-slate-900 leading-tight">Alumni</h1>
-            <p className="text-xs text-slate-500 leading-tight">Management System</p>
+            <h1 className="font-bold text-slate-900 leading-tight">IHES</h1>
+            <p className="text-xs text-slate-500 leading-tight">Alumni Association</p>
           </div>
         </div>
 
@@ -118,7 +118,7 @@ function MobileHeader({ onMenu }) {
       </button>
       <div className="flex items-center gap-2">
         <GraduationCap className="text-indigo-600" size={20} />
-        <span className="font-bold">Alumni System</span>
+        <span className="font-bold">IHES Alumni Association</span>
       </div>
     </header>
   );

@@ -35,7 +35,7 @@ export default function Login() {
             <div className="bg-white/20 backdrop-blur p-2 rounded-lg">
               <GraduationCap size={22} />
             </div>
-            <span className="font-bold">Alumni System</span>
+            <span className="font-bold">IHES Alumni Association</span>
           </Link>
           <div>
             <h1 className="text-5xl font-extrabold mb-4 leading-tight">
@@ -45,7 +45,7 @@ export default function Login() {
               Sign in to access your alumni network, events, and career opportunities.
             </p>
           </div>
-          <p className="text-sm text-white/60">© {new Date().getFullYear()} Alumni Management System</p>
+          <p className="text-sm text-white/60">© {new Date().getFullYear()} IHES Alumni Association</p>
         </div>
       </div>
 
@@ -56,7 +56,7 @@ export default function Login() {
             <div className="bg-gradient-to-br from-indigo-600 to-purple-600 p-2 rounded-lg">
               <GraduationCap className="text-white" size={22} />
             </div>
-            <span className="font-bold text-slate-900">Alumni System</span>
+            <span className="font-bold text-slate-900">IHES Alumni Association</span>
           </div>
 
           <h2 className="text-3xl font-bold text-slate-900 mb-2">Sign in</h2>

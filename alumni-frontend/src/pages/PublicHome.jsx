@@ -69,7 +69,7 @@ export default function PublicHome() {
                 <GraduationCap className="text-white" size={22} />
               </div>
             )}
-            <span className="font-display font-semibold text-white">Alumni System</span>
+            <span className="font-display font-semibold text-white">IHES Alumni Association</span>
           </Link>
           <div className="flex gap-2">
             {user ? (
@@ -250,7 +250,7 @@ export default function PublicHome() {
 
       <footer className="border-t py-8 mt-8" style={{ borderColor: 'color-mix(in srgb, var(--brand-accent) 30%, white)' }}>
         <div className="max-w-7xl mx-auto px-6 text-center text-sm" style={{ color: 'color-mix(in srgb, var(--brand-primary) 55%, transparent)' }}>
-          © {new Date().getFullYear()} Alumni Management System. Built with ❤️ for lifelong connections.
+          © {new Date().getFullYear()} IHES Alumni Association. Built with ❤️ for lifelong connections.
         </div>
       </footer>
     </div>

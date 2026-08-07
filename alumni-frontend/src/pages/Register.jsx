@@ -40,7 +40,7 @@ export default function Register() {
             <div className="bg-gradient-to-br from-indigo-600 to-purple-600 p-2 rounded-lg">
               <GraduationCap className="text-white" size={22} />
             </div>
-            <span className="font-bold text-slate-900">Alumni System</span>
+            <span className="font-bold text-slate-900">IHES Alumni Association</span>
           </div>
 
           <h1 className="text-3xl font-bold text-slate-900 mb-2">Create your account</h1>

@@ -138,7 +138,7 @@ export default function Jobs() {
             <div className="bg-gradient-to-br from-indigo-600 to-purple-600 p-2 rounded-lg">
               <Briefcase className="text-white" size={20} />
             </div>
-            <span className="font-bold text-slate-900">Alumni System</span>
+            <span className="font-bold text-slate-900">IHES Alumni Association</span>
           </Link>
           <Link to="/login" className="px-5 py-2 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 transition-colors text-sm">Login</Link>
         </div>
