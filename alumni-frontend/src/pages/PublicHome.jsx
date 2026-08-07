@@ -221,19 +221,32 @@ export default function PublicHome() {
 
       {/* CTA */}
       {!user && (
-        <section className="max-w-7xl mx-auto px-6 py-16">
-          <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-12 text-center text-white">
-            <h2 className="text-4xl font-bold mb-4">Ready to reconnect?</h2>
-            <p className="text-slate-300 mb-8 text-lg">Join thousands of alumni in our growing network.</p>
-            <Link to="/register" className="inline-flex items-center gap-2 bg-white text-slate-900 px-8 py-3 rounded-xl font-bold hover:bg-slate-100 transition-colors">
+        <motion.section
+          className="max-w-7xl mx-auto px-6 py-16"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          variants={sectionFade}
+        >
+          <div
+            className="rounded-3xl p-12 text-center text-white"
+            style={{ background: 'linear-gradient(135deg, var(--brand-primary), var(--brand-secondary))' }}
+          >
+            <h2 className="font-display text-4xl font-semibold mb-4">Ready to reconnect?</h2>
+            <p className="text-white/80 mb-8 text-lg">Join thousands of alumni in our growing network.</p>
+            <Link
+              to="/register"
+              className="inline-flex items-center gap-2 px-8 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity"
+              style={{ background: 'var(--brand-accent)', color: 'var(--brand-primary)' }}
+            >
               Create Your Account
               <ArrowRight size={18} />
             </Link>
           </div>
-        </section>
+        </motion.section>
       )}
 
-      <footer className="border-t border-slate-200 py-8 mt-8">
+      <footer className="border-t py-8 mt-8" style={{ borderColor: 'color-mix(in srgb, var(--brand-accent) 30%, white)' }}>
         <div className="max-w-7xl mx-auto px-6 text-center text-sm text-slate-500">
           © {new Date().getFullYear()} Alumni Management System. Built with ❤️ for lifelong connections.
         </div>
