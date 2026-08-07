@@ -35,6 +35,9 @@ app.use('/api', notificationsRoutes);
 const adminRoutes = require('./routes/admin');
 app.use('/api/admin', adminRoutes);
 
+const statsRoutes = require('./routes/stats');
+app.use('/api', statsRoutes);
+
 app.get('/api/health', (req, res) => {
   res.json({ ok: true });
 });
