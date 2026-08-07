@@ -2094,7 +2094,7 @@ git commit -m "feat(backend): add groups routes"
 - Test: `alumni-backend/tests/notifications.test.js`
 
 **Interfaces:**
-- Consumes: `requireAuth` (Task 3), `query` (Task 1).
+- Consumes: `requireAuth` (Task 3), `query` (Task 1), `asyncHandler` (Task 12, `src/lib/asyncHandler.js` — wraps every async route handler so a rejected promise reaches the global error middleware in `server.js` instead of crashing the process; see Task 12's fix-round note in the ledger for why this exists).
 - Produces: `routes/notifications.js` mounted at `/api`. `GET /notifications` → `{notifications: [...], unread: <int>}`. `PATCH /notifications` → `204`, marks all of the current user's notifications read. Also exports `createNotification({userId, type, title, body, link})` — a plain function (not a route) that Task 16 will call from other routes to insert notification rows and emit `notification:new`.
 
 - [ ] **Step 1: Write the failing tests — `alumni-backend/tests/notifications.test.js`**
@@ -2153,22 +2153,23 @@ Expected: FAIL (404 / import error)
 const express = require('express');
 const { query } = require('../db');
 const { requireAuth } = require('../middleware/auth');
+const { asyncHandler } = require('../lib/asyncHandler');
 
 const router = express.Router();
 
-router.get('/notifications', requireAuth, async (req, res) => {
+router.get('/notifications', requireAuth, asyncHandler(async (req, res) => {
   const notifications = await query(
     'SELECT * FROM notifications WHERE user_id = $1 ORDER BY created_at DESC',
     [req.user.id]
   );
   const unread = notifications.filter((n) => !n.read_at).length;
   res.json({ notifications, unread });
-});
+}));
 
-router.patch('/notifications', requireAuth, async (req, res) => {
+router.patch('/notifications', requireAuth, asyncHandler(async (req, res) => {
   await query('UPDATE notifications SET read_at = now() WHERE user_id = $1 AND read_at IS NULL', [req.user.id]);
   res.status(204).end();
-});
+}));
 
 async function createNotification({ userId, type, title, body, link }) {
   const rows = await query(
@@ -2211,7 +2212,7 @@ git commit -m "feat(backend): add notifications routes"
 - Test: `alumni-backend/tests/admin.test.js`
 
 **Interfaces:**
-- Consumes: `requireAuth`, `requireAdmin` (Task 3), `query` (Task 1).
+- Consumes: `requireAuth`, `requireAdmin` (Task 3), `query` (Task 1), `asyncHandler` (Task 12, `src/lib/asyncHandler.js`).
 - Produces: `routes/admin.js` mounted at `/api/admin`. All routes admin-only. `GET /users` → `{users: [...]}` (no `password_hash`). `PUT /users/:id` body any of `{role, active, is_batch_leader}` → `200 {user}`. `DELETE /users/:id` → `204`, or `400 {error}` if `req.params.id == req.user.id` (self-delete blocked server-side, matching the UI hiding that button but enforcing it for real).
 
 - [ ] **Step 1: Write the failing tests — `alumni-backend/tests/admin.test.js`**
@@ -2276,19 +2277,20 @@ Expected: FAIL (404)
 const express = require('express');
 const { query } = require('../db');
 const { requireAuth, requireAdmin } = require('../middleware/auth');
+const { asyncHandler } = require('../lib/asyncHandler');
 
 const router = express.Router();
 router.use(requireAuth, requireAdmin);
 
-router.get('/users', async (req, res) => {
+router.get('/users', asyncHandler(async (req, res) => {
   const users = await query(
     `SELECT id, email, role, active, is_batch_leader, full_name, batch_year, course, created_at
      FROM users ORDER BY created_at DESC`
   );
   res.json({ users });
-});
+}));
 
-router.put('/users/:id', async (req, res) => {
+router.put('/users/:id', asyncHandler(async (req, res) => {
   const updates = {};
   for (const field of ['role', 'active', 'is_batch_leader']) {
     if (field in req.body) updates[field] = req.body[field];
@@ -2306,15 +2308,15 @@ router.put('/users/:id', async (req, res) => {
   const user = rows[0];
   delete user.password_hash;
   res.json({ user });
-});
+}));
 
-router.delete('/users/:id', async (req, res) => {
+router.delete('/users/:id', asyncHandler(async (req, res) => {
   if (String(req.params.id) === String(req.user.id)) {
     return res.status(400).json({ error: 'Cannot delete your own account' });
   }
   await query('DELETE FROM users WHERE id = $1', [req.params.id]);
   res.status(204).end();
-});
+}));
 
 module.exports = router;
 ```
@@ -2348,7 +2350,7 @@ git commit -m "feat(backend): add admin user management routes"
 - Test: `alumni-backend/tests/stats.test.js`
 
 **Interfaces:**
-- Consumes: `query` (Task 1). No auth (public, per `PublicHome.jsx` usage).
+- Consumes: `query` (Task 1), `asyncHandler` (Task 12, `src/lib/asyncHandler.js`). No auth (public, per `PublicHome.jsx` usage).
 - Produces: `routes/stats.js` mounted at `/api`, route `GET /stats` → `200` with exactly the shape `Dashboard.jsx`/`PublicHome.jsx` consume: `{totalAlumni, totalEvents, totalCheckins, totalMessages, registrationsTrend: [{label, value}], checkinsTrend: [{label, value}], byBatch: [{label, value}], byIndustry: [{label, value}], eventsByMonth: [{label, value}], topCompanies: [{label, value}], byCourse: [{label, value}]}`. Trends cover the last 12 months, labelled `"Mon YYYY"` (e.g. `"Jan 2026"`), oldest first. `topCompanies` is limited to the top 8 by count.
 
 - [ ] **Step 1: Write the failing test — `alumni-backend/tests/stats.test.js`**
@@ -2398,6 +2400,7 @@ Expected: FAIL (404)
 ```js
 const express = require('express');
 const { query } = require('../db');
+const { asyncHandler } = require('../lib/asyncHandler');
 
 const router = express.Router();
 
@@ -2438,7 +2441,7 @@ async function groupCount(table, column, { limit } = {}) {
   return rows.map((r) => ({ label: String(r.label), value: r.value }));
 }
 
-router.get('/stats', async (req, res) => {
+router.get('/stats', asyncHandler(async (req, res) => {
   const [totalAlumni] = await query('SELECT COUNT(*)::int AS c FROM users');
   const [totalEvents] = await query('SELECT COUNT(*)::int AS c FROM events');
   const [totalCheckins] = await query('SELECT COUNT(*)::int AS c FROM event_checkins');
@@ -2466,7 +2469,7 @@ router.get('/stats', async (req, res) => {
     byCourse,
     topCompanies,
   });
-});
+}));
 
 module.exports = router;
 ```
@@ -2646,18 +2649,24 @@ Add the import near the top:
 const { emitToUser } = require('../lib/socket');
 ```
 
-Change the `POST /` handler to emit after inserting:
+The already-implemented `POST /` handler wraps its body in `try { ... } catch (err) { ... }` (added in Task 11) — **keep that wrapper**, only insert the emit call inside the `try` block, right after the insert and before the response:
+
 ```js
 router.post('/', requireAuth, async (req, res) => {
-  const { receiver_id, body } = req.body;
-  if (!receiver_id || !body) return res.status(400).json({ error: 'receiver_id and body are required' });
-  const rows = await query(
-    `INSERT INTO messages (sender_id, receiver_id, body) VALUES ($1,$2,$3) RETURNING *`,
-    [req.user.id, receiver_id, body]
-  );
-  const message = rows[0];
-  emitToUser(receiver_id, 'message:new', message);
-  res.status(201).json({ message });
+  try {
+    const { receiver_id, body } = req.body;
+    if (!receiver_id || !body) return res.status(400).json({ error: 'receiver_id and body are required' });
+    const rows = await query(
+      `INSERT INTO messages (sender_id, receiver_id, body) VALUES ($1,$2,$3) RETURNING *`,
+      [req.user.id, receiver_id, body]
+    );
+    const message = rows[0];
+    emitToUser(receiver_id, 'message:new', message);
+    res.status(201).json({ message: message });
+  } catch (err) {
+    console.error('Error sending message:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 ```
 
