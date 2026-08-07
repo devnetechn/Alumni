@@ -683,7 +683,7 @@ Find the `{/* CTA */}` block and replace it with:
 - [ ] **Step 2: Replace the `<footer>` block**
 
 ```jsx
-      <footer className="border-t py-8 mt-8" style={{ borderColor: '#e8ddc8' }}>
+      <footer className="border-t py-8 mt-8" style={{ borderColor: 'color-mix(in srgb, var(--brand-accent) 30%, white)' }}>
         <div className="max-w-7xl mx-auto px-6 text-center text-sm text-slate-500">
           © {new Date().getFullYear()} Alumni Management System. Built with ❤️ for lifelong connections.
         </div>
