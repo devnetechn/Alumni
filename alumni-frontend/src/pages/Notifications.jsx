@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Bell, CheckCheck } from 'lucide-react';
 import { api } from '../api';
 import { getSocket } from '../socket';
+import { Panel, Button } from '../components/ui';
 
 export default function Notifications() {
   const [items, setItems] = useState([]);
@@ -33,41 +34,39 @@ export default function Notifications() {
     <div className="p-6 lg:p-10 max-w-3xl mx-auto">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-2">
-            <Bell className="text-indigo-600" /> Notifications
+          <h1 className="font-display text-3xl text-[var(--brand-ink)] flex items-center gap-2">
+            <Bell className="text-[var(--brand-accent)]" /> Notifications
           </h1>
           <p className="text-slate-500 mt-1">{unread} unread</p>
         </div>
         {unread > 0 && (
-          <button onClick={markAll} className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold">
+          <Button onClick={markAll} className="text-sm">
             <CheckCheck size={16} /> Mark all read
-          </button>
+          </Button>
         )}
       </div>
 
       <div className="space-y-3">
         {items.length === 0 && (
-          <div className="bg-white p-8 rounded-2xl border border-slate-200 text-center text-slate-500">
+          <Panel className="p-8 text-center text-slate-500">
             No notifications yet.
-          </div>
+          </Panel>
         )}
         {items.map((n) => (
-          <Link
-            key={n.id}
-            to={n.link || '#'}
-            className={`block bg-white p-5 rounded-2xl border transition-all ${n.read_at ? 'border-slate-200' : 'border-indigo-300 bg-indigo-50/40'}`}
-          >
-            <div className="flex items-start gap-3">
-              <div className={`w-2 h-2 rounded-full mt-2 ${n.read_at ? 'bg-slate-300' : 'bg-indigo-600'}`} />
-              <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-slate-900">{n.title}</h3>
-                  <span className="text-xs text-slate-400 capitalize">{n.type}</span>
+          <Link key={n.id} to={n.link || '#'}>
+            <Panel className={`p-5 transition-all ${n.read_at ? '' : 'shadow-[4px_4px_0_var(--brand-accent)] border-[var(--brand-accent)]'}`}>
+              <div className="flex items-start gap-3">
+                <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${n.read_at ? 'bg-slate-300' : 'bg-[var(--brand-accent)]'}`} />
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-[var(--brand-ink)]">{n.title}</h3>
+                    <span className="text-xs text-slate-400 capitalize">{n.type}</span>
+                  </div>
+                  {n.body && <p className="text-sm text-slate-600 mt-1 line-clamp-2">{n.body}</p>}
+                  <p className="text-xs text-slate-400 mt-1">{new Date(n.created_at).toLocaleString()}</p>
                 </div>
-                {n.body && <p className="text-sm text-slate-600 mt-1 line-clamp-2">{n.body}</p>}
-                <p className="text-xs text-slate-400 mt-1">{new Date(n.created_at).toLocaleString()}</p>
               </div>
-            </div>
+            </Panel>
           </Link>
         ))}
       </div>
