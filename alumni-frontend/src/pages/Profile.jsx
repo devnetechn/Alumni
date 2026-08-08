@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Radio, Save, UserCircle, CheckCircle2, XCircle, Upload, Trash2 } from 'lucide-react';
 import { api } from '../api';
+import { Panel, Button, Input } from '../components/ui';
 
 export default function Profile() {
   const [me, setMe] = useState(null);
@@ -90,23 +91,22 @@ export default function Profile() {
   return (
     <div className="p-6 lg:p-10 max-w-4xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900">My Profile</h1>
+        <h1 className="font-display text-3xl text-[var(--brand-ink)]">My Profile</h1>
         <p className="text-slate-500 mt-1">Manage your personal and professional information</p>
       </div>
 
       {msg && (
-        <div className={`flex items-center gap-2 p-4 rounded-xl mb-6 border ${
-          msg.type === 'ok' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-800'
+        <div className={`flex items-center gap-2 p-4 rounded-[var(--radius)] mb-6 border-2 font-semibold ${
+          msg.type === 'ok' ? 'bg-white border-[var(--brand-success)] text-[var(--brand-success)]' : 'bg-white border-[var(--brand-danger)] text-[var(--brand-danger)]'
         }`}>
           <MsgIcon size={20} />
-          <span className="font-semibold">{msg.text}</span>
+          <span>{msg.text}</span>
         </div>
       )}
 
       <form onSubmit={submit} className="space-y-6">
-        {/* Header card */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 flex items-center gap-5">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 overflow-hidden flex items-center justify-center text-white font-extrabold text-3xl flex-shrink-0">
+        <Panel className="p-6 flex items-center gap-5">
+          <div className="w-20 h-20 rounded-[var(--radius)] bg-[var(--brand-accent)] border-2 border-[var(--brand-ink)] overflow-hidden flex items-center justify-center text-white font-extrabold text-3xl flex-shrink-0">
             {form.profile_pic ? (
               <img src={form.profile_pic} alt="" className="w-full h-full object-cover" />
             ) : (
@@ -114,16 +114,15 @@ export default function Profile() {
             )}
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-slate-900">{me.full_name || 'Complete your profile'}</h2>
+            <h2 className="font-display text-2xl text-[var(--brand-ink)]">{me.full_name || 'Complete your profile'}</h2>
             <p className="text-slate-500">{me.email}</p>
-            {me.role === 'admin' && <span className="inline-block mt-1 bg-amber-100 text-amber-800 text-xs px-2 py-0.5 rounded-full font-bold">ADMIN</span>}
+            {me.role === 'admin' && <span className="inline-block mt-1 bg-[var(--brand-accent)] text-white text-xs px-2 py-0.5 rounded border-2 border-[var(--brand-ink)] font-bold">ADMIN</span>}
           </div>
-        </div>
+        </Panel>
 
-        {/* Photo */}
         <Section title="Profile Photo">
           <div className="col-span-2 flex items-center gap-5">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 overflow-hidden flex items-center justify-center text-white font-extrabold text-4xl flex-shrink-0 border-4 border-white shadow-lg">
+            <div className="w-24 h-24 rounded-[var(--radius)] bg-[var(--brand-accent)] border-[2.5px] border-[var(--brand-ink)] overflow-hidden flex items-center justify-center text-white font-extrabold text-4xl flex-shrink-0">
               {form.profile_pic ? (
                 <img src={form.profile_pic} alt="" className="w-full h-full object-cover" />
               ) : (
@@ -133,21 +132,13 @@ export default function Profile() {
             <div className="flex-1">
               <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onFile} />
               <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => fileRef.current?.click()}
-                  className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-colors"
-                >
+                <Button type="button" variant="secondary" onClick={() => fileRef.current?.click()}>
                   <Upload size={16} /> Upload Photo
-                </button>
+                </Button>
                 {form.profile_pic && (
-                  <button
-                    type="button"
-                    onClick={clearPhoto}
-                    className="inline-flex items-center gap-2 bg-slate-100 hover:bg-red-50 hover:text-red-600 text-slate-700 px-4 py-2 rounded-lg font-semibold text-sm transition-colors"
-                  >
+                  <Button type="button" variant="danger" onClick={clearPhoto}>
                     <Trash2 size={16} /> Remove
-                  </button>
+                  </Button>
                 )}
               </div>
               <p className="text-xs text-slate-500 mt-2">JPG or PNG, max 2MB. Auto-resized to 400px.</p>
@@ -155,66 +146,62 @@ export default function Profile() {
           </div>
         </Section>
 
-        {/* Personal */}
         <Section title="Personal Information" icon={UserCircle}>
           <Field label="Full Name" span>
-            <input className="w-full border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500" value={form.full_name || ''} onChange={update('full_name')} />
+            <Input value={form.full_name || ''} onChange={update('full_name')} />
           </Field>
           <Field label="Contact">
-            <input className="w-full border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500" value={form.contact || ''} onChange={update('contact')} />
+            <Input value={form.contact || ''} onChange={update('contact')} />
           </Field>
           <Field label="Address">
-            <input className="w-full border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500" value={form.address || ''} onChange={update('address')} />
+            <Input value={form.address || ''} onChange={update('address')} />
           </Field>
         </Section>
 
-        {/* Academic */}
         <Section title="Academic">
           <Field label="Batch Year">
-            <input className="w-full border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500" value={form.batch_year || ''} onChange={update('batch_year')} />
+            <Input value={form.batch_year || ''} onChange={update('batch_year')} />
           </Field>
           <Field label="Course">
-            <input className="w-full border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500" value={form.course || ''} onChange={update('course')} />
+            <Input value={form.course || ''} onChange={update('course')} />
           </Field>
         </Section>
 
-        {/* Professional */}
         <Section title="Professional">
           <Field label="Company">
-            <input className="w-full border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500" value={form.company || ''} onChange={update('company')} />
+            <Input value={form.company || ''} onChange={update('company')} />
           </Field>
           <Field label="Position">
-            <input className="w-full border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500" value={form.position || ''} onChange={update('position')} />
+            <Input value={form.position || ''} onChange={update('position')} />
           </Field>
           <Field label="Industry" span>
-            <input className="w-full border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500" value={form.industry || ''} onChange={update('industry')} />
+            <Input value={form.industry || ''} onChange={update('industry')} />
           </Field>
           <Field label="Bio" span>
-            <textarea rows="3" className="w-full border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500" value={form.bio || ''} onChange={update('bio')} placeholder="Tell other alumni about yourself..." />
+            <Input as="textarea" rows="3" value={form.bio || ''} onChange={update('bio')} placeholder="Tell other alumni about yourself..." />
           </Field>
           <Field label="Mentorship" span>
-            <label className="flex items-center gap-2 text-sm text-slate-700">
+            <label className="flex items-center gap-2 text-sm text-[var(--brand-ink)] font-semibold">
               <input type="checkbox" checked={!!form.mentor_available} onChange={(e) => setForm({ ...form, mentor_available: e.target.checked })} />
               I am available as a mentor
             </label>
           </Field>
         </Section>
 
-        {/* NFC */}
         <Section title="Alumni Card">
           <Field label="NFC UID" span>
             <div className="flex gap-2">
-              <input className="flex-1 border border-slate-300 rounded-lg px-3 py-2.5 font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500" value={form.nfc_uid || ''} onChange={update('nfc_uid')} placeholder="Tap scan or type manually" />
-              <button type="button" onClick={scanNfc} className="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg font-semibold transition-colors">
+              <Input className="font-mono" value={form.nfc_uid || ''} onChange={update('nfc_uid')} placeholder="Tap scan or type manually" />
+              <Button type="button" onClick={scanNfc} className="flex-shrink-0">
                 <Radio size={16} /> Scan
-              </button>
+              </Button>
             </div>
           </Field>
         </Section>
 
-        <button className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+        <Button type="submit">
           <Save size={18} /> Save Changes
-        </button>
+        </Button>
       </form>
     </div>
   );
@@ -222,17 +209,17 @@ export default function Profile() {
 
 function Section({ title, children }) {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-6">
+    <Panel className="p-6">
       <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">{title}</h3>
       <div className="grid grid-cols-2 gap-4">{children}</div>
-    </div>
+    </Panel>
   );
 }
 
 function Field({ label, children, span }) {
   return (
     <div className={span ? 'col-span-2' : ''}>
-      <label className="block text-sm font-semibold text-slate-700 mb-1.5">{label}</label>
+      <label className="block text-sm font-bold text-[var(--brand-ink)] mb-1.5">{label}</label>
       {children}
     </div>
   );
