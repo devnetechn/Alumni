@@ -26,6 +26,13 @@ async function requireAuth(req, res, next) {
     delete user.password_hash;
     if (!user.active) return res.status(403).json({ error: 'Account is deactivated' });
     req.user = user;
+
+    const REGISTRATION_ALLOWLIST = ['/api/me', '/api/school', '/api/registration/renew-checkout'];
+    const requestPath = req.originalUrl.split('?')[0];
+    if (user.registration_paid_until && new Date(user.registration_paid_until) < new Date() && !REGISTRATION_ALLOWLIST.includes(requestPath)) {
+      return res.status(402).json({ error: 'Registration expired', registrationPaidUntil: user.registration_paid_until });
+    }
+
     next();
   } catch (err) {
     return res.status(500).json({ error: 'Internal server error' });

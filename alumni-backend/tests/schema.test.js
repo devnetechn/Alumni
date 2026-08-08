@@ -10,7 +10,7 @@ test('all expected tables exist after migration', async () => {
   expect(names).toEqual([
     'announcements', 'event_checkins', 'event_rsvps', 'events',
     'group_members', 'group_posts', 'groups', 'jobs',
-    'messages', 'notifications', 'platform_admins', 'schools', 'users',
+    'messages', 'notifications', 'platform_admins', 'processed_webhook_events', 'schools', 'users',
   ]);
 });
 
@@ -19,7 +19,7 @@ test('schools table exists with the expected columns', async () => {
     `SELECT column_name FROM information_schema.columns WHERE table_name = 'schools'`
   );
   const names = rows.map((r) => r.column_name).sort();
-  expect(names).toEqual(['active', 'created_at', 'id', 'logo', 'name', 'plan', 'slug', 'trial_ends_at']);
+  expect(names).toEqual(['active', 'created_at', 'id', 'logo', 'name', 'plan', 'registration_fee', 'registration_open', 'slug', 'trial_ends_at']);
 });
 
 test('every tenant table has a school_id column', async () => {
