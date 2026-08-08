@@ -76,11 +76,16 @@ export default function AdminUsers() {
                   )}
                 </td>
                 <td className="py-3 px-6">
-                  {u.role === 'admin' ? (
-                    <Badge tone="accent"><Crown size={12} /> Admin</Badge>
-                  ) : (
-                    <Badge tone="neutral">Alumni</Badge>
-                  )}
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {u.role === 'admin' ? (
+                      <Badge tone="accent"><Crown size={12} /> Admin</Badge>
+                    ) : (
+                      <Badge tone="neutral">Alumni</Badge>
+                    )}
+                    <Badge tone={u.member_type === 'guest' ? 'warning' : 'neutral'}>
+                      {u.member_type === 'guest' ? 'Guest' : 'Alumnus'}
+                    </Badge>
+                  </div>
                 </td>
                 <td className="py-3 px-6">
                   {u.active ? (
@@ -97,7 +102,16 @@ export default function AdminUsers() {
                     <button onClick={() => toggleActive(u)} title="Toggle active" className="p-2 border-2 border-transparent hover:border-[var(--brand-ink)] rounded-[var(--radius)] text-[var(--brand-ink)]">
                       {u.active ? <UserX size={16} /> : <UserCheck size={16} />}
                     </button>
-                    <button onClick={() => toggleLeader(u)} title="Toggle batch leader" className={`p-2 border-2 border-transparent hover:border-[var(--brand-ink)] rounded-[var(--radius)] ${u.is_batch_leader ? 'text-[#b8860b]' : 'text-[var(--brand-ink)]'}`}>
+                    <button
+                      onClick={() => toggleLeader(u)}
+                      disabled={u.member_type === 'guest'}
+                      title={u.member_type === 'guest' ? 'Guests cannot be batch leaders' : 'Toggle batch leader'}
+                      className={`p-2 border-2 border-transparent rounded-[var(--radius)] ${
+                        u.member_type === 'guest'
+                          ? 'text-slate-300 cursor-not-allowed'
+                          : `hover:border-[var(--brand-ink)] ${u.is_batch_leader ? 'text-[#b8860b]' : 'text-[var(--brand-ink)]'}`
+                      }`}
+                    >
                       <Star size={16} />
                     </button>
                     {u.id !== me.id && (
