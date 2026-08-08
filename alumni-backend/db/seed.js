@@ -3,21 +3,42 @@ const { Pool } = require('pg');
 const { hashPassword } = require('../src/lib/password');
 
 async function seed(pool) {
+  const schoolRows = await pool.query(
+    `INSERT INTO schools (slug, name) VALUES ('ihes', 'IHES Alumni Association')
+     ON CONFLICT (slug) DO NOTHING
+     RETURNING id`
+  );
+  const ihesId = schoolRows.rows[0]
+    ? schoolRows.rows[0].id
+    : (await pool.query(`SELECT id FROM schools WHERE slug = 'ihes'`)).rows[0].id;
+
+  const demoSchoolHash = await hashPassword('admin123');
+  await pool.query(
+    `INSERT INTO schools (slug, name) VALUES ('demo-school', 'Demo School') ON CONFLICT (slug) DO NOTHING`
+  );
+  const demoSchoolId = (await pool.query(`SELECT id FROM schools WHERE slug = 'demo-school'`)).rows[0].id;
+  await pool.query(
+    `INSERT INTO users (school_id, email, password_hash, role, full_name)
+     VALUES ($1, 'admin@demo-school.local', $2, 'admin', 'Demo School Admin')
+     ON CONFLICT (school_id, email) DO NOTHING`,
+    [demoSchoolId, demoSchoolHash]
+  );
+
   const adminHash = await hashPassword('admin123');
   const adminRows = await pool.query(
-    `INSERT INTO users (email, password_hash, role, full_name, batch_year, course)
-     VALUES ('admin@alumni.local', $1, 'admin', 'System Admin', 2015, 'BSCS')
-     ON CONFLICT (email) DO NOTHING
+    `INSERT INTO users (school_id, email, password_hash, role, full_name, batch_year, course)
+     VALUES ($1, 'admin@alumni.local', $2, 'admin', 'System Admin', 2015, 'BSCS')
+     ON CONFLICT (school_id, email) DO NOTHING
      RETURNING id`,
-    [adminHash]
+    [ihesId, adminHash]
   );
 
   const botHash = await hashPassword(require('crypto').randomBytes(24).toString('hex'));
   await pool.query(
-    `INSERT INTO users (email, password_hash, role, full_name, active, is_bot)
-     VALUES ('bot@ihes.local', $1, 'alumni', 'IHES Assistant', true, true)
-     ON CONFLICT (email) DO NOTHING`,
-    [botHash]
+    `INSERT INTO users (school_id, email, password_hash, role, full_name, active, is_bot)
+     VALUES ($1, 'bot@ihes.local', $2, 'alumni', 'IHES Assistant', true, true)
+     ON CONFLICT (school_id, email) DO NOTHING`,
+    [ihesId, botHash]
   );
 
   const sampleHash = await hashPassword('password123');
@@ -29,41 +50,41 @@ async function seed(pool) {
   ];
   for (const [email, full_name, batch_year, course, industry, company, position, mentor_available, is_batch_leader] of alumniData) {
     await pool.query(
-      `INSERT INTO users (email, password_hash, role, full_name, batch_year, course, industry, company, position, mentor_available, is_batch_leader)
-       VALUES ($1,$2,'alumni',$3,$4,$5,$6,$7,$8,$9,$10)
-       ON CONFLICT (email) DO NOTHING`,
-      [email, sampleHash, full_name, batch_year, course, industry, company, position, mentor_available, is_batch_leader]
+      `INSERT INTO users (school_id, email, password_hash, role, full_name, batch_year, course, industry, company, position, mentor_available, is_batch_leader)
+       VALUES ($1,$2,$3,'alumni',$4,$5,$6,$7,$8,$9,$10,$11)
+       ON CONFLICT (school_id, email) DO NOTHING`,
+      [ihesId, email, sampleHash, full_name, batch_year, course, industry, company, position, mentor_available, is_batch_leader]
     );
   }
 
-  const adminId = (await pool.query(`SELECT id FROM users WHERE email = 'admin@alumni.local'`)).rows[0].id;
+  const adminId = (await pool.query(`SELECT id FROM users WHERE school_id = $1 AND email = 'admin@alumni.local'`, [ihesId])).rows[0].id;
 
-  const existingEvents = await pool.query('SELECT COUNT(*)::int AS c FROM events');
+  const existingEvents = await pool.query('SELECT COUNT(*)::int AS c FROM events WHERE school_id = $1', [ihesId]);
   if (existingEvents.rows[0].c === 0) {
     await pool.query(
-      `INSERT INTO events (title, description, location, event_date, created_by) VALUES
-       ('Homecoming 2025', 'Annual alumni homecoming', 'Main Gym', now() - interval '2 months', $1),
-       ('Batch 2026 Reunion', 'Reconnect with your batch', 'Function Hall', now() + interval '1 month', $1)`,
-      [adminId]
+      `INSERT INTO events (school_id, title, description, location, event_date, created_by) VALUES
+       ($1, 'Homecoming 2025', 'Annual alumni homecoming', 'Main Gym', now() - interval '2 months', $2),
+       ($1, 'Batch 2026 Reunion', 'Reconnect with your batch', 'Function Hall', now() + interval '1 month', $2)`,
+      [ihesId, adminId]
     );
   }
 
-  const existingJobs = await pool.query('SELECT COUNT(*)::int AS c FROM jobs');
+  const existingJobs = await pool.query('SELECT COUNT(*)::int AS c FROM jobs WHERE school_id = $1', [ihesId]);
   if (existingJobs.rows[0].c === 0) {
     await pool.query(
-      `INSERT INTO jobs (title, company, location, description, job_type, is_referral, posted_by) VALUES
-       ('Frontend Developer', 'Globex Inc', 'Remote', 'React experience needed', 'job', true, $1),
-       ('Marketing Intern', 'BuildRight', 'Cebu City', 'Summer internship', 'internship', false, $1)`,
-      [adminId]
+      `INSERT INTO jobs (school_id, title, company, location, description, job_type, is_referral, posted_by) VALUES
+       ($1, 'Frontend Developer', 'Globex Inc', 'Remote', 'React experience needed', 'job', true, $2),
+       ($1, 'Marketing Intern', 'BuildRight', 'Cebu City', 'Summer internship', 'internship', false, $2)`,
+      [ihesId, adminId]
     );
   }
 
-  const existingAnnouncements = await pool.query('SELECT COUNT(*)::int AS c FROM announcements');
+  const existingAnnouncements = await pool.query('SELECT COUNT(*)::int AS c FROM announcements WHERE school_id = $1', [ihesId]);
   if (existingAnnouncements.rows[0].c === 0) {
     await pool.query(
-      `INSERT INTO announcements (title, body, posted_by) VALUES
-       ('Welcome to the new Alumni Portal', 'We are excited to launch this platform for our community.', $1)`,
-      [adminId]
+      `INSERT INTO announcements (school_id, title, body, posted_by) VALUES
+       ($1, 'Welcome to the new Alumni Portal', 'We are excited to launch this platform for our community.', $2)`,
+      [ihesId, adminId]
     );
   }
 }
