@@ -18,6 +18,11 @@ export function setTrialExpiredHandler(fn) {
   trialExpiredHandler = fn;
 }
 
+let registrationExpiredHandler = null;
+export function setRegistrationExpiredHandler(fn) {
+  registrationExpiredHandler = fn;
+}
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -28,8 +33,12 @@ api.interceptors.response.use(
         window.location.href = '/login';
       }
     }
-    if (error.response && error.response.status === 402 && trialExpiredHandler) {
-      trialExpiredHandler(error.response.data);
+    if (error.response && error.response.status === 402) {
+      if (error.response.data.error === 'Registration expired' && registrationExpiredHandler) {
+        registrationExpiredHandler(error.response.data);
+      } else if (trialExpiredHandler) {
+        trialExpiredHandler(error.response.data);
+      }
     }
     return Promise.reject(error);
   }

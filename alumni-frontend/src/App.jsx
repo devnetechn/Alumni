@@ -9,6 +9,7 @@ import Register from './pages/Register';
 import RegisterSuccess from './pages/RegisterSuccess';
 import Signup from './pages/Signup';
 import TrialExpired from './pages/TrialExpired';
+import RenewRegistration from './pages/RenewRegistration';
 import PlatformSignup from './pages/PlatformSignup';
 import PlatformLogin from './pages/PlatformLogin';
 import PlatformDashboard from './pages/PlatformDashboard';
@@ -137,7 +138,7 @@ function MobileHeader({ onMenu }) {
 }
 
 function Shell({ children }) {
-  const { user, trialExpired } = useAuth();
+  const { user, trialExpired, registrationExpired } = useAuth();
   const [open, setOpen] = useState(false);
   const location = useLocation();
 
@@ -148,6 +149,7 @@ function Shell({ children }) {
   const showSidebar = user && !publicOnlyRoutes.includes(location.pathname);
 
   if (user && trialExpired) return <TrialExpired />;
+  if (user && registrationExpired) return <RenewRegistration />;
   if (!showSidebar) return <>{children}</>;
 
   return (

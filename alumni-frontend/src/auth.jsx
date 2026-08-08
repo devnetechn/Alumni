@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { api, setTrialExpiredHandler } from './api';
+import { api, setTrialExpiredHandler, setRegistrationExpiredHandler } from './api';
 import { connectSocket, disconnectSocket } from './socket';
 
 const AuthCtx = createContext(null);
@@ -9,6 +9,7 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [school, setSchool] = useState(null);
   const [trialExpired, setTrialExpired] = useState(null);
+  const [registrationExpired, setRegistrationExpired] = useState(null);
 
   // Enrich token user with alumni profile fields (is_batch_leader etc.)
   const refresh = async () => {
@@ -35,6 +36,7 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     setTrialExpiredHandler((data) => setTrialExpired(data));
+    setRegistrationExpiredHandler((data) => setRegistrationExpired(data));
     api.get('/school').then((r) => setSchool(r.data)).catch(() => {});
   }, []);
 
@@ -67,7 +69,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthCtx.Provider value={{ user, login, register, logout, loading, refresh, school, trialExpired, setSession }}>
+    <AuthCtx.Provider value={{ user, login, register, logout, loading, refresh, school, trialExpired, registrationExpired, setSession }}>
       {children}
     </AuthCtx.Provider>
   );
