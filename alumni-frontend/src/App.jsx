@@ -8,6 +8,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Signup from './pages/Signup';
 import TrialExpired from './pages/TrialExpired';
+import PlatformSignup from './pages/PlatformSignup';
+import PlatformLogin from './pages/PlatformLogin';
 import Dashboard from './pages/Dashboard';
 import Directory from './pages/Directory';
 import Events from './pages/Events';
@@ -137,6 +139,8 @@ function Shell({ children }) {
   const [open, setOpen] = useState(false);
   const location = useLocation();
 
+  if (location.pathname.startsWith('/platform')) return <>{children}</>;
+
   // Public routes (no sidebar)
   const publicOnlyRoutes = ['/', '/login', '/register', '/signup'];
   const showSidebar = user && !publicOnlyRoutes.includes(location.pathname);
@@ -163,6 +167,8 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/platform/signup" element={<PlatformSignup />} />
+        <Route path="/platform/login" element={<PlatformLogin />} />
         <Route path="/dashboard" element={<Protected><Dashboard /></Protected>} />
         <Route path="/directory" element={<Protected><Directory /></Protected>} />
         <Route path="/events" element={<Protected><Events /></Protected>} />
