@@ -4,9 +4,13 @@ import QRCode from 'qrcode';
 import { Download, QrCode } from 'lucide-react';
 import { api, API_BASE } from '../api';
 import { Panel, Button, Badge } from '../components/ui';
+import { useAuth } from '../auth';
+import AlumniScanner from '../components/AlumniScanner';
 
 export default function EventCheckin() {
   const { id } = useParams();
+  const { user } = useAuth();
+  const isOfficer = user?.role === 'admin' || user?.is_batch_leader;
   const [event, setEvent] = useState(null);
   const [attendance, setAttendance] = useState([]);
   const canvasRef = useRef(null);
@@ -60,6 +64,8 @@ export default function EventCheckin() {
           <span>Event code: <span className="font-mono font-semibold">EVENT:{id}</span></span>
         </div>
       </Panel>
+
+      {isOfficer && <AlumniScanner eventId={id} onCheckedIn={loadAttendance} />}
 
       <Panel className="overflow-hidden">
         <div className="p-6 border-b-[2.5px] border-[var(--brand-ink)] flex items-center justify-between">

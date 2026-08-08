@@ -54,10 +54,14 @@ export default function AlumniScanner({ eventId, onCheckedIn }) {
 
     return () => {
       cancelled = true;
-      html5QrCode
-        .stop()
-        .then(() => html5QrCode.clear())
-        .catch(() => {});
+      try {
+        // stop() throws synchronously (not a rejected promise) if the
+        // scanner never reached a running state, e.g. camera permission
+        // was denied or start() hadn't resolved yet.
+        html5QrCode.stop().then(() => html5QrCode.clear()).catch(() => {});
+      } catch {
+        // nothing to stop
+      }
       html5QrCodeRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
