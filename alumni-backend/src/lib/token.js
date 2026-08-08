@@ -11,8 +11,12 @@ function signToken(user) {
   return jwt.sign({ id: user.id, role: user.role, school_id: user.school_id }, SECRET, { expiresIn: '7d' });
 }
 
+function signPlatformToken(admin) {
+  return jwt.sign({ type: 'platform_admin', id: admin.id }, SECRET, { expiresIn: '7d' });
+}
+
 function verifyToken(token) {
   return jwt.verify(token, SECRET);
 }
 
-module.exports = { signToken, verifyToken };
+module.exports = { signToken, signPlatformToken, verifyToken };
