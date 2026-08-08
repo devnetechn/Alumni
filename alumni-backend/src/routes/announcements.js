@@ -1,5 +1,4 @@
 const express = require('express');
-const { query } = require('../db');
 const { requireAuth, requireAdmin } = require('../middleware/auth');
 const { asyncHandler } = require('../lib/asyncHandler');
 const { createNotification } = require('./notifications');
@@ -7,7 +6,7 @@ const { createNotification } = require('./notifications');
 const router = express.Router();
 
 router.get('/', asyncHandler(async (req, res) => {
-  const rows = await query(
+  const rows = await req.db(
     `SELECT a.*, u.full_name AS poster_name, u.email AS poster_email, u.profile_pic AS poster_pic,
             u.role AS poster_role, u.position AS poster_position
      FROM announcements a LEFT JOIN users u ON u.id = a.posted_by
@@ -19,15 +18,15 @@ router.get('/', asyncHandler(async (req, res) => {
 router.post('/', requireAuth, requireAdmin, asyncHandler(async (req, res) => {
   const { title, body } = req.body;
   if (!title) return res.status(400).json({ error: 'title is required' });
-  const rows = await query(
-    `INSERT INTO announcements (title, body, posted_by) VALUES ($1,$2,$3) RETURNING *`,
-    [title, body || null, req.user.id]
+  const rows = await req.db(
+    `INSERT INTO announcements (school_id, title, body, posted_by) VALUES ($1,$2,$3,$4) RETURNING *`,
+    [req.school.id, title, body || null, req.user.id]
   );
   const announcement = rows[0];
 
-  const others = await query('SELECT id FROM users WHERE id != $1 AND active = true', [req.user.id]);
+  const others = await req.db('SELECT id FROM users WHERE id != $1 AND active = true', [req.user.id]);
   for (const u of others) {
-    await createNotification({
+    await createNotification(req.db, {
       userId: u.id,
       type: 'announcement',
       title: 'New announcement',
@@ -40,7 +39,7 @@ router.post('/', requireAuth, requireAdmin, asyncHandler(async (req, res) => {
 }));
 
 router.delete('/:id', requireAuth, requireAdmin, asyncHandler(async (req, res) => {
-  await query('DELETE FROM announcements WHERE id = $1', [req.params.id]);
+  await req.db('DELETE FROM announcements WHERE id = $1', [req.params.id]);
   res.status(204).end();
 }));
 

@@ -1,13 +1,14 @@
 const request = require('supertest');
 const { app } = require('../src/server');
 const { pool, appPool, query } = require('../src/db');
-const { resetDb, insertUser, authHeader } = require('./helpers');
+const { resetDb, insertUser, authHeader, getDefaultSchool, hostFor } = require('./helpers');
 
 beforeEach(() => resetDb());
 afterAll(() => Promise.all([pool.end(), appPool.end()]));
 
 test('GET /api/announcements is public', async () => {
-  const res = await request(app).get('/api/announcements');
+  const school = await getDefaultSchool();
+  const res = await request(app).get('/api/announcements').set('Host', hostFor(school));
   expect(res.status).toBe(200);
   expect(res.body.announcements).toEqual([]);
 });
@@ -30,7 +31,8 @@ test('admin can create and delete an announcement', async () => {
   expect(create.status).toBe(201);
   expect(create.body.announcement.title).toBe('Welcome');
 
-  const list = await request(app).get('/api/announcements');
+  const school = await getDefaultSchool();
+  const list = await request(app).get('/api/announcements').set('Host', hostFor(school));
   expect(list.body.announcements[0].poster_role).toBe('admin');
 
   const del = await request(app)
