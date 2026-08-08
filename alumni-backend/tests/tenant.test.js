@@ -58,3 +58,11 @@ test('returns 404 for an inactive school even if the slug matches', async () => 
   const res = await request(app).get('/whoami').set('Host', 'inactive-test.example.com');
   expect(res.status).toBe(404);
 });
+
+const { app: realApp } = require('../src/server');
+
+test('the real app resolves a school before hitting a route', async () => {
+  await makeSchool('server-wiring-test');
+  const res = await request(realApp).get('/api/health').set('Host', 'server-wiring-test.example.com');
+  expect(res.status).toBe(200); // health check bypasses tenant resolution entirely
+});

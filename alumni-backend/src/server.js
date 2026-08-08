@@ -5,6 +5,13 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '2mb' }));
 
+app.get('/api/health', (req, res) => {
+  res.json({ ok: true });
+});
+
+const { resolveTenant } = require('./middleware/tenant');
+app.use(resolveTenant);
+
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
 
@@ -37,10 +44,6 @@ app.use('/api/admin', adminRoutes);
 
 const statsRoutes = require('./routes/stats');
 app.use('/api', statsRoutes);
-
-app.get('/api/health', (req, res) => {
-  res.json({ ok: true });
-});
 
 // Global error-handling middleware
 app.use((err, req, res, next) => {
