@@ -2,6 +2,7 @@ import { Routes, Route, Navigate, Link, NavLink, useNavigate, useLocation } from
 import { useAuth } from './auth';
 import { GraduationCap, LayoutDashboard, Users, Calendar, Megaphone, Briefcase, UserCircle, IdCard, LogOut, Menu, X, MessageSquare, Shield, FileText, UsersRound, Bell, QrCode } from 'lucide-react';
 import { useState } from 'react';
+import { Wordmark, Button } from './components/ui';
 import PublicHome from './pages/PublicHome';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -52,14 +53,14 @@ function Sidebar({ open, onClose }) {
   return (
     <>
       {open && <div className="fixed inset-0 bg-black/40 z-30 lg:hidden" onClick={onClose} />}
-      <aside className={`fixed lg:sticky lg:flex-shrink-0 top-0 left-0 h-screen w-64 bg-white border-r border-slate-200 z-40 flex flex-col transition-transform lg:transform-none ${open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
-        <div className="flex items-center gap-2 px-6 py-5 border-b border-slate-200 flex-shrink-0">
-          <div className="bg-gradient-to-br from-indigo-600 to-purple-600 p-2 rounded-lg">
+      <aside className={`fixed lg:sticky lg:flex-shrink-0 top-0 left-0 h-screen w-64 bg-white border-r-[2.5px] border-[var(--brand-ink)] z-40 flex flex-col transition-transform lg:transform-none ${open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+        <div className="flex items-center gap-2 px-6 py-5 border-b-[2.5px] border-[var(--brand-ink)] flex-shrink-0">
+          <div className="bg-[var(--brand-accent)] border-2 border-[var(--brand-ink)] rounded-[var(--radius)] p-2">
             <GraduationCap className="text-white" size={22} />
           </div>
           <div>
-            <h1 className="font-bold text-slate-900 leading-tight">IHES</h1>
-            <p className="text-xs text-slate-500 leading-tight">Alumni Association</p>
+            <Wordmark />
+            <p className="text-xs text-slate-500 leading-tight">IHES Alumni Association</p>
           </div>
         </div>
 
@@ -72,10 +73,10 @@ function Sidebar({ open, onClose }) {
               to={item.to}
               onClick={onClose}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                `flex items-center gap-3 px-3 py-2.5 rounded-[var(--radius)] text-sm font-bold transition-colors border-2 ${
                   isActive
-                    ? 'bg-indigo-50 text-indigo-700'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                    ? 'bg-[var(--brand-accent)] text-white border-[var(--brand-ink)]'
+                    : 'text-[var(--brand-ink)] border-transparent hover:border-[var(--brand-ink)] hover:bg-[var(--brand-surface)]'
                 }`
               }
             >
@@ -85,23 +86,20 @@ function Sidebar({ open, onClose }) {
           ))}
         </nav>
 
-        <div className="flex-shrink-0 border-t border-slate-200 p-4">
+        <div className="flex-shrink-0 border-t-[2.5px] border-[var(--brand-ink)] p-4">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+            <div className="w-9 h-9 rounded-[var(--radius)] bg-[var(--brand-accent)] border-2 border-[var(--brand-ink)] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
               {user.email[0].toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-slate-900 truncate">{user.email}</p>
+              <p className="text-sm font-bold text-[var(--brand-ink)] truncate">{user.email}</p>
               <p className="text-xs text-slate-500 capitalize">{user.role}</p>
             </div>
           </div>
-          <button
-            onClick={() => { logout(); nav('/'); }}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition-colors"
-          >
+          <Button variant="secondary" className="w-full" onClick={() => { logout(); nav('/'); }}>
             <LogOut size={16} />
             Logout
-          </button>
+          </Button>
         </div>
       </aside>
     </>
@@ -112,13 +110,13 @@ function MobileHeader({ onMenu }) {
   const { user } = useAuth();
   if (!user) return null;
   return (
-    <header className="lg:hidden sticky top-0 z-20 bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-3">
-      <button onClick={onMenu} className="p-2 hover:bg-slate-100 rounded-lg">
+    <header className="lg:hidden sticky top-0 z-20 bg-white border-b-[2.5px] border-[var(--brand-ink)] px-4 py-3 flex items-center gap-3">
+      <button onClick={onMenu} className="p-2 border-2 border-transparent hover:border-[var(--brand-ink)] rounded-[var(--radius)] text-[var(--brand-ink)]">
         <Menu size={20} />
       </button>
       <div className="flex items-center gap-2">
-        <GraduationCap className="text-indigo-600" size={20} />
-        <span className="font-bold">IHES Alumni Association</span>
+        <GraduationCap className="text-[var(--brand-accent)]" size={20} />
+        <Wordmark />
       </div>
     </header>
   );
@@ -136,7 +134,7 @@ function Shell({ children }) {
   if (!showSidebar) return <>{children}</>;
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex min-h-screen bg-[var(--brand-bg)]">
       <Sidebar open={open} onClose={() => setOpen(false)} />
       <div className="flex-1 flex flex-col min-w-0">
         <MobileHeader onMenu={() => setOpen(true)} />
