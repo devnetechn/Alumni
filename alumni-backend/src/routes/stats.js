@@ -51,9 +51,14 @@ async function groupCount(table, column, { limit } = {}) {
   return rows.map((r) => ({ label: String(r.label), value: r.value }));
 }
 
+async function getCoreCounts() {
+  const [totalAlumniRow] = await query('SELECT COUNT(*)::int AS c FROM users WHERE is_bot = false');
+  const [totalEventsRow] = await query('SELECT COUNT(*)::int AS c FROM events');
+  return { totalAlumni: totalAlumniRow.c, totalEvents: totalEventsRow.c };
+}
+
 router.get('/stats', asyncHandler(async (req, res) => {
-  const [totalAlumni] = await query('SELECT COUNT(*)::int AS c FROM users');
-  const [totalEvents] = await query('SELECT COUNT(*)::int AS c FROM events');
+  const { totalAlumni, totalEvents } = await getCoreCounts();
   const [totalCheckins] = await query('SELECT COUNT(*)::int AS c FROM event_checkins');
   const [totalMessages] = await query('SELECT COUNT(*)::int AS c FROM messages');
 
@@ -67,8 +72,8 @@ router.get('/stats', asyncHandler(async (req, res) => {
   const topCompanies = await groupCount('users', 'company', { limit: 8 });
 
   res.json({
-    totalAlumni: totalAlumni.c,
-    totalEvents: totalEvents.c,
+    totalAlumni,
+    totalEvents,
     totalCheckins: totalCheckins.c,
     totalMessages: totalMessages.c,
     registrationsTrend,
@@ -82,3 +87,4 @@ router.get('/stats', asyncHandler(async (req, res) => {
 }));
 
 module.exports = router;
+module.exports.getCoreCounts = getCoreCounts;

@@ -2,6 +2,7 @@ const request = require('supertest');
 const { app } = require('../src/server');
 const { pool } = require('../src/db');
 const { resetDb, insertUser, authHeader } = require('./helpers');
+const { getCoreCounts } = require('../src/routes/stats');
 
 beforeEach(() => resetDb());
 afterAll(() => pool.end());
@@ -45,4 +46,12 @@ test('GET /api/stats eventsByMonth includes future events, not just past ones', 
   expect(res.body.eventsByMonth.length).toBe(12);
   const total = res.body.eventsByMonth.reduce((sum, m) => sum + m.value, 0);
   expect(total).toBeGreaterThan(0);
+});
+
+test('getCoreCounts returns totalAlumni excluding bot accounts, and totalEvents', async () => {
+  await insertUser({ batch_year: 2020 });
+  await insertUser({ is_bot: true, email: 'bot@ihes.local', full_name: 'IHES Assistant' });
+  const counts = await getCoreCounts();
+  expect(counts.totalAlumni).toBe(1);
+  expect(counts.totalEvents).toBe(0);
 });
