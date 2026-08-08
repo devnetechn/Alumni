@@ -13,3 +13,13 @@ test('all expected tables exist after migration', async () => {
     'messages', 'notifications', 'users',
   ]);
 });
+
+test('users table has an is_bot column defaulting to false', async () => {
+  const { rows } = await pool.query(
+    `SELECT data_type, column_default FROM information_schema.columns
+     WHERE table_name = 'users' AND column_name = 'is_bot'`
+  );
+  expect(rows.length).toBe(1);
+  expect(rows[0].data_type).toBe('boolean');
+  expect(rows[0].column_default).toContain('false');
+});

@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS users (
   role TEXT NOT NULL DEFAULT 'alumni' CHECK (role IN ('admin','alumni')),
   active BOOLEAN NOT NULL DEFAULT true,
   is_batch_leader BOOLEAN NOT NULL DEFAULT false,
+  is_bot BOOLEAN NOT NULL DEFAULT false,
   full_name TEXT,
   batch_year INTEGER,
   course TEXT,
@@ -112,3 +113,5 @@ CREATE TABLE IF NOT EXISTS notifications (
   read_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS is_bot BOOLEAN NOT NULL DEFAULT false;
