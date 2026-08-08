@@ -7,6 +7,7 @@ import PublicHome from './pages/PublicHome';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Signup from './pages/Signup';
+import TrialExpired from './pages/TrialExpired';
 import Dashboard from './pages/Dashboard';
 import Directory from './pages/Directory';
 import Events from './pages/Events';
@@ -124,7 +125,7 @@ function MobileHeader({ onMenu }) {
 }
 
 function Shell({ children }) {
-  const { user } = useAuth();
+  const { user, trialExpired } = useAuth();
   const [open, setOpen] = useState(false);
   const location = useLocation();
 
@@ -132,6 +133,7 @@ function Shell({ children }) {
   const publicOnlyRoutes = ['/', '/login', '/register', '/signup'];
   const showSidebar = user && !publicOnlyRoutes.includes(location.pathname);
 
+  if (user && trialExpired) return <TrialExpired />;
   if (!showSidebar) return <>{children}</>;
 
   return (
