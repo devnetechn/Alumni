@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import {
-  Users, Calendar, CheckCircle2, MessageSquare, TrendingUp, ArrowUpRight,
+  Users, Calendar, CheckCircle2, MessageSquare,
 } from 'lucide-react';
 import {
   LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts';
 import { api } from '../api';
-
-const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#f43f5e', '#84cc16'];
+import { StatTile } from '../components/ui';
+import { CHART_COLORS, chartTooltipStyle, chartAxisProps, chartGridProps } from '../lib/chartTheme';
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
@@ -22,39 +22,29 @@ export default function Dashboard() {
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900">Analytics Dashboard</h1>
+        <h1 className="font-display text-3xl text-[var(--brand-ink)]">Analytics Dashboard</h1>
         <p className="text-slate-500 mt-1">Real-time insights into your alumni community</p>
       </div>
 
-      {/* Stat cards */}
+      {/* Stat tiles */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Total Alumni" value={stats.totalAlumni} icon={Users} gradient="from-blue-500 to-indigo-600" />
-        <StatCard label="Total Events" value={stats.totalEvents} icon={Calendar} gradient="from-emerald-500 to-teal-600" />
-        <StatCard label="Check-ins" value={stats.totalCheckins} icon={CheckCircle2} gradient="from-purple-500 to-pink-600" />
-        <StatCard label="Messages Sent" value={stats.totalMessages} icon={MessageSquare} gradient="from-amber-500 to-orange-600" />
+        <StatTile label="Total Alumni" value={stats.totalAlumni} icon={Users} />
+        <StatTile label="Total Events" value={stats.totalEvents} icon={Calendar} />
+        <StatTile label="Check-ins" value={stats.totalCheckins} icon={CheckCircle2} />
+        <StatTile label="Messages Sent" value={stats.totalMessages} icon={MessageSquare} />
       </div>
 
       {/* Line chart — Registrations trend */}
       <Panel title="Registrations & Check-ins Trend" subtitle="Last 12 months">
         <ResponsiveContainer width="100%" height={280}>
           <AreaChart data={mergeTrends(stats.registrationsTrend, stats.checkinsTrend)}>
-            <defs>
-              <linearGradient id="gReg" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#6366f1" stopOpacity={0.4} />
-                <stop offset="100%" stopColor="#6366f1" stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="gCheck" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#ec4899" stopOpacity={0.4} />
-                <stop offset="100%" stopColor="#ec4899" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" vertical={false} />
-            <XAxis dataKey="label" stroke="#94a3b8" fontSize={12} />
-            <YAxis stroke="#94a3b8" fontSize={12} allowDecimals={false} />
-            <Tooltip contentStyle={tooltipStyle} />
+            <CartesianGrid {...chartGridProps} vertical={false} />
+            <XAxis dataKey="label" {...chartAxisProps} />
+            <YAxis {...chartAxisProps} allowDecimals={false} />
+            <Tooltip contentStyle={chartTooltipStyle} />
             <Legend wrapperStyle={{ fontSize: 13 }} />
-            <Area type="monotone" dataKey="registrations" stroke="#6366f1" strokeWidth={2.5} fill="url(#gReg)" name="New Alumni" />
-            <Area type="monotone" dataKey="checkins" stroke="#ec4899" strokeWidth={2.5} fill="url(#gCheck)" name="Event Check-ins" />
+            <Area type="monotone" dataKey="registrations" stroke={CHART_COLORS[0]} strokeWidth={2.5} fill={CHART_COLORS[0]} fillOpacity={0.15} name="New Alumni" />
+            <Area type="monotone" dataKey="checkins" stroke={CHART_COLORS[1]} strokeWidth={2.5} fill={CHART_COLORS[1]} fillOpacity={0.15} name="Event Check-ins" />
           </AreaChart>
         </ResponsiveContainer>
       </Panel>
@@ -64,17 +54,11 @@ export default function Dashboard() {
         <Panel title="Alumni by Batch Year">
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={stats.byBatch}>
-              <defs>
-                <linearGradient id="gBar" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#8b5cf6" />
-                  <stop offset="100%" stopColor="#6366f1" />
-                </linearGradient>
-              </defs>
-              <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="label" stroke="#94a3b8" fontSize={12} />
-              <YAxis stroke="#94a3b8" fontSize={12} allowDecimals={false} />
-              <Tooltip contentStyle={tooltipStyle} cursor={{ fill: '#f1f5f9' }} />
-              <Bar dataKey="value" fill="url(#gBar)" radius={[8, 8, 0, 0]} name="Alumni" />
+              <CartesianGrid {...chartGridProps} vertical={false} />
+              <XAxis dataKey="label" {...chartAxisProps} />
+              <YAxis {...chartAxisProps} allowDecimals={false} />
+              <Tooltip contentStyle={chartTooltipStyle} cursor={{ fill: 'var(--brand-surface)' }} />
+              <Bar dataKey="value" fill={CHART_COLORS[0]} radius={[2, 2, 0, 0]} name="Alumni" />
             </BarChart>
           </ResponsiveContainer>
         </Panel>
@@ -94,10 +78,10 @@ export default function Dashboard() {
                 paddingAngle={3}
               >
                 {stats.byIndustry.map((_, i) => (
-                  <Cell key={i} fill={COLORS[i % COLORS.length]} stroke="white" strokeWidth={2} />
+                  <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} stroke="white" strokeWidth={2} />
                 ))}
               </Pie>
-              <Tooltip contentStyle={tooltipStyle} />
+              <Tooltip contentStyle={chartTooltipStyle} />
               <Legend wrapperStyle={{ fontSize: 12 }} iconType="circle" />
             </PieChart>
           </ResponsiveContainer>
@@ -107,11 +91,11 @@ export default function Dashboard() {
         <Panel title="Events by Month">
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={stats.eventsByMonth}>
-              <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="label" stroke="#94a3b8" fontSize={12} />
-              <YAxis stroke="#94a3b8" fontSize={12} allowDecimals={false} />
-              <Tooltip contentStyle={tooltipStyle} />
-              <Line type="monotone" dataKey="value" stroke="#10b981" strokeWidth={3} dot={{ fill: '#10b981', r: 5 }} activeDot={{ r: 7 }} name="Events" />
+              <CartesianGrid {...chartGridProps} vertical={false} />
+              <XAxis dataKey="label" {...chartAxisProps} />
+              <YAxis {...chartAxisProps} allowDecimals={false} />
+              <Tooltip contentStyle={chartTooltipStyle} />
+              <Line type="monotone" dataKey="value" stroke={CHART_COLORS[2]} strokeWidth={3} dot={{ fill: CHART_COLORS[2], r: 5 }} activeDot={{ r: 7 }} name="Events" />
             </LineChart>
           </ResponsiveContainer>
         </Panel>
@@ -120,11 +104,11 @@ export default function Dashboard() {
         <Panel title="Top Companies">
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={stats.topCompanies} layout="vertical" margin={{ left: 20 }}>
-              <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" horizontal={false} />
-              <XAxis type="number" stroke="#94a3b8" fontSize={12} allowDecimals={false} />
-              <YAxis type="category" dataKey="label" stroke="#94a3b8" fontSize={12} width={100} />
-              <Tooltip contentStyle={tooltipStyle} cursor={{ fill: '#f1f5f9' }} />
-              <Bar dataKey="value" fill="#f59e0b" radius={[0, 8, 8, 0]} name="Alumni" />
+              <CartesianGrid {...chartGridProps} horizontal={false} />
+              <XAxis type="number" {...chartAxisProps} allowDecimals={false} />
+              <YAxis type="category" dataKey="label" {...chartAxisProps} width={100} />
+              <Tooltip contentStyle={chartTooltipStyle} cursor={{ fill: 'var(--brand-surface)' }} />
+              <Bar dataKey="value" fill={CHART_COLORS[1]} radius={[0, 2, 2, 0]} name="Alumni" />
             </BarChart>
           </ResponsiveContainer>
         </Panel>
@@ -144,10 +128,10 @@ export default function Dashboard() {
                 labelLine={false}
               >
                 {stats.byCourse.map((_, i) => (
-                  <Cell key={i} fill={COLORS[i % COLORS.length]} stroke="white" strokeWidth={2} />
+                  <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} stroke="white" strokeWidth={2} />
                 ))}
               </Pie>
-              <Tooltip contentStyle={tooltipStyle} />
+              <Tooltip contentStyle={chartTooltipStyle} />
             </PieChart>
           </ResponsiveContainer>
         </Panel>
@@ -166,37 +150,11 @@ function mergeTrends(reg, checkins) {
   return Object.values(map);
 }
 
-const tooltipStyle = {
-  background: 'white',
-  border: '1px solid #e2e8f0',
-  borderRadius: '12px',
-  boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-  fontSize: 13,
-};
-
-function StatCard({ label, value, icon: Icon, gradient }) {
-  return (
-    <div className="bg-white rounded-2xl border border-slate-200 p-5 hover:shadow-lg transition-shadow">
-      <div className="flex items-start justify-between mb-3">
-        <div className={`bg-gradient-to-br ${gradient} p-2.5 rounded-xl`}>
-          <Icon className="text-white" size={20} />
-        </div>
-        <div className="flex items-center gap-1 text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full font-bold">
-          <ArrowUpRight size={12} />
-          Live
-        </div>
-      </div>
-      <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">{label}</p>
-      <p className="text-3xl font-extrabold text-slate-900 mt-1">{value}</p>
-    </div>
-  );
-}
-
 function Panel({ title, subtitle, children, full }) {
   return (
-    <div className={`bg-white rounded-2xl border border-slate-200 p-6 ${full ? 'lg:col-span-2' : ''}`}>
+    <div className={`bg-white border-[2.5px] border-[var(--brand-ink)] rounded-[var(--radius)] shadow-[4px_4px_0_var(--brand-ink)] p-6 ${full ? 'lg:col-span-2' : ''}`}>
       <div className="mb-4">
-        <h2 className="font-bold text-slate-900">{title}</h2>
+        <h2 className="font-display text-lg text-[var(--brand-ink)]">{title}</h2>
         {subtitle && <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}
       </div>
       {children}
