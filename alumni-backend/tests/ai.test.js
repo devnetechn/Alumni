@@ -1,16 +1,23 @@
 const { generateReply, FALLBACK_REPLY, NOT_CONFIGURED_REPLY } = require('../src/lib/ai');
-const { pool, query } = require('../src/db');
-const { resetDb } = require('./helpers');
+const { pool, appPool, query, queryForSchool } = require('../src/db');
+const { resetDb, getDefaultSchool } = require('./helpers');
 
 beforeEach(() => resetDb());
-afterAll(() => pool.end());
+afterAll(() => Promise.all([pool.end(), appPool.end()]));
+
+async function testDb() {
+  const school = await getDefaultSchool();
+  return (text, params) => queryForSchool(school.id, text, params);
+}
 
 test('returns the not-configured fallback when no client is available', async () => {
-  const reply = await generateReply([], 'Hello', null);
+  const db = await testDb();
+  const reply = await generateReply([], 'Hello', db, null);
   expect(reply).toBe(NOT_CONFIGURED_REPLY);
 });
 
 test("returns the model's direct text reply when no tool call is requested", async () => {
+  const db = await testDb();
   const fakeClient = {
     chat: {
       completions: {
@@ -20,16 +27,18 @@ test("returns the model's direct text reply when no tool call is requested", asy
       },
     },
   };
-  const reply = await generateReply([], 'How do I RSVP?', fakeClient);
+  const reply = await generateReply([], 'How do I RSVP?', db, fakeClient);
   expect(reply).toBe('You can RSVP from the Events page.');
   expect(fakeClient.chat.completions.create).toHaveBeenCalledTimes(1);
 });
 
 test('executes a requested tool call against the real database and feeds the result back', async () => {
+  const school = await getDefaultSchool();
   await query(
-    `INSERT INTO events (title, description, location, event_date) VALUES ($1,$2,$3, now() + interval '1 day')`,
-    ['Homecoming', 'desc', 'Gym']
+    `INSERT INTO events (school_id, title, description, location, event_date) VALUES ($1,$2,$3,$4, now() + interval '1 day')`,
+    [school.id, 'Homecoming', 'desc', 'Gym']
   );
+  const db = await testDb();
   const fakeClient = {
     chat: {
       completions: {
@@ -48,7 +57,7 @@ test('executes a requested tool call against the real database and feeds the res
       },
     },
   };
-  const reply = await generateReply([], 'What events are coming up?', fakeClient);
+  const reply = await generateReply([], 'What events are coming up?', db, fakeClient);
   expect(reply).toBe('The next event is Homecoming.');
   expect(fakeClient.chat.completions.create).toHaveBeenCalledTimes(2);
   const secondCallArgs = fakeClient.chat.completions.create.mock.calls[1][0];
@@ -58,14 +67,16 @@ test('executes a requested tool call against the real database and feeds the res
 });
 
 test('returns the fallback reply when the OpenAI call throws', async () => {
+  const db = await testDb();
   const fakeClient = {
     chat: { completions: { create: jest.fn().mockRejectedValue(new Error('network down')) } },
   };
-  const reply = await generateReply([], 'Hello', fakeClient);
+  const reply = await generateReply([], 'Hello', db, fakeClient);
   expect(reply).toBe(FALLBACK_REPLY);
 });
 
 test('returns the fallback reply, not a crash, when a tool call fails internally', async () => {
+  const db = await testDb();
   const fakeClient = {
     chat: {
       completions: {
@@ -84,6 +95,6 @@ test('returns the fallback reply, not a crash, when a tool call fails internally
       },
     },
   };
-  const reply = await generateReply([], 'What jobs are open?', fakeClient);
+  const reply = await generateReply([], 'What jobs are open?', db, fakeClient);
   expect(reply).toBe("I couldn't check that right now, but feel free to browse Jobs directly.");
 });

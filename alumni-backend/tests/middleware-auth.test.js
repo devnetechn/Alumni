@@ -1,6 +1,6 @@
 const express = require('express');
 const request = require('supertest');
-const { pool } = require('../src/db');
+const { pool, appPool } = require('../src/db');
 const { requireAuth, requireAdmin } = require('../src/middleware/auth');
 const { resetDb, insertUser, authHeader } = require('./helpers');
 
@@ -9,7 +9,7 @@ app.get('/protected', requireAuth, (req, res) => res.json({ id: req.user.id }));
 app.get('/admin-only', requireAuth, requireAdmin, (req, res) => res.json({ ok: true }));
 
 beforeEach(() => resetDb());
-afterAll(() => pool.end());
+afterAll(() => Promise.all([pool.end(), appPool.end()]));
 
 test('rejects requests with no token', async () => {
   const res = await request(app).get('/protected');

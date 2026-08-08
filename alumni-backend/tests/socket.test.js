@@ -1,8 +1,8 @@
 const { io: ioClient } = require('socket.io-client');
 const request = require('supertest');
 const { app, server } = require('../src/server');
-const { pool } = require('../src/db');
-const { resetDb, insertUser, authHeader } = require('./helpers');
+const { pool, appPool, queryForSchool } = require('../src/db');
+const { resetDb, insertUser, authHeader, getDefaultSchool } = require('./helpers');
 const { signToken } = require('../src/lib/token');
 const { createNotification } = require('../src/routes/notifications');
 
@@ -16,7 +16,7 @@ beforeAll((done) => {
 });
 
 afterAll((done) => {
-  pool.end().then(() => server.close(done));
+  Promise.all([pool.end(), appPool.end()]).then(() => server.close(done));
 });
 
 beforeEach(() => resetDb());
@@ -54,7 +54,9 @@ test('createNotification emits a notification:new event to that user', async () 
   await new Promise((resolve) => userSocket.on('connect', resolve));
 
   const received = new Promise((resolve) => userSocket.on('notification:new', resolve));
-  await createNotification({ userId: user.id, type: 'info', title: 'Ping' });
+  const school = await getDefaultSchool();
+  const db = (text, params) => queryForSchool(school.id, text, params);
+  await createNotification(db, { userId: user.id, type: 'info', title: 'Ping' });
 
   const payload = await received;
   expect(payload.title).toBe('Ping');

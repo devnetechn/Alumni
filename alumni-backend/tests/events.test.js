@@ -1,10 +1,10 @@
 const request = require('supertest');
 const { app } = require('../src/server');
-const { pool, query } = require('../src/db');
-const { resetDb, insertUser, authHeader } = require('./helpers');
+const { pool, appPool, query } = require('../src/db');
+const { resetDb, insertUser, authHeader, getDefaultSchool, hostFor } = require('./helpers');
 
 beforeEach(() => resetDb());
-afterAll(() => pool.end());
+afterAll(() => Promise.all([pool.end(), appPool.end()]));
 
 test('POST /api/events requires admin', async () => {
   const alumni = await insertUser({ role: 'alumni' });
@@ -16,7 +16,8 @@ test('POST /api/events requires admin', async () => {
 });
 
 test('GET /api/events is public (no auth required)', async () => {
-  const res = await request(app).get('/api/events');
+  const school = await getDefaultSchool();
+  const res = await request(app).get('/api/events').set('Host', hostFor(school));
   expect(res.status).toBe(200);
 });
 

@@ -1,5 +1,4 @@
 const express = require('express');
-const { query } = require('../db');
 const { requireAuth } = require('../middleware/auth');
 const { asyncHandler } = require('../lib/asyncHandler');
 
@@ -11,7 +10,7 @@ const EDITABLE_FIELDS = [
 ];
 
 router.get('/me', requireAuth, asyncHandler(async (req, res) => {
-  const [bot] = await query('SELECT id, full_name FROM users WHERE is_bot = true LIMIT 1');
+  const [bot] = await req.db('SELECT id, full_name FROM users WHERE is_bot = true LIMIT 1');
   res.json({ me: req.user, bot: bot || null });
 }));
 
@@ -26,7 +25,7 @@ router.put('/me', requireAuth, asyncHandler(async (req, res) => {
   const setClause = columns.map((col, i) => `${col} = $${i + 1}`).join(', ');
   const values = columns.map((col) => updates[col]);
 
-  const rows = await query(
+  const rows = await req.db(
     `UPDATE users SET ${setClause} WHERE id = $${columns.length + 1} RETURNING *`,
     [...values, req.user.id]
   );

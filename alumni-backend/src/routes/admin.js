@@ -1,5 +1,4 @@
 const express = require('express');
-const { query } = require('../db');
 const { requireAuth, requireAdmin } = require('../middleware/auth');
 const { asyncHandler } = require('../lib/asyncHandler');
 
@@ -7,7 +6,7 @@ const router = express.Router();
 router.use(requireAuth, requireAdmin);
 
 router.get('/users', asyncHandler(async (req, res) => {
-  const users = await query(
+  const users = await req.db(
     `SELECT id, email, role, active, is_batch_leader, full_name, batch_year, course, created_at
      FROM users ORDER BY created_at DESC`
   );
@@ -24,7 +23,7 @@ router.put('/users/:id', asyncHandler(async (req, res) => {
 
   const setClause = columns.map((col, i) => `${col} = $${i + 1}`).join(', ');
   const values = columns.map((col) => updates[col]);
-  const rows = await query(
+  const rows = await req.db(
     `UPDATE users SET ${setClause} WHERE id = $${columns.length + 1} RETURNING *`,
     [...values, req.params.id]
   );
@@ -38,7 +37,7 @@ router.delete('/users/:id', asyncHandler(async (req, res) => {
   if (String(req.params.id) === String(req.user.id)) {
     return res.status(400).json({ error: 'Cannot delete your own account' });
   }
-  await query('DELETE FROM users WHERE id = $1', [req.params.id]);
+  await req.db('DELETE FROM users WHERE id = $1', [req.params.id]);
   res.status(204).end();
 }));
 

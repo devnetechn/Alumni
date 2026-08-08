@@ -1,8 +1,8 @@
-const { pool, query } = require('../src/db');
+const { pool, appPool, query } = require('../src/db');
 const { seed } = require('../db/seed');
 const { resetDb } = require('./helpers');
 
-afterAll(() => pool.end());
+afterAll(() => Promise.all([pool.end(), appPool.end()]));
 beforeEach(() => resetDb());
 
 test('seed creates the default admin and sample data', async () => {
@@ -41,4 +41,20 @@ test('seed creates a reserved bot account exactly once, idempotently', async () 
   expect(bots[0].full_name).toBe('IHES Assistant');
   expect(bots[0].role).toBe('alumni');
   expect(bots[0].active).toBe(true);
+});
+
+test('seed creates two schools, scoping existing fixtures to the first and adding a minimal second', async () => {
+  await seed(pool);
+
+  const schools = await query('SELECT * FROM schools ORDER BY id ASC');
+  expect(schools.length).toBe(2);
+  expect(schools[0].slug).toBe('ihes');
+  expect(schools[1].slug).toBe('demo-school');
+
+  const ihesUsers = await query('SELECT * FROM users WHERE school_id = $1', [schools[0].id]);
+  expect(ihesUsers.length).toBeGreaterThanOrEqual(6); // admin + 4 alumni + bot
+
+  const demoUsers = await query('SELECT * FROM users WHERE school_id = $1', [schools[1].id]);
+  expect(demoUsers.length).toBe(1);
+  expect(demoUsers[0].role).toBe('admin');
 });

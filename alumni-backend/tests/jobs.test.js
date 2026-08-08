@@ -1,35 +1,38 @@
 const request = require('supertest');
 const { app } = require('../src/server');
-const { pool } = require('../src/db');
-const { resetDb, insertUser, authHeader } = require('./helpers');
+const { pool, appPool } = require('../src/db');
+const { resetDb, insertUser, authHeader, getDefaultSchool, hostFor } = require('./helpers');
 
 beforeEach(() => resetDb());
-afterAll(() => pool.end());
+afterAll(() => Promise.all([pool.end(), appPool.end()]));
 
 test('GET /api/jobs is public and includes poster info', async () => {
+  const school = await getDefaultSchool();
   const poster = await insertUser({ full_name: 'Poster Person' });
   await request(app)
     .post('/api/jobs')
     .set('Authorization', authHeader(poster))
     .send({ title: 'Backend Dev', company: 'Acme', job_type: 'job' });
 
-  const res = await request(app).get('/api/jobs');
+  const res = await request(app).get('/api/jobs').set('Host', hostFor(school));
   expect(res.status).toBe(200);
   expect(res.body.jobs[0].poster_name).toBe('Poster Person');
 });
 
 test('GET /api/jobs?type=internship filters by job_type', async () => {
+  const school = await getDefaultSchool();
   const poster = await insertUser();
   await request(app).post('/api/jobs').set('Authorization', authHeader(poster)).send({ title: 'Job A', job_type: 'job' });
   await request(app).post('/api/jobs').set('Authorization', authHeader(poster)).send({ title: 'Intern A', job_type: 'internship' });
 
-  const res = await request(app).get('/api/jobs').query({ type: 'internship' });
+  const res = await request(app).get('/api/jobs').query({ type: 'internship' }).set('Host', hostFor(school));
   expect(res.body.jobs.length).toBe(1);
   expect(res.body.jobs[0].title).toBe('Intern A');
 });
 
 test('POST /api/jobs requires auth', async () => {
-  const res = await request(app).post('/api/jobs').send({ title: 'No Auth Job' });
+  const school = await getDefaultSchool();
+  const res = await request(app).post('/api/jobs').set('Host', hostFor(school)).send({ title: 'No Auth Job' });
   expect(res.status).toBe(401);
 });
 

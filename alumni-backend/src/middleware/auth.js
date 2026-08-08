@@ -13,8 +13,13 @@ async function requireAuth(req, res, next) {
     return res.status(401).json({ error: 'Invalid or expired token' });
   }
 
+  if (req.school && payload.school_id !== req.school.id) {
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
+
   try {
-    const rows = await query('SELECT * FROM users WHERE id = $1', [payload.id]);
+    const db = req.db || query;
+    const rows = await db('SELECT * FROM users WHERE id = $1', [payload.id]);
     if (rows.length === 0) return res.status(401).json({ error: 'User not found' });
 
     const user = rows[0];

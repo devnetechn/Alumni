@@ -8,7 +8,7 @@ if (!SECRET) {
 }
 
 function signToken(user) {
-  return jwt.sign({ id: user.id, role: user.role }, SECRET, { expiresIn: '7d' });
+  return jwt.sign({ id: user.id, role: user.role, school_id: user.school_id }, SECRET, { expiresIn: '7d' });
 }
 
 function verifyToken(token) {

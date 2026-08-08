@@ -32,6 +32,23 @@ The Messages page includes a reserved "IHES Assistant" bot account (seeded by
 fixed "isn't configured yet" message instead of an AI-generated one — the
 rest of the app is unaffected either way.
 
+## Multi-tenancy
+
+Every alumni, event, job, etc. belongs to a school (`schools` table), resolved per-request from
+the subdomain (e.g. `ihes.yourapp.com`). Row-Level Security enforces isolation at the database
+level — the app's runtime connection uses a restricted `alumni_app` Postgres role (not the
+`postgres` superuser used for migrations/seeding), since superusers always bypass RLS. This role
+is created automatically the first time `npm run migrate` / `npm run migrate:test` runs, using
+the placeholder password in `.env.example`'s `APP_DATABASE_URL`/`TEST_APP_DATABASE_URL` — change
+it before deploying anywhere but local dev.
+
+`npm run seed` creates two schools (`ihes`, the original fixture data, and a minimal `demo-school`)
+so isolation can be checked manually: log into `ihes.localhost:5173` and `demo-school.localhost:5173`
+(both resolve to `127.0.0.1` automatically in modern browsers, no `/etc/hosts` editing needed) and
+confirm neither sees the other's alumni, events, or messages.
+
+There is no self-serve signup yet — new schools are inserted directly into the `schools` table.
+
 ## Frontend
 
 `alumni-frontend`'s Vite dev server proxies `/api` to `http://localhost:4000` — no
