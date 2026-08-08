@@ -3,7 +3,10 @@ const cors = require('cors');
 
 const app = express();
 app.use(cors());
-app.use(express.json({ limit: '2mb' }));
+app.use(express.json({
+  limit: '2mb',
+  verify: (req, res, buf) => { req.rawBody = buf; },
+}));
 
 app.get('/api/health', (req, res) => {
   res.json({ ok: true });
@@ -14,6 +17,9 @@ app.use('/api/platform', platformRoutes);
 
 const platformAdminRoutes = require('./routes/platformAdmin');
 app.use('/api/platform/admin', platformAdminRoutes);
+
+const paymentsWebhookRoutes = require('./routes/paymentsWebhook');
+app.use('/api/payments', paymentsWebhookRoutes);
 
 const { resolveTenant } = require('./middleware/tenant');
 app.use(resolveTenant);
