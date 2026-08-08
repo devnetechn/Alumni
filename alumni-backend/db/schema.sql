@@ -236,3 +236,23 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO alumni_app;
 
 ALTER TABLE schools ADD COLUMN IF NOT EXISTS logo TEXT;
 ALTER TABLE schools ADD COLUMN IF NOT EXISTS trial_ends_at TIMESTAMPTZ NOT NULL DEFAULT (now() + interval '30 days');
+
+CREATE TABLE IF NOT EXISTS platform_admins (
+  id SERIAL PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'alumni_platform') THEN
+    CREATE ROLE alumni_platform LOGIN PASSWORD 'alumni_platform_dev' BYPASSRLS;
+  END IF;
+END
+$$;
+
+GRANT SELECT, UPDATE, DELETE ON schools TO alumni_platform;
+GRANT SELECT ON users, events, event_rsvps, event_checkins, jobs, announcements, messages, groups, group_members, group_posts, notifications TO alumni_platform;
+GRANT ALL ON platform_admins TO alumni_platform;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO alumni_platform;

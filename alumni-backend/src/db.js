@@ -15,9 +15,15 @@ function resolveConnectionString(varName) {
 
 const pool = new Pool({ connectionString: resolveConnectionString('DATABASE_URL') });
 const appPool = new Pool({ connectionString: resolveConnectionString('APP_DATABASE_URL') });
+const platformPool = new Pool({ connectionString: resolveConnectionString('PLATFORM_DATABASE_URL') });
 
 async function query(text, params) {
   const result = await pool.query(text, params);
+  return result.rows;
+}
+
+async function platformQuery(text, params) {
+  const result = await platformPool.query(text, params);
   return result.rows;
 }
 
@@ -37,4 +43,4 @@ async function queryForSchool(schoolId, text, params) {
   }
 }
 
-module.exports = { pool, appPool, query, queryForSchool };
+module.exports = { pool, appPool, platformPool, query, queryForSchool, platformQuery };

@@ -10,7 +10,7 @@ test('all expected tables exist after migration', async () => {
   expect(names).toEqual([
     'announcements', 'event_checkins', 'event_rsvps', 'events',
     'group_members', 'group_posts', 'groups', 'jobs',
-    'messages', 'notifications', 'schools', 'users',
+    'messages', 'notifications', 'platform_admins', 'schools', 'users',
   ]);
 });
 
