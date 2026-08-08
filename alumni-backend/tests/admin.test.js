@@ -1,7 +1,7 @@
 const request = require('supertest');
 const { app } = require('../src/server');
 const { pool, appPool, query } = require('../src/db');
-const { resetDb, insertUser, authHeader } = require('./helpers');
+const { resetDb, insertUser, authHeader, getDefaultSchool, hostFor } = require('./helpers');
 
 beforeEach(() => resetDb());
 afterAll(() => Promise.all([pool.end(), appPool.end()]));
@@ -115,4 +115,36 @@ test('deleting a user who owns an event/job/announcement succeeds and nulls out 
 
   const announcementRows = await query('SELECT posted_by FROM announcements WHERE id = $1', [announcement.body.announcement.id]);
   expect(announcementRows[0].posted_by).toBeNull();
+});
+
+test('GET /api/school includes registration_open and registration_fee', async () => {
+  const school = await getDefaultSchool();
+  const res = await request(app).get('/api/school').set('Host', hostFor(school));
+  expect(res.status).toBe(200);
+  expect(res.body.registration_open).toBe(true);
+  expect(res.body.registration_fee).toBe(0);
+});
+
+test('PATCH /api/admin/school requires admin', async () => {
+  const school = await getDefaultSchool();
+  const alumni = await insertUser();
+  const res = await request(app)
+    .patch('/api/admin/school')
+    .set('Host', hostFor(school))
+    .set('Authorization', authHeader(alumni))
+    .send({ registration_fee: 20000 });
+  expect(res.status).toBe(403);
+});
+
+test('admin can update registration_open and registration_fee', async () => {
+  const school = await getDefaultSchool();
+  const admin = await insertUser({ role: 'admin' });
+  const res = await request(app)
+    .patch('/api/admin/school')
+    .set('Host', hostFor(school))
+    .set('Authorization', authHeader(admin))
+    .send({ registration_open: false, registration_fee: 20000 });
+  expect(res.status).toBe(200);
+  expect(res.body.school.registration_open).toBe(false);
+  expect(res.body.school.registration_fee).toBe(20000);
 });

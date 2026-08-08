@@ -5,6 +5,23 @@ const { asyncHandler } = require('../lib/asyncHandler');
 const router = express.Router();
 router.use(requireAuth, requireAdmin);
 
+router.patch('/school', asyncHandler(async (req, res) => {
+  const updates = {};
+  for (const field of ['registration_open', 'registration_fee']) {
+    if (field in req.body) updates[field] = req.body[field];
+  }
+  const columns = Object.keys(updates);
+  if (columns.length === 0) return res.status(400).json({ error: 'No valid fields to update' });
+
+  const setClause = columns.map((col, i) => `${col} = $${i + 1}`).join(', ');
+  const values = columns.map((col) => updates[col]);
+  const rows = await req.db(
+    `UPDATE schools SET ${setClause} WHERE id = $${columns.length + 1} RETURNING id, slug, name, registration_open, registration_fee`,
+    [...values, req.school.id]
+  );
+  res.json({ school: rows[0] });
+}));
+
 router.get('/users', asyncHandler(async (req, res) => {
   const users = await req.db(
     `SELECT id, email, role, active, is_batch_leader, member_type, full_name, batch_year, course, created_at

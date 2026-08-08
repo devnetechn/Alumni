@@ -10,7 +10,7 @@ async function resolveTenant(req, res, next) {
     const slug = subdomainFrom(req.headers.host);
     let school = null;
 
-    const bySlug = await query('SELECT id, slug, name, logo, plan, trial_ends_at, active FROM schools WHERE slug = $1', [slug]);
+    const bySlug = await query('SELECT id, slug, name, logo, plan, trial_ends_at, active, registration_open, registration_fee FROM schools WHERE slug = $1', [slug]);
     if (bySlug.length > 0 && bySlug[0].active) {
       school = bySlug[0];
     }
@@ -22,7 +22,7 @@ async function resolveTenant(req, res, next) {
         try {
           const payload = verifyToken(token);
           if (payload.school_id) {
-            const byId = await query('SELECT id, slug, name, logo, plan, trial_ends_at, active FROM schools WHERE id = $1', [payload.school_id]);
+            const byId = await query('SELECT id, slug, name, logo, plan, trial_ends_at, active, registration_open, registration_fee FROM schools WHERE id = $1', [payload.school_id]);
             if (byId.length > 0 && byId[0].active) {
               school = byId[0];
             }
