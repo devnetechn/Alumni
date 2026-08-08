@@ -24,6 +24,9 @@ app.use('/api/auth', authRoutes);
 const schoolRoutes = require('./routes/school');
 app.use('/api', schoolRoutes);
 
+const chatRoutes = require('./routes/chat');
+app.use('/api', chatRoutes);
+
 const meRoutes = require('./routes/me');
 app.use('/api', meRoutes);
 
