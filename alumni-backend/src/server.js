@@ -18,6 +18,9 @@ app.use(resolveTenant);
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
 
+const schoolRoutes = require('./routes/school');
+app.use('/api', schoolRoutes);
+
 const meRoutes = require('./routes/me');
 app.use('/api', meRoutes);
 
