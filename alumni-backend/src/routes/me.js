@@ -10,9 +10,10 @@ const EDITABLE_FIELDS = [
   'position', 'industry', 'bio', 'profile_pic', 'mentor_available', 'nfc_uid',
 ];
 
-router.get('/me', requireAuth, (req, res) => {
-  res.json({ me: req.user });
-});
+router.get('/me', requireAuth, asyncHandler(async (req, res) => {
+  const [bot] = await query('SELECT id, full_name FROM users WHERE is_bot = true LIMIT 1');
+  res.json({ me: req.user, bot: bot || null });
+}));
 
 router.put('/me', requireAuth, asyncHandler(async (req, res) => {
   const updates = {};

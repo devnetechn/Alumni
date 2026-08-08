@@ -35,3 +35,18 @@ test('PUT /api/me cannot escalate role via request body', async () => {
   expect(res.status).toBe(200);
   expect(res.body.me.role).toBe('alumni');
 });
+
+test('GET /api/me exposes the reserved bot account id and name', async () => {
+  const user = await insertUser();
+  const bot = await insertUser({ is_bot: true, full_name: 'IHES Assistant', email: 'bot@ihes.local' });
+  const res = await request(app).get('/api/me').set('Authorization', authHeader(user));
+  expect(res.status).toBe(200);
+  expect(res.body.bot).toEqual({ id: bot.id, full_name: 'IHES Assistant' });
+});
+
+test('GET /api/me returns bot: null when no bot account exists', async () => {
+  const user = await insertUser();
+  const res = await request(app).get('/api/me').set('Authorization', authHeader(user));
+  expect(res.status).toBe(200);
+  expect(res.body.bot).toBeNull();
+});
