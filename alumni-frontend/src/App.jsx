@@ -48,7 +48,7 @@ const navItems = [
 ];
 
 function Sidebar({ open, onClose }) {
-  const { user, logout } = useAuth();
+  const { user, logout, school } = useAuth();
   const nav = useNavigate();
   if (!user) return null;
 
@@ -57,12 +57,16 @@ function Sidebar({ open, onClose }) {
       {open && <div className="fixed inset-0 bg-black/40 z-30 lg:hidden" onClick={onClose} />}
       <aside className={`fixed lg:sticky lg:flex-shrink-0 top-0 left-0 h-screen w-64 bg-white border-r-[2.5px] border-[var(--brand-ink)] z-40 flex flex-col transition-transform lg:transform-none ${open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         <div className="flex items-center gap-2 px-6 py-5 border-b-[2.5px] border-[var(--brand-ink)] flex-shrink-0">
-          <div className="bg-[var(--brand-accent)] border-2 border-[var(--brand-ink)] rounded-[var(--radius)] p-2">
-            <GraduationCap className="text-white" size={22} />
-          </div>
+          {school?.logo ? (
+            <img src={school.logo} alt="" className="w-9 h-9 rounded-[var(--radius)] border-2 border-[var(--brand-ink)] object-cover" />
+          ) : (
+            <div className="bg-[var(--brand-accent)] border-2 border-[var(--brand-ink)] rounded-[var(--radius)] p-2">
+              <GraduationCap className="text-white" size={22} />
+            </div>
+          )}
           <div>
             <Wordmark />
-            <p className="text-xs text-slate-500 leading-tight">IHES Alumni Association</p>
+            <p className="text-xs text-slate-500 leading-tight">{school?.name || 'IHES Alumni Association'}</p>
           </div>
         </div>
 
@@ -109,7 +113,7 @@ function Sidebar({ open, onClose }) {
 }
 
 function MobileHeader({ onMenu }) {
-  const { user } = useAuth();
+  const { user, school } = useAuth();
   if (!user) return null;
   return (
     <header className="lg:hidden sticky top-0 z-20 bg-white border-b-[2.5px] border-[var(--brand-ink)] px-4 py-3 flex items-center gap-3">
@@ -117,7 +121,11 @@ function MobileHeader({ onMenu }) {
         <Menu size={20} />
       </button>
       <div className="flex items-center gap-2">
-        <GraduationCap className="text-[var(--brand-accent)]" size={20} />
+        {school?.logo ? (
+          <img src={school.logo} alt="" className="w-5 h-5 rounded object-cover" />
+        ) : (
+          <GraduationCap className="text-[var(--brand-accent)]" size={20} />
+        )}
         <Wordmark />
       </div>
     </header>

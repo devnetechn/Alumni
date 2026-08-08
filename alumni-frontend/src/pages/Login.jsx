@@ -5,7 +5,7 @@ import { useAuth } from '../auth';
 import { Button, Input, Wordmark } from '../components/ui';
 
 export default function Login() {
-  const { login } = useAuth();
+  const { login, school } = useAuth();
   const nav = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -33,9 +33,13 @@ export default function Login() {
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, white 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
         <div className="relative z-10 flex flex-col justify-between p-12 text-white">
           <Link to="/" className="flex items-center gap-2">
-            <div className="bg-[var(--brand-accent)] border-2 border-white p-2 rounded-[var(--radius)]">
-              <GraduationCap size={22} />
-            </div>
+            {school?.logo ? (
+              <img src={school.logo} alt="" className="w-9 h-9 rounded-[var(--radius)] border-2 border-white object-cover" />
+            ) : (
+              <div className="bg-[var(--brand-accent)] border-2 border-white p-2 rounded-[var(--radius)]">
+                <GraduationCap size={22} />
+              </div>
+            )}
             <Wordmark className="text-white" />
           </Link>
           <div>
@@ -54,9 +58,13 @@ export default function Login() {
       <div className="flex-1 flex items-center justify-center p-6">
         <form onSubmit={onSubmit} className="w-full max-w-md">
           <div className="lg:hidden mb-8 flex items-center gap-2">
-            <div className="bg-[var(--brand-accent)] border-2 border-[var(--brand-ink)] p-2 rounded-[var(--radius)]">
-              <GraduationCap className="text-white" size={22} />
-            </div>
+            {school?.logo ? (
+              <img src={school.logo} alt="" className="w-9 h-9 rounded-[var(--radius)] border-2 border-[var(--brand-ink)] object-cover" />
+            ) : (
+              <div className="bg-[var(--brand-accent)] border-2 border-[var(--brand-ink)] p-2 rounded-[var(--radius)]">
+                <GraduationCap className="text-white" size={22} />
+              </div>
+            )}
             <Wordmark />
           </div>
 

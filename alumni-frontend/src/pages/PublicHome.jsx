@@ -8,12 +8,6 @@ import PosterBadge from '../components/PosterBadge';
 import Hero from '../components/Hero';
 import { Panel, Button, Wordmark } from '../components/ui';
 
-// Swap point: once the real school logo is supplied, save it as
-// src/assets/logo.svg, then uncomment the import below and delete the
-// `const logo = null;` line.
-// import logo from '../assets/logo.svg';
-const logo = null;
-
 const sectionFade = {
   hidden: { opacity: 0, y: 16 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.25, ease: 'easeOut' } },
@@ -29,7 +23,7 @@ const cardFade = {
 };
 
 export default function PublicHome() {
-  const { user } = useAuth();
+  const { user, school } = useAuth();
   const [announcements, setAnnouncements] = useState([]);
   const [events, setEvents] = useState([]);
   const [stats, setStats] = useState(null);
@@ -58,8 +52,8 @@ export default function PublicHome() {
       >
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-2">
-            {logo ? (
-              <img src={logo} alt="Alumni logo" className="h-9 w-9 rounded-[var(--radius)] object-contain" />
+            {school?.logo ? (
+              <img src={school.logo} alt="" className="h-9 w-9 rounded-[var(--radius)] border-2 border-white object-cover" />
             ) : (
               <div className="p-2 rounded-[var(--radius)] bg-[var(--brand-accent)] border-2 border-white">
                 <GraduationCap className="text-white" size={22} />
