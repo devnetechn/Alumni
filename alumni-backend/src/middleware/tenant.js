@@ -39,6 +39,13 @@ async function resolveTenant(req, res, next) {
 
     req.school = school;
     req.db = (text, params) => queryForSchool(school.id, text, params);
+
+    const trialExpired = school.plan === 'trial' && new Date(school.trial_ends_at) < new Date();
+    const allowlist = ['/api/auth/login', '/api/me', '/api/school'];
+    if (trialExpired && !allowlist.includes(req.path)) {
+      return res.status(402).json({ error: 'Trial expired', trialEndsAt: school.trial_ends_at });
+    }
+
     next();
   } catch (err) {
     next(err);
