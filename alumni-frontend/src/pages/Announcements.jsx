@@ -3,6 +3,7 @@ import { Plus, X, Trash2 } from 'lucide-react';
 import { api } from '../api';
 import { useAuth } from '../auth';
 import PosterBadge from '../components/PosterBadge';
+import { Panel, Button, Input } from '../components/ui';
 
 export default function Announcements() {
   const { user } = useAuth();
@@ -33,47 +34,32 @@ export default function Announcements() {
     <div className="p-6 lg:p-10 max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Announcements</h1>
+          <h1 className="font-display text-3xl text-[var(--brand-ink)]">Announcements</h1>
           <p className="text-slate-500 mt-1">News and updates for the alumni community</p>
         </div>
         {isAdmin && (
-          <button onClick={() => setShowForm(!showForm)} className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-4 py-2.5 rounded-lg font-semibold transition-colors">
+          <Button onClick={() => setShowForm(!showForm)}>
             {showForm ? <><X size={18} /> Cancel</> : <><Plus size={18} /> New</>}
-          </button>
+          </Button>
         )}
       </div>
 
       {showForm && isAdmin && (
-        <form onSubmit={submit} className="bg-white p-6 rounded-2xl border border-slate-200 mb-6 space-y-4">
-          <input
-            className="w-full border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            placeholder="Announcement title"
-            value={form.title}
-            onChange={(e) => setForm({ ...form, title: e.target.value })}
-            required
-          />
-          <textarea
-            className="w-full border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            rows="5"
-            placeholder="Write your announcement..."
-            value={form.body}
-            onChange={(e) => setForm({ ...form, body: e.target.value })}
-          />
-          <button className="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-lg font-semibold transition-colors">
-            Publish
-          </button>
-        </form>
+        <Panel as="form" onSubmit={submit} className="p-6 mb-6 space-y-4">
+          <Input placeholder="Announcement title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
+          <Input as="textarea" rows="5" placeholder="Write your announcement..." value={form.body} onChange={(e) => setForm({ ...form, body: e.target.value })} />
+          <Button type="submit">Publish</Button>
+        </Panel>
       )}
 
       <div className="space-y-4">
         {items.length === 0 && (
-          <div className="bg-white p-8 rounded-2xl border border-slate-200 text-center text-slate-500">
+          <Panel className="p-8 text-center text-slate-500">
             No announcements yet.
-          </div>
+          </Panel>
         )}
         {items.map((a) => (
-          <article key={a.id} className="bg-white p-6 rounded-2xl border border-slate-200 hover:shadow-md transition-shadow">
-            {/* Poster header */}
+          <Panel key={a.id} className="p-6">
             <div className="flex items-start justify-between gap-3 mb-4">
               <PosterBadge
                 name={a.poster_name}
@@ -84,16 +70,14 @@ export default function Announcements() {
                 date={new Date(a.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
               />
               {isAdmin && (
-                <button onClick={() => remove(a.id)} className="text-slate-400 hover:text-red-600 p-1">
+                <button onClick={() => remove(a.id)} className="text-slate-400 hover:text-[var(--brand-danger)] p-1">
                   <Trash2 size={16} />
                 </button>
               )}
             </div>
-
-            {/* Content */}
-            <h3 className="text-xl font-bold text-slate-900 mb-2">{a.title}</h3>
+            <h3 className="text-xl font-bold text-[var(--brand-ink)] mb-2">{a.title}</h3>
             <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">{a.body}</p>
-          </article>
+          </Panel>
         ))}
       </div>
     </div>
