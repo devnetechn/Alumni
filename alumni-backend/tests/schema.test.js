@@ -19,7 +19,7 @@ test('schools table exists with the expected columns', async () => {
     `SELECT column_name FROM information_schema.columns WHERE table_name = 'schools'`
   );
   const names = rows.map((r) => r.column_name).sort();
-  expect(names).toEqual(['active', 'created_at', 'id', 'name', 'plan', 'slug']);
+  expect(names).toEqual(['active', 'created_at', 'id', 'logo', 'name', 'plan', 'slug', 'trial_ends_at']);
 });
 
 test('every tenant table has a school_id column', async () => {
