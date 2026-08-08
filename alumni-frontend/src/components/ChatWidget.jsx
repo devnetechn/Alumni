@@ -84,13 +84,15 @@ export default function ChatWidget() {
           </form>
         </div>
       )}
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="w-14 h-14 rounded-[var(--radius)] bg-[var(--brand-accent)] border-[2.5px] border-[var(--brand-ink)] shadow-[4px_4px_0_var(--brand-ink)] flex items-center justify-center text-white hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[3px_3px_0_var(--brand-ink)] transition-all"
-        aria-label="Open AI chat"
-      >
-        {open ? <X size={24} /> : <Bot size={24} />}
-      </button>
+      {!open && (
+        <button
+          onClick={() => setOpen(true)}
+          className="w-14 h-14 rounded-[var(--radius)] bg-[var(--brand-accent)] border-[2.5px] border-[var(--brand-ink)] shadow-[4px_4px_0_var(--brand-ink)] flex items-center justify-center text-white hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[3px_3px_0_var(--brand-ink)] transition-all"
+          aria-label="Open AI chat"
+        >
+          <Bot size={24} />
+        </button>
+      )}
     </div>
   );
 }
