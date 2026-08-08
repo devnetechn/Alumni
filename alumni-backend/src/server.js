@@ -9,6 +9,9 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true });
 });
 
+const platformRoutes = require('./routes/platform');
+app.use('/api/platform', platformRoutes);
+
 const { resolveTenant } = require('./middleware/tenant');
 app.use(resolveTenant);
 
