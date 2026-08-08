@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { QrCode, Calendar } from 'lucide-react';
 import { api } from '../api';
+import { Panel } from '../components/ui';
 
 // Entry point para sa officers: list upcoming events, tap to scan.
 export default function ScanRedirect() {
@@ -23,8 +24,8 @@ export default function ScanRedirect() {
   return (
     <div className="p-6 lg:p-10 max-w-3xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-2">
-          <QrCode className="text-indigo-600" /> Scan Check-in
+        <h1 className="font-display text-3xl text-[var(--brand-ink)] flex items-center gap-2">
+          <QrCode className="text-[var(--brand-accent)]" /> Scan Check-in
         </h1>
         <p className="text-slate-500 mt-1">Pilia ang event nga inyo gi-man sa scanning.</p>
       </div>
@@ -33,29 +34,30 @@ export default function ScanRedirect() {
 
       <div className="space-y-3">
         {events.map((ev) => (
-          <button
+          <Panel
             key={ev.id}
+            as="button"
             onClick={() => nav(`/events/${ev.id}/checkin`)}
-            className="w-full text-left bg-white p-5 rounded-2xl border border-slate-200 hover:border-indigo-500 hover:shadow-md transition-all"
+            className="w-full text-left p-5 hover:shadow-[4px_4px_0_var(--brand-accent)] hover:border-[var(--brand-accent)] transition-all"
           >
             <div className="flex items-center gap-4">
-              <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-3 rounded-xl">
+              <div className="bg-[var(--brand-accent)] border-2 border-[var(--brand-ink)] p-3 rounded-[var(--radius)]">
                 <Calendar className="text-white" size={22} />
               </div>
               <div className="flex-1">
-                <h3 className="font-bold text-slate-900">{ev.title}</h3>
+                <h3 className="font-bold text-[var(--brand-ink)]">{ev.title}</h3>
                 <p className="text-xs text-slate-500">
                   {new Date(ev.event_date).toLocaleString()} {ev.location ? `· ${ev.location}` : ''}
                 </p>
               </div>
               <QrCode className="text-slate-400" size={22} />
             </div>
-          </button>
+          </Panel>
         ))}
         {!loading && events.length === 0 && (
-          <div className="bg-white p-8 rounded-2xl border border-slate-200 text-center text-slate-500">
+          <Panel className="p-8 text-center text-slate-500">
             Walay event available.
-          </div>
+          </Panel>
         )}
       </div>
     </div>
