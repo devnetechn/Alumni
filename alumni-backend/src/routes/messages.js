@@ -3,8 +3,33 @@ const { query } = require('../db');
 const { requireAuth } = require('../middleware/auth');
 const { emitToUser } = require('../lib/socket');
 const { createNotification } = require('./notifications');
+const { generateReply } = require('../lib/ai');
 
 const router = express.Router();
+
+async function replyIfBot(receiverId, senderId, userBody) {
+  const [bot] = await query('SELECT id FROM users WHERE is_bot = true LIMIT 1');
+  if (!bot || bot.id !== receiverId) return;
+
+  const historyRows = await query(
+    `SELECT sender_id, body FROM messages
+     WHERE (sender_id = $1 AND receiver_id = $2) OR (sender_id = $2 AND receiver_id = $1)
+     ORDER BY created_at DESC LIMIT 10`,
+    [senderId, bot.id]
+  );
+  const history = historyRows
+    .reverse()
+    .slice(0, -1)
+    .map((m) => ({ role: m.sender_id === bot.id ? 'assistant' : 'user', content: m.body }));
+
+  const reply = await generateReply(history, userBody);
+
+  const [replyMessage] = await query(
+    `INSERT INTO messages (sender_id, receiver_id, body) VALUES ($1,$2,$3) RETURNING *`,
+    [bot.id, senderId, reply]
+  );
+  emitToUser(senderId, 'message:new', replyMessage);
+}
 
 router.get('/', requireAuth, async (req, res) => {
   try {
@@ -79,6 +104,10 @@ router.post('/', requireAuth, async (req, res) => {
       link: `/messages?to=${req.user.id}`,
     });
     res.status(201).json({ message: message });
+
+    replyIfBot(receiver_id, req.user.id, body).catch((err) => {
+      console.error('Error generating bot reply:', err);
+    });
   } catch (err) {
     console.error('Error sending message:', err);
     res.status(500).json({ error: 'Internal server error' });
