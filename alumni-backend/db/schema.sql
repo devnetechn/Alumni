@@ -259,3 +259,15 @@ GRANT SELECT, UPDATE, DELETE ON schools TO alumni_platform;
 GRANT SELECT ON users, events, event_rsvps, event_checkins, jobs, announcements, messages, groups, group_members, group_posts, notifications TO alumni_platform;
 GRANT ALL ON platform_admins TO alumni_platform;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO alumni_platform;
+
+ALTER TABLE schools ADD COLUMN IF NOT EXISTS registration_open BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE schools ADD COLUMN IF NOT EXISTS registration_fee INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS registration_paid_until TIMESTAMPTZ;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS paymongo_checkout_session_id TEXT;
+
+UPDATE users SET registration_paid_until = now() + interval '2 years' WHERE registration_paid_until IS NULL;
+
+CREATE TABLE IF NOT EXISTS processed_webhook_events (
+  id TEXT PRIMARY KEY,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
