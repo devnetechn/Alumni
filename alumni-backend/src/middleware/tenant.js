@@ -33,6 +33,13 @@ async function resolveTenant(req, res, next) {
       }
     }
 
+    if (!school && process.env.NODE_ENV !== 'production' && process.env.DEFAULT_SCHOOL_SLUG) {
+      const fallback = await query('SELECT id, slug, name, logo, plan, trial_ends_at, active, registration_open, registration_fee FROM schools WHERE slug = $1', [process.env.DEFAULT_SCHOOL_SLUG]);
+      if (fallback.length > 0 && fallback[0].active) {
+        school = fallback[0];
+      }
+    }
+
     if (!school) {
       return res.status(404).json({ error: 'Unknown school' });
     }
