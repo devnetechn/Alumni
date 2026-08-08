@@ -13,11 +13,31 @@ export default function Messages() {
   const [alumniList, setAlumniList] = useState([]);
   const [searching, setSearching] = useState(false);
   const [searchQ, setSearchQ] = useState('');
+  const [botInfo, setBotInfo] = useState(null);
+  const [botTyping, setBotTyping] = useState(false);
   const scrollRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
   const [searchParams] = useSearchParams();
 
   const loadConvos = () => api.get('/messages').then((r) => setConversations(r.data.conversations));
   useEffect(() => { loadConvos(); }, []);
+
+  useEffect(() => {
+    api.get('/me').then((r) => setBotInfo(r.data.bot || null));
+  }, []);
+
+  const displayConversations = botInfo
+    ? [
+        conversations.find((c) => c.other_id === botInfo.id) || {
+          other_id: botInfo.id,
+          other_name: botInfo.full_name,
+          other_email: '',
+          last_body: 'Ask me anything about the site',
+          unread_count: 0,
+        },
+        ...conversations.filter((c) => c.other_id !== botInfo.id),
+      ]
+    : conversations;
 
   useEffect(() => {
     const to = searchParams.get('to');
@@ -32,10 +52,14 @@ export default function Messages() {
       if (active && (message.sender_id === active || message.receiver_id === active)) {
         openThread(active);
       }
+      if (botInfo && message.sender_id === botInfo.id) {
+        setBotTyping(false);
+        clearTimeout(typingTimeoutRef.current);
+      }
     };
     socket.on('message:new', onNewMessage);
     return () => socket.off('message:new', onNewMessage);
-  }, [active]);
+  }, [active, botInfo]);
 
   const openThread = async (userId) => {
     setActive(userId);
@@ -52,6 +76,11 @@ export default function Messages() {
     setBody('');
     openThread(active);
     loadConvos();
+    if (botInfo && active === botInfo.id) {
+      setBotTyping(true);
+      clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = setTimeout(() => setBotTyping(false), 15000);
+    }
   };
 
   const searchAlumni = async (q) => {
@@ -108,10 +137,10 @@ export default function Messages() {
           )}
 
           <div className="flex-1 overflow-y-auto">
-            {conversations.length === 0 && !searching && (
+            {displayConversations.length === 0 && !searching && (
               <p className="p-6 text-center text-sm text-slate-500">No messages yet. Click "New Message" to start.</p>
             )}
-            {conversations.map((c) => (
+            {displayConversations.map((c) => (
               <button
                 key={c.other_id}
                 onClick={() => openThread(c.other_id)}
@@ -167,6 +196,13 @@ export default function Messages() {
                     </div>
                   );
                 })}
+                {active === botInfo?.id && botTyping && (
+                  <div className="flex justify-start">
+                    <div className="max-w-md px-4 py-2.5 rounded-2xl bg-white border border-slate-200 text-slate-400 rounded-bl-sm text-sm italic">
+                      IHES Assistant is typing…
+                    </div>
+                  </div>
+                )}
               </div>
               <form onSubmit={send} className="p-4 border-t border-slate-200 flex gap-2">
                 <input
