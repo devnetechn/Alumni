@@ -10,6 +10,7 @@ import Signup from './pages/Signup';
 import TrialExpired from './pages/TrialExpired';
 import PlatformSignup from './pages/PlatformSignup';
 import PlatformLogin from './pages/PlatformLogin';
+import PlatformDashboard from './pages/PlatformDashboard';
 import Dashboard from './pages/Dashboard';
 import Directory from './pages/Directory';
 import Events from './pages/Events';
@@ -169,6 +170,7 @@ export default function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/platform/signup" element={<PlatformSignup />} />
         <Route path="/platform/login" element={<PlatformLogin />} />
+        <Route path="/platform/dashboard" element={<PlatformDashboard />} />
         <Route path="/dashboard" element={<Protected><Dashboard /></Protected>} />
         <Route path="/directory" element={<Protected><Directory /></Protected>} />
         <Route path="/events" element={<Protected><Events /></Protected>} />
