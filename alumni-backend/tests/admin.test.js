@@ -39,6 +39,41 @@ test('admin can list users, toggle role/active/is_batch_leader, and delete other
   expect(del.status).toBe(204);
 });
 
+test('admin cannot make a guest a batch leader', async () => {
+  const admin = await insertUser({ role: 'admin' });
+  const guest = await insertUser({ member_type: 'guest' });
+
+  const res = await request(app)
+    .put(`/api/admin/users/${guest.id}`)
+    .set('Authorization', authHeader(admin))
+    .send({ is_batch_leader: true });
+
+  expect(res.status).toBe(400);
+});
+
+test('admin can make an alumnus a batch leader', async () => {
+  const admin = await insertUser({ role: 'admin' });
+  const alumnus = await insertUser({ member_type: 'alumnus' });
+
+  const res = await request(app)
+    .put(`/api/admin/users/${alumnus.id}`)
+    .set('Authorization', authHeader(admin))
+    .send({ is_batch_leader: true });
+
+  expect(res.status).toBe(200);
+  expect(res.body.user.is_batch_leader).toBe(true);
+});
+
+test('GET /api/admin/users includes member_type', async () => {
+  const admin = await insertUser({ role: 'admin' });
+  const guest = await insertUser({ member_type: 'guest' });
+
+  const res = await request(app).get('/api/admin/users').set('Authorization', authHeader(admin));
+  expect(res.status).toBe(200);
+  const found = res.body.users.find((u) => u.id === guest.id);
+  expect(found.member_type).toBe('guest');
+});
+
 test('admin cannot delete their own account', async () => {
   const admin = await insertUser({ role: 'admin' });
   const res = await request(app).delete(`/api/admin/users/${admin.id}`).set('Authorization', authHeader(admin));
