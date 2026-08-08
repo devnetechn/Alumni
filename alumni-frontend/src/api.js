@@ -13,6 +13,11 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+let trialExpiredHandler = null;
+export function setTrialExpiredHandler(fn) {
+  trialExpiredHandler = fn;
+}
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -22,6 +27,9 @@ api.interceptors.response.use(
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }
+    }
+    if (error.response && error.response.status === 402 && trialExpiredHandler) {
+      trialExpiredHandler(error.response.data);
     }
     return Promise.reject(error);
   }
