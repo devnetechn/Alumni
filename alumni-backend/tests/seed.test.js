@@ -31,3 +31,14 @@ test('seed is idempotent — running twice does not duplicate the admin', async 
   const admins = await query(`SELECT * FROM users WHERE email = 'admin@alumni.local'`);
   expect(admins.length).toBe(1);
 });
+
+test('seed creates a reserved bot account exactly once, idempotently', async () => {
+  await seed(pool);
+  await seed(pool);
+  const bots = await query(`SELECT * FROM users WHERE email = 'bot@ihes.local'`);
+  expect(bots.length).toBe(1);
+  expect(bots[0].is_bot).toBe(true);
+  expect(bots[0].full_name).toBe('IHES Assistant');
+  expect(bots[0].role).toBe('alumni');
+  expect(bots[0].active).toBe(true);
+});

@@ -12,6 +12,14 @@ async function seed(pool) {
     [adminHash]
   );
 
+  const botHash = await hashPassword(require('crypto').randomBytes(24).toString('hex'));
+  await pool.query(
+    `INSERT INTO users (email, password_hash, role, full_name, active, is_bot)
+     VALUES ('bot@ihes.local', $1, 'alumni', 'IHES Assistant', true, true)
+     ON CONFLICT (email) DO NOTHING`,
+    [botHash]
+  );
+
   const sampleHash = await hashPassword('password123');
   const alumniData = [
     ['ana.reyes@alumni.local', 'Ana Reyes', 2019, 'BSIT', 'Tech', 'Globex Inc', 'Software Engineer', false, false],
