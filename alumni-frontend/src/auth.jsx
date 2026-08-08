@@ -40,6 +40,8 @@ export function AuthProvider({ children }) {
     api.get('/school').then((r) => setSchool(r.data)).catch(() => {});
   }, []);
 
+  const refreshSchool = () => api.get('/school').then((r) => setSchool(r.data)).catch(() => {});
+
   const setSession = (token, user) => {
     localStorage.setItem('token', token);
     connectSocket(token);
@@ -69,7 +71,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthCtx.Provider value={{ user, login, register, logout, loading, refresh, school, trialExpired, registrationExpired, setSession }}>
+    <AuthCtx.Provider value={{ user, login, register, logout, loading, refresh, refreshSchool, school, trialExpired, registrationExpired, setSession }}>
       {children}
     </AuthCtx.Provider>
   );

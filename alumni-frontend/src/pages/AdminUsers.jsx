@@ -1,15 +1,33 @@
-import { useEffect, useState } from 'react';
-import { Shield, UserX, UserCheck, Trash2, Crown, Star } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Shield, UserX, UserCheck, Trash2, Crown, Star, ToggleLeft, ToggleRight } from 'lucide-react';
 import { api } from '../api';
 import { useAuth } from '../auth';
-import { Panel, Badge, Avatar } from '../components/ui';
+import { Panel, Badge, Avatar, Button, Input } from '../components/ui';
 
 export default function AdminUsers() {
-  const { user: me } = useAuth();
+  const { user: me, school, refreshSchool } = useAuth();
   const [users, setUsers] = useState([]);
+  const [savingSettings, setSavingSettings] = useState(false);
+  const feeInputRef = useRef(null);
 
   const load = () => api.get('/admin/users').then((r) => setUsers(r.data.users));
   useEffect(() => { load(); }, []);
+
+  const toggleRegistrationOpen = async () => {
+    setSavingSettings(true);
+    await api.patch('/admin/school', { registration_open: !school.registration_open });
+    await refreshSchool();
+    setSavingSettings(false);
+  };
+
+  const saveFee = async () => {
+    const pesos = parseFloat(feeInputRef.current.value);
+    if (isNaN(pesos) || pesos < 0) return;
+    setSavingSettings(true);
+    await api.patch('/admin/school', { registration_fee: Math.round(pesos * 100) });
+    await refreshSchool();
+    setSavingSettings(false);
+  };
 
   const toggleRole = async (u) => {
     await api.put(`/admin/users/${u.id}`, { role: u.role === 'admin' ? 'alumni' : 'admin' });
@@ -45,6 +63,31 @@ export default function AdminUsers() {
         </h1>
         <p className="text-slate-500 mt-1">Manage alumni accounts, roles, and membership status</p>
       </div>
+
+      <Panel className="p-6 mb-6">
+        <h2 className="font-bold text-[var(--brand-ink)] mb-4">Registration Settings</h2>
+        <div className="flex flex-wrap items-center gap-6">
+          <button
+            onClick={toggleRegistrationOpen}
+            disabled={savingSettings}
+            className="flex items-center gap-2 font-semibold text-sm text-[var(--brand-ink)]"
+          >
+            {school?.registration_open ? <ToggleRight className="text-[var(--brand-success)]" size={28} /> : <ToggleLeft className="text-slate-400" size={28} />}
+            Registration is {school?.registration_open ? 'Open' : 'Closed'}
+          </button>
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-semibold text-[var(--brand-ink)]">Fee (₱)</label>
+            <Input
+              key={school?.registration_fee}
+              ref={feeInputRef}
+              className="w-32"
+              defaultValue={school?.registration_fee ? (school.registration_fee / 100).toFixed(2) : ''}
+              placeholder="200.00"
+            />
+            <Button type="button" variant="secondary" onClick={saveFee} disabled={savingSettings}>Save</Button>
+          </div>
+        </div>
+      </Panel>
 
       <Panel className="overflow-hidden">
         <table className="w-full text-sm">
