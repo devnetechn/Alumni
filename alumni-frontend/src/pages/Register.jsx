@@ -8,7 +8,7 @@ export default function Register() {
   const { register } = useAuth();
   const nav = useNavigate();
   const [form, setForm] = useState({
-    email: '', password: '', full_name: '', batch_year: '', course: '', contact: '', company: '', position: '', industry: ''
+    email: '', password: '', full_name: '', batch_year: '', contact: '', address: '', member_type: 'alumnus'
   });
   const [err, setErr] = useState('');
   const [loading, setLoading] = useState(false);
@@ -64,29 +64,23 @@ export default function Register() {
               <Field label="Password">
                 <Input type="password" value={form.password} onChange={update('password')} required />
               </Field>
+              <Field label="I am a">
+                <Input as="select" value={form.member_type} onChange={update('member_type')}>
+                  <option value="alumnus">Alumnus</option>
+                  <option value="guest">Guest</option>
+                </Input>
+              </Field>
             </Section>
 
-            <Section title="Academic">
+            <Section title="Details">
               <Field label="Batch Year">
                 <Input value={form.batch_year} onChange={update('batch_year')} placeholder="2020" />
               </Field>
-              <Field label="Course">
-                <Input value={form.course} onChange={update('course')} placeholder="BS Computer Science" />
-              </Field>
-            </Section>
-
-            <Section title="Professional">
               <Field label="Contact">
                 <Input value={form.contact} onChange={update('contact')} />
               </Field>
-              <Field label="Industry">
-                <Input value={form.industry} onChange={update('industry')} />
-              </Field>
-              <Field label="Company">
-                <Input value={form.company} onChange={update('company')} />
-              </Field>
-              <Field label="Position">
-                <Input value={form.position} onChange={update('position')} />
+              <Field label="Address" span>
+                <Input value={form.address} onChange={update('address')} />
               </Field>
             </Section>
 
