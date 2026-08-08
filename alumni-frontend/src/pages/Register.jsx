@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { GraduationCap, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../auth';
+import { api } from '../api';
 import { Panel, Button, Input, Wordmark } from '../components/ui';
 
 export default function Register() {
-  const { register } = useAuth();
-  const nav = useNavigate();
+  const { school } = useAuth();
   const [form, setForm] = useState({
     email: '', password: '', full_name: '', batch_year: '', contact: '', address: '', member_type: 'alumnus'
   });
@@ -20,11 +20,13 @@ export default function Register() {
     setErr('');
     setLoading(true);
     try {
-      await register({ ...form, batch_year: form.batch_year ? parseInt(form.batch_year) : null });
-      nav('/dashboard');
+      const { data } = await api.post('/registration/signup-checkout', {
+        ...form,
+        batch_year: form.batch_year ? parseInt(form.batch_year) : null,
+      });
+      window.location.href = data.checkoutUrl;
     } catch (e) {
       setErr(e.response?.data?.error || 'Register failed');
-    } finally {
       setLoading(false);
     }
   };
@@ -53,6 +55,19 @@ export default function Register() {
             </div>
           )}
 
+          {school && !school.registration_open && (
+            <div className="bg-white border-2 border-[var(--brand-ink)] text-[var(--brand-ink)] font-semibold p-4 rounded-[var(--radius)] mb-5 text-sm">
+              Registration is currently closed. Please check back later.
+            </div>
+          )}
+
+          {school && school.registration_open && school.registration_fee > 0 && (
+            <div className="bg-[var(--brand-surface)] border-2 border-[var(--brand-ink)] p-4 rounded-[var(--radius)] mb-5 text-sm">
+              Registration fee: <span className="font-bold">₱{(school.registration_fee / 100).toFixed(2)}</span> — you'll be redirected to complete payment after submitting this form.
+            </div>
+          )}
+
+          {school && school.registration_open && school.registration_fee > 0 && (
           <form onSubmit={onSubmit} className="space-y-5">
             <Section title="Account">
               <Field label="Full Name" span>
@@ -85,9 +100,10 @@ export default function Register() {
             </Section>
 
             <Button type="submit" disabled={loading} className="w-full">
-              {loading ? 'Creating...' : <>Create Account <ArrowRight size={18} /></>}
+              {loading ? 'Redirecting to payment...' : <>Continue to Payment <ArrowRight size={18} /></>}
             </Button>
           </form>
+          )}
 
           <p className="text-center text-sm text-slate-500 mt-6">
             Already have an account? <Link to="/login" className="text-[var(--brand-accent)] hover:underline font-bold">Sign in</Link>
