@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Plus, MapPin, Calendar, Clock, QrCode, X, Check, HelpCircle, XCircle, ClipboardCheck } from 'lucide-react';
 import { api } from '../api';
 import { useAuth } from '../auth';
+import { Panel, Button, Input } from '../components/ui';
 
 export default function Events() {
   const { user } = useAuth();
@@ -43,51 +44,51 @@ export default function Events() {
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Events</h1>
+          <h1 className="font-display text-3xl text-[var(--brand-ink)]">Events</h1>
           <p className="text-slate-500 mt-1">Upcoming alumni gatherings and activities</p>
         </div>
         {user.role === 'admin' && (
-          <button onClick={() => setShowForm(!showForm)} className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-4 py-2.5 rounded-lg font-semibold transition-colors">
+          <Button onClick={() => setShowForm(!showForm)}>
             {showForm ? <><X size={18} /> Cancel</> : <><Plus size={18} /> New Event</>}
-          </button>
+          </Button>
         )}
       </div>
 
       {showForm && (
-        <form onSubmit={create} className="bg-white p-6 rounded-2xl border border-slate-200 mb-6 grid grid-cols-2 gap-4">
-          <input className="border border-slate-300 rounded-lg px-3 py-2.5 col-span-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Event title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
-          <input className="border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Location" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} />
-          <input type="datetime-local" className="border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500" value={form.event_date} onChange={(e) => setForm({ ...form, event_date: e.target.value })} required />
-          <textarea className="border border-slate-300 rounded-lg px-3 py-2.5 col-span-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" rows="3" placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-          <button className="col-span-2 bg-slate-900 hover:bg-slate-800 text-white py-2.5 rounded-lg font-semibold transition-colors">Create Event</button>
-        </form>
+        <Panel as="form" onSubmit={create} className="p-6 mb-6 grid grid-cols-2 gap-4">
+          <Input className="col-span-2" placeholder="Event title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
+          <Input placeholder="Location" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} />
+          <Input type="datetime-local" value={form.event_date} onChange={(e) => setForm({ ...form, event_date: e.target.value })} required />
+          <Input as="textarea" className="col-span-2" rows="3" placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+          <Button type="submit" className="col-span-2">Create Event</Button>
+        </Panel>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {events.length === 0 && (
-          <div className="col-span-full bg-white p-8 rounded-2xl border border-slate-200 text-center text-slate-500">
+          <Panel className="col-span-full p-8 text-center text-slate-500">
             No events yet.
-          </div>
+          </Panel>
         )}
         {events.map((ev) => {
           const d = new Date(ev.event_date);
           return (
-            <div key={ev.id} className="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl transition-all">
-              <div className="bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-600 p-6 text-white">
-                <div className="flex items-center gap-2 text-xs uppercase tracking-wider opacity-80 mb-1">
+            <Panel key={ev.id} className="overflow-hidden group">
+              <div className="bg-[var(--brand-ink)] p-6 text-white">
+                <div className="flex items-center gap-2 text-xs uppercase tracking-wider opacity-70 mb-1">
                   <Calendar size={12} />
                   {d.toLocaleDateString('en-US', { weekday: 'long' })}
                 </div>
-                <div className="text-4xl font-extrabold">
+                <div className="font-display text-4xl">
                   {d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                 </div>
-                <div className="flex items-center gap-1 text-sm opacity-90 mt-1">
+                <div className="flex items-center gap-1 text-sm opacity-80 mt-1">
                   <Clock size={12} />
                   {d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                 </div>
               </div>
               <div className="p-5">
-                <h3 className="font-bold text-lg text-slate-900 mb-2 group-hover:text-indigo-600 transition-colors">{ev.title}</h3>
+                <h3 className="font-bold text-lg text-[var(--brand-ink)] mb-2 group-hover:text-[var(--brand-accent)] transition-colors">{ev.title}</h3>
                 {ev.location && (
                   <div className="flex items-center gap-1.5 text-sm text-slate-500 mb-3">
                     <MapPin size={14} />
@@ -98,29 +99,31 @@ export default function Events() {
 
                 {rsvpState[ev.id]?.counts && (
                   <div className="flex gap-3 text-xs text-slate-500 mb-3">
-                    <span className="flex items-center gap-1"><Check size={12} className="text-emerald-500" /> {rsvpState[ev.id].counts.going} going</span>
-                    <span className="flex items-center gap-1"><HelpCircle size={12} className="text-amber-500" /> {rsvpState[ev.id].counts.maybe}</span>
+                    <span className="flex items-center gap-1"><Check size={12} className="text-[var(--brand-success)]" /> {rsvpState[ev.id].counts.going} going</span>
+                    <span className="flex items-center gap-1"><HelpCircle size={12} className="text-[#b8860b]" /> {rsvpState[ev.id].counts.maybe}</span>
                   </div>
                 )}
 
                 <div className="grid grid-cols-3 gap-1 mb-3">
-                  <RsvpBtn active={rsvpState[ev.id]?.myStatus === 'going'} onClick={() => rsvp(ev.id, 'going')} color="emerald" icon={Check} label="Going" />
-                  <RsvpBtn active={rsvpState[ev.id]?.myStatus === 'maybe'} onClick={() => rsvp(ev.id, 'maybe')} color="amber" icon={HelpCircle} label="Maybe" />
-                  <RsvpBtn active={rsvpState[ev.id]?.myStatus === 'not_going'} onClick={() => rsvp(ev.id, 'not_going')} color="red" icon={XCircle} label="No" />
+                  <RsvpBtn active={rsvpState[ev.id]?.myStatus === 'going'} onClick={() => rsvp(ev.id, 'going')} tone="success" icon={Check} label="Going" />
+                  <RsvpBtn active={rsvpState[ev.id]?.myStatus === 'maybe'} onClick={() => rsvp(ev.id, 'maybe')} tone="warning" icon={HelpCircle} label="Maybe" />
+                  <RsvpBtn active={rsvpState[ev.id]?.myStatus === 'not_going'} onClick={() => rsvp(ev.id, 'not_going')} tone="danger" icon={XCircle} label="No" />
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
-                  <Link to={`/events/${ev.id}/checkin`} className="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-700 px-3 py-2 rounded-lg font-semibold text-sm transition-colors justify-center">
-                    <QrCode size={16} />
-                    Check-in
+                  <Link to={`/events/${ev.id}/checkin`}>
+                    <Button variant="secondary" className="w-full">
+                      <QrCode size={16} /> Check-in
+                    </Button>
                   </Link>
-                  <Link to={`/events/${ev.id}/registrations`} className="inline-flex items-center gap-2 bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-700 px-3 py-2 rounded-lg font-semibold text-sm transition-colors justify-center">
-                    <ClipboardCheck size={16} />
-                    Registrations
+                  <Link to={`/events/${ev.id}/registrations`}>
+                    <Button variant="secondary" className="w-full">
+                      <ClipboardCheck size={16} /> Registrations
+                    </Button>
                   </Link>
                 </div>
               </div>
-            </div>
+            </Panel>
           );
         })}
       </div>
@@ -128,14 +131,14 @@ export default function Events() {
   );
 }
 
-function RsvpBtn({ active, onClick, color, icon: Icon, label }) {
-  const colorMap = {
-    emerald: active ? 'bg-emerald-600 text-white border-emerald-600' : 'border-slate-200 text-slate-600 hover:bg-emerald-50 hover:border-emerald-300',
-    amber: active ? 'bg-amber-500 text-white border-amber-500' : 'border-slate-200 text-slate-600 hover:bg-amber-50 hover:border-amber-300',
-    red: active ? 'bg-red-600 text-white border-red-600' : 'border-slate-200 text-slate-600 hover:bg-red-50 hover:border-red-300',
+function RsvpBtn({ active, onClick, tone, icon: Icon, label }) {
+  const toneMap = {
+    success: active ? 'bg-[var(--brand-success)] text-white border-[var(--brand-ink)]' : 'border-slate-300 text-slate-600 hover:border-[var(--brand-success)]',
+    warning: active ? 'bg-[#ffd23f] text-[var(--brand-ink)] border-[var(--brand-ink)]' : 'border-slate-300 text-slate-600 hover:border-[#b8860b]',
+    danger: active ? 'bg-[var(--brand-danger)] text-white border-[var(--brand-ink)]' : 'border-slate-300 text-slate-600 hover:border-[var(--brand-danger)]',
   };
   return (
-    <button onClick={onClick} className={`border px-2 py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition-colors ${colorMap[color]}`}>
+    <button onClick={onClick} className={`border-2 px-2 py-1.5 rounded-[var(--radius)] text-xs font-bold flex items-center justify-center gap-1 transition-colors ${toneMap[tone]}`}>
       <Icon size={12} /> {label}
     </button>
   );
