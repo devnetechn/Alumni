@@ -6,6 +6,7 @@ import { api } from '../api';
 import { useAuth } from '../auth';
 import PosterBadge from '../components/PosterBadge';
 import Hero from '../components/Hero';
+import ChatWidget from '../components/ChatWidget';
 import { Panel, Button, Wordmark } from '../components/ui';
 
 const sectionFade = {
@@ -219,6 +220,8 @@ export default function PublicHome() {
           © {new Date().getFullYear()} IHES Alumni Association. Built for lifelong connections.
         </div>
       </footer>
+
+      <ChatWidget />
     </div>
   );
 }
