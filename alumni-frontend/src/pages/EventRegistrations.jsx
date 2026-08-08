@@ -59,6 +59,7 @@ export default function EventRegistrations() {
         {regs.length === 0 ? (
           <div className="p-8 text-center text-slate-500">No registrations yet.</div>
         ) : (
+          <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="text-xs uppercase text-[var(--brand-ink)] border-b border-slate-200">
@@ -104,6 +105,7 @@ export default function EventRegistrations() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </Panel>
 

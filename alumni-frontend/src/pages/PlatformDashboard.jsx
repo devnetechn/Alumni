@@ -89,6 +89,7 @@ export default function PlatformDashboard() {
           ) : schools.length === 0 ? (
             <div className="p-8 text-center text-slate-500">No schools yet.</div>
           ) : (
+            <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b-[2.5px] border-[var(--brand-ink)] text-[var(--brand-ink)] text-xs uppercase tracking-wider">
@@ -138,6 +139,7 @@ export default function PlatformDashboard() {
                 })}
               </tbody>
             </table>
+            </div>
           )}
         </Panel>
       </div>
