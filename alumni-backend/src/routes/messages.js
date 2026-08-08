@@ -21,7 +21,7 @@ async function replyIfBot(db, schoolId, receiverId, senderId, userBody) {
     .slice(0, -1)
     .map((m) => ({ role: m.sender_id === bot.id ? 'assistant' : 'user', content: m.body }));
 
-  const reply = await generateReply(history, userBody);
+  const reply = await generateReply(history, userBody, db);
 
   const [replyMessage] = await db(
     `INSERT INTO messages (school_id, sender_id, receiver_id, body) VALUES ($1,$2,$3,$4) RETURNING *`,

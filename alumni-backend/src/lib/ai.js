@@ -1,6 +1,5 @@
 require('dotenv').config();
 const OpenAI = require('openai');
-const { query } = require('../db');
 const { getCoreCounts } = require('../routes/stats');
 
 const API_KEY = process.env.OPENAI_API_KEY;
@@ -44,36 +43,36 @@ const tools = [
   },
 ];
 
-async function get_upcoming_events() {
-  return query(
+async function get_upcoming_events(db) {
+  return db(
     `SELECT title, description, location, event_date FROM events WHERE event_date >= now() ORDER BY event_date ASC LIMIT 5`
   );
 }
 
-async function get_open_jobs() {
-  return query(
+async function get_open_jobs(db) {
+  return db(
     `SELECT title, company, location, job_type, is_referral FROM jobs ORDER BY created_at DESC LIMIT 5`
   );
 }
 
-async function get_stats() {
-  return getCoreCounts();
+async function get_stats(db) {
+  return getCoreCounts(db);
 }
 
 const toolImplementations = { get_upcoming_events, get_open_jobs, get_stats };
 
-async function callTool(name) {
+async function callTool(db, name) {
   const impl = toolImplementations[name];
   if (!impl) return { error: 'unknown tool' };
   try {
-    return await impl();
+    return await impl(db);
   } catch (err) {
     console.error(`ai.js tool "${name}" failed:`, err);
     return { error: `could not run ${name}` };
   }
 }
 
-async function generateReply(history, userMessage, client = defaultClient) {
+async function generateReply(history, userMessage, db, client = defaultClient) {
   if (!client) return NOT_CONFIGURED_REPLY;
 
   try {
@@ -92,7 +91,7 @@ async function generateReply(history, userMessage, client = defaultClient) {
 
     const toolMessages = [];
     for (const call of choice.tool_calls) {
-      const result = await callTool(call.function.name);
+      const result = await callTool(db, call.function.name);
       toolMessages.push({ role: 'tool', tool_call_id: call.id, content: JSON.stringify(result) });
     }
 
