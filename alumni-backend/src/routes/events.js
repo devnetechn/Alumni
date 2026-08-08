@@ -60,8 +60,8 @@ router.post('/:id/rsvp', requireAuth, asyncHandler(async (req, res) => {
     return res.status(400).json({ error: 'Invalid status' });
   }
   const rows = await req.db(
-    `INSERT INTO event_rsvps (school_id, event_id, user_id, status)
-     VALUES ($1,$2,$3,$4)
+    `INSERT INTO event_rsvps (school_id, event_id, user_id, status, paid)
+     VALUES ($1,$2,$3,$4, true)
      ON CONFLICT (event_id, user_id) DO UPDATE SET status = EXCLUDED.status
      RETURNING *`,
     [req.school.id, req.params.id, req.user.id, status]

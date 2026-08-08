@@ -6,7 +6,7 @@ const { resetDb, insertUser, authHeader } = require('./helpers');
 beforeEach(() => resetDb());
 afterAll(() => Promise.all([pool.end(), appPool.end()]));
 
-async function makeEventWithRsvp({ paid, status = 'going' } = {}) {
+async function makeEventWithRsvp({ paid = false, status = 'going' } = {}) {
   const admin = await insertUser({ role: 'admin' });
   const alumni = await insertUser({ full_name: 'Attendee One', nfc_uid: 'NFC123' });
   const create = await request(app)
@@ -18,12 +18,13 @@ async function makeEventWithRsvp({ paid, status = 'going' } = {}) {
     .post(`/api/events/${eventId}/rsvp`)
     .set('Authorization', authHeader(alumni))
     .send({ status });
-  if (paid) {
-    await request(app)
-      .patch(`/api/events/${eventId}/registrations/${alumni.id}`)
-      .set('Authorization', authHeader(admin))
-      .send({ paid: true });
-  }
+  // POST /rsvp now auto-marks paid=true for a fresh RSVP (see events.js) --
+  // explicitly set the requested value either way so this fixture's
+  // "unpaid" case still means unpaid.
+  await request(app)
+    .patch(`/api/events/${eventId}/registrations/${alumni.id}`)
+    .set('Authorization', authHeader(admin))
+    .send({ paid });
   return { admin, alumni, eventId };
 }
 
@@ -101,6 +102,41 @@ test('POST /checkin is rejected for a plain alumni (not officer/admin)', async (
     .set('Authorization', authHeader(plainAlumni))
     .send({ code: `ALUMNI:${alumni.id}` });
   expect(res.status).toBe(403);
+});
+
+test('POST /rsvp auto-marks paid=true for an alumni in good standing', async () => {
+  const admin = await insertUser({ role: 'admin' });
+  const alumni = await insertUser({ registration_paid_until: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString() });
+  const create = await request(app)
+    .post('/api/events')
+    .set('Authorization', authHeader(admin))
+    .send({ title: 'Gala', event_date: '2026-12-01T18:00:00Z' });
+  const eventId = create.body.event.id;
+
+  const res = await request(app)
+    .post(`/api/events/${eventId}/rsvp`)
+    .set('Authorization', authHeader(alumni))
+    .send({ status: 'going' });
+
+  expect(res.status).toBe(200);
+  expect(res.body.rsvp.paid).toBe(true);
+});
+
+test('changing RSVP status does not reset an admin-overridden paid value', async () => {
+  const { alumni, eventId, admin } = await makeEventWithRsvp({ paid: true });
+  await request(app)
+    .patch(`/api/events/${eventId}/registrations/${alumni.id}`)
+    .set('Authorization', authHeader(admin))
+    .send({ paid: false });
+
+  const res = await request(app)
+    .post(`/api/events/${eventId}/rsvp`)
+    .set('Authorization', authHeader(alumni))
+    .send({ status: 'maybe' });
+
+  expect(res.status).toBe(200);
+  expect(res.body.rsvp.status).toBe('maybe');
+  expect(res.body.rsvp.paid).toBe(false);
 });
 
 test('GET /export returns CSV content', async () => {
