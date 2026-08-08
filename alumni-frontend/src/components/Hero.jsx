@@ -9,11 +9,11 @@ import heroPoster from '../assets/hero.png';
 const heroVideoSrc = null;
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
+  hidden: { opacity: 0, y: 16 },
   visible: (i = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, delay: i * 0.12, ease: 'easeOut' },
+    transition: { duration: 0.22, delay: i * 0.06, ease: 'easeOut' },
   }),
 };
 
@@ -34,13 +34,7 @@ export default function Hero({ stats }) {
         ) : (
           <img src={heroPoster} alt="" className="w-full h-full object-cover" />
         )}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(to bottom, color-mix(in srgb, var(--brand-primary) 55%, transparent) 0%, color-mix(in srgb, var(--brand-primary) 75%, transparent) 60%, color-mix(in srgb, var(--brand-primary) 92%, transparent) 100%)',
-          }}
-        />
+        <div className="absolute inset-0 bg-black/55" />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-6 py-24 text-center text-white w-full">
@@ -49,7 +43,7 @@ export default function Hero({ stats }) {
           animate="visible"
           custom={0}
           variants={fadeUp}
-          className="inline-flex items-center gap-2 bg-white/10 backdrop-blur border border-white/20 px-4 py-1.5 rounded-full text-sm font-medium mb-6"
+          className="inline-flex items-center gap-2 bg-[var(--brand-accent)] border-2 border-white px-4 py-1.5 rounded-[var(--radius)] text-sm font-bold mb-6 text-white"
         >
           <Sparkles size={14} />
           Reconnect. Network. Grow.
@@ -60,7 +54,7 @@ export default function Hero({ stats }) {
           animate="visible"
           custom={1}
           variants={fadeUp}
-          className="font-display text-5xl md:text-6xl font-semibold mb-6 leading-tight"
+          className="font-display text-5xl md:text-6xl mb-6 leading-tight"
         >
           Welcome home,
           <br />
@@ -98,9 +92,9 @@ export default function Hero({ stats }) {
 
 function StatBox({ icon: Icon, label, value }) {
   return (
-    <div className="bg-white/10 backdrop-blur border border-white/20 rounded-2xl p-5">
-      <Icon className="mx-auto mb-2 opacity-80" size={20} />
-      <p className="text-3xl font-bold">{value}</p>
+    <div className="bg-white/10 border-2 border-white/40 rounded-[var(--radius)] p-5">
+      <Icon className="mx-auto mb-2 opacity-90" size={20} />
+      <p className="font-display text-3xl">{value}</p>
       <p className="text-xs opacity-80 uppercase tracking-wider">{label}</p>
     </div>
   );

@@ -6,6 +6,7 @@ import { api } from '../api';
 import { useAuth } from '../auth';
 import PosterBadge from '../components/PosterBadge';
 import Hero from '../components/Hero';
+import { Panel, Button, Wordmark } from '../components/ui';
 
 // Swap point: once the real school logo is supplied, save it as
 // src/assets/logo.svg, then uncomment the import below and delete the
@@ -14,16 +15,16 @@ import Hero from '../components/Hero';
 const logo = null;
 
 const sectionFade = {
-  hidden: { opacity: 0, y: 32 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.25, ease: 'easeOut' } },
 };
 
 const cardFade = {
-  hidden: { opacity: 0, y: 24 },
+  hidden: { opacity: 0, y: 12 },
   visible: (i = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, delay: i * 0.08, ease: 'easeOut' },
+    transition: { duration: 0.2, delay: i * 0.05, ease: 'easeOut' },
   }),
 };
 
@@ -48,49 +49,36 @@ export default function PublicHome() {
   }, []);
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--brand-cream)' }}>
+    <div className="min-h-screen" style={{ background: 'var(--brand-bg)' }}>
       {/* Top bar */}
       <header
-        className={`fixed top-0 left-0 right-0 z-20 transition-colors duration-300 border-b ${
-          scrolled ? 'backdrop-blur-lg' : 'border-transparent'
+        className={`fixed top-0 left-0 right-0 z-20 transition-colors duration-300 border-b-[2.5px] ${
+          scrolled ? 'bg-[var(--brand-ink)] border-[var(--brand-ink)]' : 'border-transparent'
         }`}
-        style={
-          scrolled
-            ? { background: 'color-mix(in srgb, var(--brand-primary) 75%, transparent)', borderColor: 'rgba(255,255,255,0.1)' }
-            : undefined
-        }
       >
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-2">
             {logo ? (
-              <img src={logo} alt="Alumni logo" className="h-9 w-9 rounded-lg object-contain" />
+              <img src={logo} alt="Alumni logo" className="h-9 w-9 rounded-[var(--radius)] object-contain" />
             ) : (
-              <div className="p-2 rounded-lg" style={{ background: 'var(--brand-secondary)' }}>
+              <div className="p-2 rounded-[var(--radius)] bg-[var(--brand-accent)] border-2 border-white">
                 <GraduationCap className="text-white" size={22} />
               </div>
             )}
-            <span className="font-display font-semibold text-white">IHES Alumni Association</span>
+            <Wordmark className="text-white" />
           </Link>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
             {user ? (
-              <Link
-                to="/dashboard"
-                className="px-5 py-2 text-white rounded-lg font-semibold hover:opacity-90 transition-opacity text-sm"
-                style={{ background: 'var(--brand-secondary)' }}
-              >
-                Dashboard →
+              <Link to="/dashboard">
+                <Button variant="primary">Dashboard →</Button>
               </Link>
             ) : (
               <>
-                <Link to="/login" className="px-5 py-2 text-white/90 hover:text-white font-semibold text-sm">
+                <Link to="/login" className="px-5 py-2 text-white/90 hover:text-white font-bold text-sm">
                   Login
                 </Link>
-                <Link
-                  to="/register"
-                  className="px-5 py-2 rounded-lg font-semibold hover:opacity-90 transition-opacity text-sm"
-                  style={{ background: 'var(--brand-accent)', color: 'var(--brand-primary)' }}
-                >
-                  Register
+                <Link to="/register">
+                  <Button variant="primary">Register</Button>
                 </Link>
               </>
             )}
@@ -109,18 +97,15 @@ export default function PublicHome() {
         variants={sectionFade}
       >
         <div className="flex items-center gap-3 mb-8">
-          <div
-            className="p-2 rounded-lg"
-            style={{ background: 'color-mix(in srgb, var(--brand-accent) 18%, white)' }}
-          >
-            <Megaphone style={{ color: 'var(--brand-secondary)' }} size={22} />
+          <div className="p-2 rounded-[var(--radius)] bg-[var(--brand-accent)] border-2 border-[var(--brand-ink)]">
+            <Megaphone className="text-white" size={22} />
           </div>
-          <h2 className="font-display text-3xl font-semibold" style={{ color: 'var(--brand-primary)' }}>
+          <h2 className="font-display text-3xl text-[var(--brand-ink)]">
             Latest Announcements
           </h2>
         </div>
         {announcements.length === 0 ? (
-          <p className="text-slate-500 bg-white p-8 rounded-2xl border" style={{ borderColor: 'color-mix(in srgb, var(--brand-accent) 30%, white)' }}>No announcements yet.</p>
+          <Panel className="p-8 text-slate-500">No announcements yet.</Panel>
         ) : (
           <div className="grid md:grid-cols-2 gap-5">
             {announcements.map((a, i) => (
@@ -131,8 +116,7 @@ export default function PublicHome() {
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.3 }}
                 variants={cardFade}
-                className="group bg-white p-6 rounded-2xl border hover:shadow-lg transition-shadow"
-                style={{ borderColor: 'color-mix(in srgb, var(--brand-accent) 30%, white)' }}
+                className="group bg-white border-[2.5px] border-[var(--brand-ink)] rounded-[var(--radius)] p-6 hover:shadow-[4px_4px_0_var(--brand-ink)] transition-shadow"
               >
                 <div className="mb-4">
                   <PosterBadge
@@ -145,7 +129,7 @@ export default function PublicHome() {
                     size="sm"
                   />
                 </div>
-                <h3 className="font-display text-xl font-semibold mb-2" style={{ color: 'var(--brand-primary)' }}>
+                <h3 className="font-display text-xl mb-2 text-[var(--brand-ink)]">
                   {a.title}
                 </h3>
                 <p className="text-slate-600 leading-relaxed">{a.body}</p>
@@ -164,18 +148,15 @@ export default function PublicHome() {
         variants={sectionFade}
       >
         <div className="flex items-center gap-3 mb-8">
-          <div
-            className="p-2 rounded-lg"
-            style={{ background: 'color-mix(in srgb, var(--brand-secondary) 15%, white)' }}
-          >
-            <Calendar style={{ color: 'var(--brand-secondary)' }} size={22} />
+          <div className="p-2 rounded-[var(--radius)] bg-[var(--brand-accent)] border-2 border-[var(--brand-ink)]">
+            <Calendar className="text-white" size={22} />
           </div>
-          <h2 className="font-display text-3xl font-semibold" style={{ color: 'var(--brand-primary)' }}>
+          <h2 className="font-display text-3xl text-[var(--brand-ink)]">
             Upcoming Events
           </h2>
         </div>
         {events.length === 0 ? (
-          <p className="text-slate-500 bg-white p-8 rounded-2xl border" style={{ borderColor: 'color-mix(in srgb, var(--brand-accent) 30%, white)' }}>No events scheduled yet.</p>
+          <Panel className="p-8 text-slate-500">No events scheduled yet.</Panel>
         ) : (
           <div className="grid md:grid-cols-3 gap-5">
             {events.map((ev, i) => (
@@ -186,25 +167,21 @@ export default function PublicHome() {
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.3 }}
                 variants={cardFade}
-                className="group bg-white rounded-2xl overflow-hidden border hover:shadow-xl transition-shadow"
-                style={{ borderColor: 'color-mix(in srgb, var(--brand-accent) 30%, white)' }}
+                className="group bg-white border-[2.5px] border-[var(--brand-ink)] rounded-[var(--radius)] overflow-hidden hover:shadow-[4px_4px_0_var(--brand-ink)] transition-shadow"
               >
-                <div
-                  className="p-6 text-white"
-                  style={{ background: 'linear-gradient(135deg, var(--brand-secondary), var(--brand-primary))' }}
-                >
-                  <div className="text-xs uppercase tracking-wider opacity-80 mb-1">
+                <div className="p-6 text-white bg-[var(--brand-ink)]">
+                  <div className="text-xs uppercase tracking-wider opacity-70 mb-1">
                     {new Date(ev.event_date).toLocaleDateString('en-US', { weekday: 'long' })}
                   </div>
-                  <div className="text-3xl font-display font-semibold">
+                  <div className="font-display text-3xl">
                     {new Date(ev.event_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                   </div>
-                  <div className="text-sm opacity-80">
+                  <div className="text-sm opacity-70">
                     {new Date(ev.event_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                   </div>
                 </div>
                 <div className="p-5">
-                  <h3 className="font-semibold text-lg mb-2" style={{ color: 'var(--brand-primary)' }}>
+                  <h3 className="font-bold text-lg mb-2 text-[var(--brand-ink)]">
                     {ev.title}
                   </h3>
                   {ev.location && (
@@ -230,27 +207,22 @@ export default function PublicHome() {
           viewport={{ once: true, amount: 0.3 }}
           variants={sectionFade}
         >
-          <div
-            className="rounded-3xl p-12 text-center text-white"
-            style={{ background: 'linear-gradient(135deg, var(--brand-primary), var(--brand-secondary))' }}
-          >
-            <h2 className="font-display text-4xl font-semibold mb-4">Ready to reconnect?</h2>
-            <p className="text-white/80 mb-8 text-lg">Join thousands of alumni in our growing network.</p>
-            <Link
-              to="/register"
-              className="inline-flex items-center gap-2 px-8 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity"
-              style={{ background: 'var(--brand-accent)', color: 'var(--brand-primary)' }}
-            >
-              Create Your Account
-              <ArrowRight size={18} />
+          <div className="bg-[var(--brand-ink)] border-[2.5px] border-[var(--brand-ink)] rounded-[var(--radius)] p-12 text-center text-white">
+            <h2 className="font-display text-4xl mb-4">Ready to reconnect?</h2>
+            <p className="text-white/70 mb-8 text-lg">Join thousands of alumni in our growing network.</p>
+            <Link to="/register">
+              <Button variant="primary">
+                Create Your Account
+                <ArrowRight size={18} />
+              </Button>
             </Link>
           </div>
         </motion.section>
       )}
 
-      <footer className="border-t py-8 mt-8" style={{ borderColor: 'color-mix(in srgb, var(--brand-accent) 30%, white)' }}>
-        <div className="max-w-7xl mx-auto px-6 text-center text-sm" style={{ color: 'color-mix(in srgb, var(--brand-primary) 55%, transparent)' }}>
-          © {new Date().getFullYear()} IHES Alumni Association. Built with ❤️ for lifelong connections.
+      <footer className="border-t-[2.5px] border-[var(--brand-ink)] py-8 mt-8">
+        <div className="max-w-7xl mx-auto px-6 text-center text-sm text-slate-500">
+          © {new Date().getFullYear()} IHES Alumni Association. Built for lifelong connections.
         </div>
       </footer>
     </div>
