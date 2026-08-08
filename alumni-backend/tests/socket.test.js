@@ -1,7 +1,7 @@
 const { io: ioClient } = require('socket.io-client');
 const request = require('supertest');
 const { app, server } = require('../src/server');
-const { pool } = require('../src/db');
+const { pool, appPool } = require('../src/db');
 const { resetDb, insertUser, authHeader } = require('./helpers');
 const { signToken } = require('../src/lib/token');
 const { createNotification } = require('../src/routes/notifications');
@@ -16,7 +16,7 @@ beforeAll((done) => {
 });
 
 afterAll((done) => {
-  pool.end().then(() => server.close(done));
+  Promise.all([pool.end(), appPool.end()]).then(() => server.close(done));
 });
 
 beforeEach(() => resetDb());

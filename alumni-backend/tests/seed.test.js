@@ -1,8 +1,8 @@
-const { pool, query } = require('../src/db');
+const { pool, appPool, query } = require('../src/db');
 const { seed } = require('../db/seed');
 const { resetDb } = require('./helpers');
 
-afterAll(() => pool.end());
+afterAll(() => Promise.all([pool.end(), appPool.end()]));
 beforeEach(() => resetDb());
 
 test('seed creates the default admin and sample data', async () => {

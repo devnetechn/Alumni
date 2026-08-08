@@ -1,11 +1,11 @@
 const request = require('supertest');
 const { app } = require('../src/server');
-const { pool, query } = require('../src/db');
+const { pool, appPool, query } = require('../src/db');
 const { resetDb, insertUser, authHeader } = require('./helpers');
 const { createNotification } = require('../src/routes/notifications');
 
 beforeEach(() => resetDb());
-afterAll(() => pool.end());
+afterAll(() => Promise.all([pool.end(), appPool.end()]));
 
 test('GET /api/notifications lists notifications and unread count', async () => {
   const user = await insertUser();

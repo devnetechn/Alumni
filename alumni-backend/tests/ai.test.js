@@ -1,9 +1,9 @@
 const { generateReply, FALLBACK_REPLY, NOT_CONFIGURED_REPLY } = require('../src/lib/ai');
-const { pool, query } = require('../src/db');
+const { pool, appPool, query } = require('../src/db');
 const { resetDb } = require('./helpers');
 
 beforeEach(() => resetDb());
-afterAll(() => pool.end());
+afterAll(() => Promise.all([pool.end(), appPool.end()]));
 
 test('returns the not-configured fallback when no client is available', async () => {
   const reply = await generateReply([], 'Hello', null);

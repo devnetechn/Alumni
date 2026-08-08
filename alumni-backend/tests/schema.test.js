@@ -1,6 +1,6 @@
-const { pool } = require('../src/db');
+const { pool, appPool } = require('../src/db');
 
-afterAll(() => pool.end());
+afterAll(() => Promise.all([pool.end(), appPool.end()]));
 
 test('all expected tables exist after migration', async () => {
   const { rows } = await pool.query(

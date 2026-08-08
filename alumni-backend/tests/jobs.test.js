@@ -1,10 +1,10 @@
 const request = require('supertest');
 const { app } = require('../src/server');
-const { pool } = require('../src/db');
+const { pool, appPool } = require('../src/db');
 const { resetDb, insertUser, authHeader } = require('./helpers');
 
 beforeEach(() => resetDb());
-afterAll(() => pool.end());
+afterAll(() => Promise.all([pool.end(), appPool.end()]));
 
 test('GET /api/jobs is public and includes poster info', async () => {
   const poster = await insertUser({ full_name: 'Poster Person' });

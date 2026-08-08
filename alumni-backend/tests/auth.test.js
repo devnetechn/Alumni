@@ -1,10 +1,10 @@
 const request = require('supertest');
 const { app } = require('../src/server');
-const { pool } = require('../src/db');
+const { pool, appPool } = require('../src/db');
 const { resetDb, insertUser } = require('./helpers');
 
 beforeEach(() => resetDb());
-afterAll(() => pool.end());
+afterAll(() => Promise.all([pool.end(), appPool.end()]));
 
 test('POST /api/auth/register creates an alumni user and returns a token', async () => {
   const res = await request(app).post('/api/auth/register').send({
