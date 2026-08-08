@@ -38,22 +38,23 @@ export function AuthProvider({ children }) {
     api.get('/school').then((r) => setSchool(r.data)).catch(() => {});
   }, []);
 
+  const setSession = (token, user) => {
+    localStorage.setItem('token', token);
+    connectSocket(token);
+    localStorage.setItem('user', JSON.stringify(user));
+    setUser(user);
+  };
+
   const login = async (email, password) => {
     const { data } = await api.post('/auth/login', { email, password });
-    localStorage.setItem('token', data.token);
-    connectSocket(data.token);
-    localStorage.setItem('user', JSON.stringify(data.user));
-    setUser(data.user);
+    setSession(data.token, data.user);
     await refresh();
     return data.user;
   };
 
   const register = async (payload) => {
     const { data } = await api.post('/auth/register', payload);
-    localStorage.setItem('token', data.token);
-    connectSocket(data.token);
-    localStorage.setItem('user', JSON.stringify(data.user));
-    setUser(data.user);
+    setSession(data.token, data.user);
     await refresh();
     return data.user;
   };
@@ -66,7 +67,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthCtx.Provider value={{ user, login, register, logout, loading, refresh, school, trialExpired }}>
+    <AuthCtx.Provider value={{ user, login, register, logout, loading, refresh, school, trialExpired, setSession }}>
       {children}
     </AuthCtx.Provider>
   );

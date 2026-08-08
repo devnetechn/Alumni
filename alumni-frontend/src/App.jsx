@@ -6,6 +6,7 @@ import { Wordmark, Button } from './components/ui';
 import PublicHome from './pages/PublicHome';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import RegisterSuccess from './pages/RegisterSuccess';
 import Signup from './pages/Signup';
 import TrialExpired from './pages/TrialExpired';
 import PlatformSignup from './pages/PlatformSignup';
@@ -143,7 +144,7 @@ function Shell({ children }) {
   if (location.pathname.startsWith('/platform')) return <>{children}</>;
 
   // Public routes (no sidebar)
-  const publicOnlyRoutes = ['/', '/login', '/register', '/signup'];
+  const publicOnlyRoutes = ['/', '/login', '/register', '/register/success', '/signup'];
   const showSidebar = user && !publicOnlyRoutes.includes(location.pathname);
 
   if (user && trialExpired) return <TrialExpired />;
@@ -167,6 +168,7 @@ export default function App() {
         <Route path="/" element={<PublicHome />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/register/success" element={<RegisterSuccess />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/platform/signup" element={<PlatformSignup />} />
         <Route path="/platform/login" element={<PlatformLogin />} />
