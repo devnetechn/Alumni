@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { ScanLine, Nfc, Square } from 'lucide-react';
 import { api } from '../api';
-import { Panel, Button } from './ui';
+import { Panel, Button, Avatar } from './ui';
 
 const SCANNER_ELEMENT_ID = 'alumni-scanner-camera';
 const DUPLICATE_COOLDOWN_MS = 3000;
@@ -10,6 +10,7 @@ const DUPLICATE_COOLDOWN_MS = 3000;
 export default function AlumniScanner({ eventId, onCheckedIn }) {
   const [scanning, setScanning] = useState(false);
   const [banner, setBanner] = useState(null); // { type: 'ok' | 'err', text: string }
+  const [scannedAlumni, setScannedAlumni] = useState(null);
   const html5QrCodeRef = useRef(null);
   const lastCodeRef = useRef({ code: null, at: 0 });
   const submittingRef = useRef(false);
@@ -23,7 +24,8 @@ export default function AlumniScanner({ eventId, onCheckedIn }) {
     lastCodeRef.current = { code, at: now };
     submittingRef.current = true;
     try {
-      await api.post(`/events/${eventId}/checkin`, { code });
+      const { data } = await api.post(`/events/${eventId}/checkin`, { code });
+      setScannedAlumni(data.alumni);
       setBanner({ type: 'ok', text: 'Checked in ✓' });
       onCheckedIn();
     } catch (err) {
@@ -103,6 +105,18 @@ export default function AlumniScanner({ eventId, onCheckedIn }) {
         >
           {banner.text}
         </div>
+      )}
+
+      {scannedAlumni && (
+        <Panel className="p-4 mb-4 flex items-center gap-4">
+          <Avatar name={scannedAlumni.full_name} pic={scannedAlumni.profile_pic} size="lg" />
+          <div>
+            <p className="font-bold text-[var(--brand-ink)]">{scannedAlumni.full_name}</p>
+            <p className="text-sm text-slate-500">
+              Batch {scannedAlumni.batch_year || '—'} · {scannedAlumni.course || '—'}
+            </p>
+          </div>
+        </Panel>
       )}
 
       {scanning ? (
