@@ -6,6 +6,7 @@ import { Wordmark, Button } from './components/ui';
 import PublicHome from './pages/PublicHome';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Directory from './pages/Directory';
 import Events from './pages/Events';
@@ -128,7 +129,7 @@ function Shell({ children }) {
   const location = useLocation();
 
   // Public routes (no sidebar)
-  const publicOnlyRoutes = ['/', '/login', '/register'];
+  const publicOnlyRoutes = ['/', '/login', '/register', '/signup'];
   const showSidebar = user && !publicOnlyRoutes.includes(location.pathname);
 
   if (!showSidebar) return <>{children}</>;
@@ -151,6 +152,7 @@ export default function App() {
         <Route path="/" element={<PublicHome />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/signup" element={<Signup />} />
         <Route path="/dashboard" element={<Protected><Dashboard /></Protected>} />
         <Route path="/directory" element={<Protected><Directory /></Protected>} />
         <Route path="/events" element={<Protected><Events /></Protected>} />
