@@ -47,6 +47,7 @@ test('creates a new user from a signup webhook event', async () => {
   const payload = checkoutPaidEvent('evt_signup1', 'cs_signup1', {
     kind: 'signup',
     school_id: String(school.id),
+    session_token: 'token-signup1',
     email: 'webhookuser@test.com',
     password_hash,
     full_name: 'Webhook User',
@@ -67,7 +68,7 @@ test('creates a new user from a signup webhook event', async () => {
 
   const rows = await query('SELECT * FROM users WHERE email = $1', ['webhookuser@test.com']);
   expect(rows.length).toBe(1);
-  expect(rows[0].paymongo_checkout_session_id).toBe('cs_signup1');
+  expect(rows[0].paymongo_checkout_session_id).toBe('token-signup1');
   expect(new Date(rows[0].registration_paid_until) > new Date()).toBe(true);
 });
 

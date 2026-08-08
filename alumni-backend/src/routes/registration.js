@@ -1,4 +1,5 @@
 const express = require('express');
+const crypto = require('crypto');
 const { asyncHandler } = require('../lib/asyncHandler');
 const { hashPassword } = require('../lib/password');
 const { signToken } = require('../lib/token');
@@ -28,6 +29,13 @@ router.post('/signup-checkout', asyncHandler(async (req, res) => {
 
   const password_hash = await hashPassword(password);
 
+  // PayMongo does not substitute a {CHECKOUT_SESSION_ID}-style placeholder in
+  // success_url (confirmed via manual testing — unlike Stripe's convention,
+  // it passes the literal string through unresolved). Mint our own
+  // correlation token instead, since the real PayMongo session id isn't
+  // known until after this call returns.
+  const sessionToken = crypto.randomUUID();
+
   const session = await paymongo.createCheckoutSession({
     lineItems: [{
       amount: req.school.registration_fee,
@@ -36,11 +44,12 @@ router.post('/signup-checkout', asyncHandler(async (req, res) => {
       quantity: 1,
     }],
     paymentMethodTypes: ['card', 'gcash', 'paymaya', 'grab_pay'],
-    successUrl: `${req.protocol}://${req.headers.host}/register/success?session_id={CHECKOUT_SESSION_ID}`,
+    successUrl: `${req.protocol}://${req.headers.host}/register/success?session_id=${sessionToken}`,
     cancelUrl: `${req.protocol}://${req.headers.host}/register`,
     metadata: {
       kind: 'signup',
       school_id: String(req.school.id),
+      session_token: sessionToken,
       email,
       password_hash,
       full_name: full_name || '',

@@ -47,6 +47,8 @@ test('POST /api/registration/signup-checkout creates a checkout session and retu
   const callArgs = paymongo.createCheckoutSession.mock.calls[0][0];
   expect(callArgs.lineItems[0].amount).toBe(20000);
   expect(callArgs.metadata.kind).toBe('signup');
+  expect(callArgs.metadata.session_token).toBeTruthy();
+  expect(callArgs.successUrl).toContain(`session_id=${callArgs.metadata.session_token}`);
   expect(callArgs.metadata.email).toBe('new@test.com');
   expect(callArgs.metadata.member_type).toBe('guest');
   expect(callArgs.metadata.password_hash).toBeTruthy();

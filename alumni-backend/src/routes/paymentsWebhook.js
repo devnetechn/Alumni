@@ -42,7 +42,7 @@ router.post('/webhook', asyncHandler(async (req, res) => {
         metadata.contact || null,
         metadata.address || null,
         metadata.member_type,
-        session.id,
+        metadata.session_token,
       ]
     );
   } else if (metadata.kind === 'renewal') {
