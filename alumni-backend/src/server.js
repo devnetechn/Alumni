@@ -12,6 +12,9 @@ app.get('/api/health', (req, res) => {
 const platformRoutes = require('./routes/platform');
 app.use('/api/platform', platformRoutes);
 
+const platformAdminRoutes = require('./routes/platformAdmin');
+app.use('/api/platform/admin', platformAdminRoutes);
+
 const { resolveTenant } = require('./middleware/tenant');
 app.use(resolveTenant);
 
