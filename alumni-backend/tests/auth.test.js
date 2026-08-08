@@ -25,6 +25,42 @@ test('POST /api/auth/register creates an alumni user and returns a token', async
   expect(res.body.user.password_hash).toBeUndefined();
 });
 
+test('POST /api/auth/register defaults member_type to alumnus when omitted', async () => {
+  const school = await getDefaultSchool();
+  const res = await request(app)
+    .post('/api/auth/register')
+    .set('Host', hostFor(school))
+    .send({ email: 'defaulttype@test.com', password: 'secret123', full_name: 'Default Type' });
+  expect(res.status).toBe(201);
+  expect(res.body.user.member_type).toBe('alumnus');
+});
+
+test('POST /api/auth/register accepts member_type guest and stores address', async () => {
+  const school = await getDefaultSchool();
+  const res = await request(app)
+    .post('/api/auth/register')
+    .set('Host', hostFor(school))
+    .send({
+      email: 'guest@test.com',
+      password: 'secret123',
+      full_name: 'A Guest',
+      member_type: 'guest',
+      address: '123 Main St',
+    });
+  expect(res.status).toBe(201);
+  expect(res.body.user.member_type).toBe('guest');
+  expect(res.body.user.address).toBe('123 Main St');
+});
+
+test('POST /api/auth/register rejects an invalid member_type', async () => {
+  const school = await getDefaultSchool();
+  const res = await request(app)
+    .post('/api/auth/register')
+    .set('Host', hostFor(school))
+    .send({ email: 'badtype@test.com', password: 'secret123', member_type: 'faculty' });
+  expect(res.status).toBe(400);
+});
+
 test('POST /api/auth/register rejects a duplicate email within the same school', async () => {
   const school = await getDefaultSchool();
   await insertUser({ email: 'dupe@test.com' });
