@@ -23,6 +23,15 @@ Node/Express + PostgreSQL API for `alumni-frontend`.
 `npm test` runs the full Jest + Supertest suite against the `alumni_test` database
 (run `npm run migrate:test` first if you haven't already).
 
+## AI support bot
+
+The Messages page includes a reserved "IHES Assistant" bot account (seeded by
+`npm run seed`, email `bot@ihes.local`). To have it generate real answers, set
+`OPENAI_API_KEY` (and optionally `OPENAI_MODEL`, default `gpt-4o-mini`) in
+`.env`. Without a key, the bot still replies to every message, just with a
+fixed "isn't configured yet" message instead of an AI-generated one — the
+rest of the app is unaffected either way.
+
 ## Frontend
 
 `alumni-frontend`'s Vite dev server proxies `/api` to `http://localhost:4000` — no
