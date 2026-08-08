@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { GraduationCap, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../auth';
+import { Panel, Button, Input, Wordmark } from '../components/ui';
 
 export default function Register() {
   const { register } = useAuth();
@@ -29,25 +30,25 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12 px-6">
+    <div className="min-h-screen bg-[var(--brand-surface)] py-12 px-6">
       <div className="max-w-2xl mx-auto">
-        <Link to="/" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-6 text-sm font-medium">
+        <Link to="/" className="inline-flex items-center gap-2 text-[var(--brand-ink)] hover:text-[var(--brand-accent)] mb-6 text-sm font-bold">
           <ArrowLeft size={16} /> Back to home
         </Link>
 
-        <div className="bg-white rounded-2xl border border-slate-200 p-8 lg:p-10 shadow-sm">
+        <Panel className="p-8 lg:p-10">
           <div className="flex items-center gap-2 mb-6">
-            <div className="bg-gradient-to-br from-indigo-600 to-purple-600 p-2 rounded-lg">
+            <div className="bg-[var(--brand-accent)] border-2 border-[var(--brand-ink)] p-2 rounded-[var(--radius)]">
               <GraduationCap className="text-white" size={22} />
             </div>
-            <span className="font-bold text-slate-900">IHES Alumni Association</span>
+            <Wordmark />
           </div>
 
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Create your account</h1>
+          <h1 className="font-display text-3xl text-[var(--brand-ink)] mb-2">Create your account</h1>
           <p className="text-slate-500 mb-8">Join the alumni network and stay connected.</p>
 
           {err && (
-            <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg mb-5 text-sm">
+            <div className="bg-white border-2 border-[var(--brand-danger)] text-[var(--brand-danger)] font-semibold p-3 rounded-[var(--radius)] mb-5 text-sm">
               {err}
             </div>
           )}
@@ -55,52 +56,49 @@ export default function Register() {
           <form onSubmit={onSubmit} className="space-y-5">
             <Section title="Account">
               <Field label="Full Name" span>
-                <input className="w-full border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500" value={form.full_name} onChange={update('full_name')} required />
+                <Input value={form.full_name} onChange={update('full_name')} required />
               </Field>
               <Field label="Email">
-                <input type="email" className="w-full border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500" value={form.email} onChange={update('email')} required />
+                <Input type="email" value={form.email} onChange={update('email')} required />
               </Field>
               <Field label="Password">
-                <input type="password" className="w-full border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500" value={form.password} onChange={update('password')} required />
+                <Input type="password" value={form.password} onChange={update('password')} required />
               </Field>
             </Section>
 
             <Section title="Academic">
               <Field label="Batch Year">
-                <input className="w-full border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500" value={form.batch_year} onChange={update('batch_year')} placeholder="2020" />
+                <Input value={form.batch_year} onChange={update('batch_year')} placeholder="2020" />
               </Field>
               <Field label="Course">
-                <input className="w-full border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500" value={form.course} onChange={update('course')} placeholder="BS Computer Science" />
+                <Input value={form.course} onChange={update('course')} placeholder="BS Computer Science" />
               </Field>
             </Section>
 
             <Section title="Professional">
               <Field label="Contact">
-                <input className="w-full border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500" value={form.contact} onChange={update('contact')} />
+                <Input value={form.contact} onChange={update('contact')} />
               </Field>
               <Field label="Industry">
-                <input className="w-full border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500" value={form.industry} onChange={update('industry')} />
+                <Input value={form.industry} onChange={update('industry')} />
               </Field>
               <Field label="Company">
-                <input className="w-full border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500" value={form.company} onChange={update('company')} />
+                <Input value={form.company} onChange={update('company')} />
               </Field>
               <Field label="Position">
-                <input className="w-full border border-slate-300 rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500" value={form.position} onChange={update('position')} />
+                <Input value={form.position} onChange={update('position')} />
               </Field>
             </Section>
 
-            <button
-              disabled={loading}
-              className="w-full bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-colors"
-            >
+            <Button type="submit" disabled={loading} className="w-full">
               {loading ? 'Creating...' : <>Create Account <ArrowRight size={18} /></>}
-            </button>
+            </Button>
           </form>
 
           <p className="text-center text-sm text-slate-500 mt-6">
-            Already have an account? <Link to="/login" className="text-indigo-600 hover:underline font-semibold">Sign in</Link>
+            Already have an account? <Link to="/login" className="text-[var(--brand-accent)] hover:underline font-bold">Sign in</Link>
           </p>
-        </div>
+        </Panel>
       </div>
     </div>
   );
@@ -118,7 +116,7 @@ function Section({ title, children }) {
 function Field({ label, children, span }) {
   return (
     <div className={span ? 'col-span-2' : ''}>
-      <label className="block text-sm font-semibold text-slate-700 mb-1.5">{label}</label>
+      <label className="block text-sm font-bold text-[var(--brand-ink)] mb-1.5">{label}</label>
       {children}
     </div>
   );
