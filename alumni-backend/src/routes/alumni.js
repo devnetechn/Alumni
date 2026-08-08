@@ -1,5 +1,4 @@
 const express = require('express');
-const { query } = require('../db');
 const { requireAuth } = require('../middleware/auth');
 const { asyncHandler } = require('../lib/asyncHandler');
 
@@ -40,7 +39,7 @@ router.get('/alumni', requireAuth, asyncHandler(async (req, res) => {
 
   const where = `WHERE ${conditions.join(' AND ')}`;
 
-  const rows = await query(
+  const rows = await req.db(
     `SELECT id, id AS user_id, email, full_name, batch_year, course, contact, address,
             company, position, industry, bio, profile_pic, mentor_available, nfc_uid, role
      FROM users ${where} ORDER BY full_name NULLS LAST`,

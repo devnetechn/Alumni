@@ -1,13 +1,14 @@
 const request = require('supertest');
 const { app } = require('../src/server');
 const { pool, appPool } = require('../src/db');
-const { resetDb, insertUser, authHeader } = require('./helpers');
+const { resetDb, insertUser, authHeader, getDefaultSchool, hostFor } = require('./helpers');
 
 beforeEach(() => resetDb());
 afterAll(() => Promise.all([pool.end(), appPool.end()]));
 
 test('GET /api/alumni requires auth', async () => {
-  const res = await request(app).get('/api/alumni');
+  const school = await getDefaultSchool();
+  const res = await request(app).get('/api/alumni').set('Host', hostFor(school));
   expect(res.status).toBe(401);
 });
 
