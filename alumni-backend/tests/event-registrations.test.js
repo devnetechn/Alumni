@@ -72,6 +72,27 @@ test('POST /checkin succeeds for a paid+going alumni, scanned by an officer or a
   expect(list.body.attendance.some((a) => a.full_name === 'Attendee One')).toBe(true);
 });
 
+test('POST /checkin response includes trimmed alumni details, not sensitive fields', async () => {
+  const { alumni, eventId } = await makeEventWithRsvp({ paid: true });
+  const officer = await insertUser({ is_batch_leader: true });
+
+  const res = await request(app)
+    .post(`/api/events/${eventId}/checkin`)
+    .set('Authorization', authHeader(officer))
+    .send({ code: `ALUMNI:${alumni.id}` });
+
+  expect(res.status).toBe(201);
+  expect(res.body.alumni).toEqual({
+    id: alumni.id,
+    full_name: 'Attendee One',
+    profile_pic: null,
+    batch_year: 2020,
+    course: 'BSCS',
+  });
+  expect(res.body.alumni.password_hash).toBeUndefined();
+  expect(res.body.alumni.email).toBeUndefined();
+});
+
 test('POST /checkin is rejected for a plain alumni (not officer/admin)', async () => {
   const { alumni, eventId } = await makeEventWithRsvp({ paid: true });
   const plainAlumni = await insertUser();

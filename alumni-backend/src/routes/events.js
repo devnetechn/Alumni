@@ -142,7 +142,16 @@ router.post('/:id/checkin', requireAuth, requireOfficer, asyncHandler(async (req
      RETURNING *`,
     [req.school.id, eventId, alumni.id, req.user.id]
   );
-  res.status(201).json({ checkin: rows[0] });
+  res.status(201).json({
+    checkin: rows[0],
+    alumni: {
+      id: alumni.id,
+      full_name: alumni.full_name,
+      profile_pic: alumni.profile_pic,
+      batch_year: alumni.batch_year,
+      course: alumni.course,
+    },
+  });
 }));
 
 router.get('/:id/export', requireAuth, requireOfficer, asyncHandler(async (req, res) => {
