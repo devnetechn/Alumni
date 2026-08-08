@@ -34,3 +34,26 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+export const platformApi = axios.create({
+  baseURL: '/api/platform/admin',
+});
+
+platformApi.interceptors.request.use((config) => {
+  const token = localStorage.getItem('platform_token');
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+platformApi.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('platform_token');
+      if (window.location.pathname !== '/platform/login') {
+        window.location.href = '/platform/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
