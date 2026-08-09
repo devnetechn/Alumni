@@ -4,6 +4,7 @@ import { GraduationCap, ArrowRight, ArrowLeft, Upload, Trash2 } from 'lucide-rea
 import { useAuth } from '../auth';
 import { api } from '../api';
 import { Panel, Button, Input, Wordmark } from '../components/ui';
+import { validateFile, resizeImage } from '../lib/media';
 
 export default function Register() {
   const { school } = useAuth();
@@ -16,36 +17,20 @@ export default function Register() {
 
   const update = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
-  const onFile = (e) => {
+  const onFile = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
       setErr('Please select an image file');
       return;
     }
-    if (file.size > 2 * 1024 * 1024) {
-      setErr('Image too large (max 2MB)');
+    const err = validateFile(file, 2 * 1024 * 1024);
+    if (err) {
+      setErr(err);
       return;
     }
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const img = new Image();
-      img.onload = () => {
-        const max = 400;
-        const scale = Math.min(1, max / Math.max(img.width, img.height));
-        const w = Math.round(img.width * scale);
-        const h = Math.round(img.height * scale);
-        const canvas = document.createElement('canvas');
-        canvas.width = w;
-        canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, w, h);
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-        setForm((f) => ({ ...f, profile_pic: dataUrl }));
-      };
-      img.src = ev.target.result;
-    };
-    reader.readAsDataURL(file);
+    const dataUrl = await resizeImage(file, { maxDim: 400, quality: 0.85 });
+    setForm((f) => ({ ...f, profile_pic: dataUrl }));
   };
 
   const clearPhoto = () => setForm((f) => ({ ...f, profile_pic: '' }));
