@@ -4,7 +4,7 @@ const cors = require('cors');
 const app = express();
 app.use(cors());
 app.use(express.json({
-  limit: '2mb',
+  limit: '15mb',
   verify: (req, res, buf) => { req.rawBody = buf; },
 }));
 
@@ -41,6 +41,9 @@ app.use('/api', meRoutes);
 
 const alumniRoutes = require('./routes/alumni');
 app.use('/api', alumniRoutes);
+
+const eventPhotosRoutes = require('./routes/eventPhotos');
+app.use('/api/events', eventPhotosRoutes);
 
 const eventsRoutes = require('./routes/events');
 app.use('/api/events', eventsRoutes);
