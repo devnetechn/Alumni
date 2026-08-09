@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { GraduationCap, Megaphone, Calendar, MapPin, ArrowRight } from 'lucide-react';
+import { GraduationCap, Megaphone, Calendar, MapPin, ArrowRight, Sparkles, X, Play } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { api } from '../api';
 import { useAuth } from '../auth';
@@ -29,11 +29,14 @@ export default function PublicHome() {
   const [events, setEvents] = useState([]);
   const [stats, setStats] = useState(null);
   const [scrolled, setScrolled] = useState(false);
+  const [highlights, setHighlights] = useState([]);
+  const [lightbox, setLightbox] = useState(null);
 
   useEffect(() => {
     api.get('/announcements').then((r) => setAnnouncements(r.data.announcements));
     api.get('/events').then((r) => setEvents(r.data.events));
     api.get('/stats').then((r) => setStats(r.data));
+    api.get('/events/highlights').then((r) => setHighlights(r.data.highlights));
   }, []);
 
   useEffect(() => {
@@ -193,6 +196,55 @@ export default function PublicHome() {
         )}
       </motion.section>
 
+      {/* Highlights */}
+      {highlights.length > 0 && (
+        <motion.section
+          className="max-w-7xl mx-auto px-6 py-16"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={sectionFade}
+        >
+          <div className="flex items-center gap-3 mb-8">
+            <div className="p-2 rounded-[var(--radius)] bg-[var(--brand-accent)] border-2 border-[var(--brand-ink)]">
+              <Sparkles className="text-white" size={22} />
+            </div>
+            <h2 className="font-display text-3xl text-[var(--brand-ink)]">
+              Highlights
+            </h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+            {highlights.map((h, i) => (
+              <motion.button
+                key={h.id}
+                type="button"
+                custom={i}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.3 }}
+                variants={cardFade}
+                onClick={() => setLightbox(h)}
+                className="group relative aspect-square rounded-[var(--radius)] overflow-hidden border-[2.5px] border-[var(--brand-ink)] hover:shadow-[4px_4px_0_var(--brand-ink)] transition-shadow text-left"
+              >
+                {h.media_type === 'video' ? (
+                  <>
+                    <video src={h.media} className="w-full h-full object-cover" preload="metadata" />
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                      <Play className="text-white" fill="white" size={32} />
+                    </div>
+                  </>
+                ) : (
+                  <img src={h.media} alt="" className="w-full h-full object-cover" />
+                )}
+                <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-2">
+                  {h.event_title} · {new Date(h.event_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                </div>
+              </motion.button>
+            ))}
+          </div>
+        </motion.section>
+      )}
+
       {/* CTA */}
       {!user && (
         <motion.section
@@ -220,6 +272,30 @@ export default function PublicHome() {
           © {new Date().getFullYear()} IHES Alumni Association. Built for lifelong connections.
         </div>
       </footer>
+
+      {lightbox && (
+        <div
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-6"
+          onClick={() => setLightbox(null)}
+        >
+          <div className="relative max-w-3xl w-full" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setLightbox(null)}
+              className="absolute -top-10 right-0 text-white p-2"
+            >
+              <X size={24} />
+            </button>
+            {lightbox.media_type === 'video' ? (
+              <video src={lightbox.media} className="w-full rounded-[var(--radius)]" controls autoPlay />
+            ) : (
+              <img src={lightbox.media} alt="" className="w-full rounded-[var(--radius)]" />
+            )}
+            <p className="text-white text-sm mt-3 text-center">
+              {lightbox.event_title} · {new Date(lightbox.event_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+            </p>
+          </div>
+        </div>
+      )}
 
       <ChatWidget />
     </div>
