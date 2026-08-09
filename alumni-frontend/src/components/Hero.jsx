@@ -1,12 +1,7 @@
 import { motion } from 'framer-motion';
 import { Users, Calendar, CheckCircle2, Sparkles } from 'lucide-react';
 import heroPoster from '../assets/hero.png';
-
-// Swap point: once the real hero video is supplied, save it as
-// src/assets/hero.mp4, then uncomment the import below and delete the
-// `const heroVideoSrc = null;` line.
-// import heroVideoSrc from '../assets/hero.mp4';
-const heroVideoSrc = null;
+import heroVideoSrc from '../assets/hero.mp4';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 16 },
