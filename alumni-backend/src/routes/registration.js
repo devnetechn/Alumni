@@ -11,7 +11,6 @@ const router = express.Router();
 router.post('/signup-checkout', asyncHandler(async (req, res) => {
   const { email, password, full_name, batch_year, contact, address, member_type, profile_pic } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'email and password are required' });
-  if (!profile_pic) return res.status(400).json({ error: 'A profile photo is required' });
 
   if (!req.school.registration_open) {
     return res.status(400).json({ error: 'Registration is currently closed' });
@@ -57,7 +56,7 @@ router.post('/signup-checkout', asyncHandler(async (req, res) => {
       contact || null,
       address || null,
       resolvedMemberType,
-      profile_pic,
+      profile_pic || null,
     ]
   );
 

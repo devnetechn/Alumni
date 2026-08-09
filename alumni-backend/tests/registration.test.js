@@ -31,17 +31,20 @@ test('POST /api/registration/signup-checkout rejects when no fee is configured',
   expect(res.status).toBe(400);
 });
 
-test('POST /api/registration/signup-checkout rejects when profile_pic is missing', async () => {
+test('POST /api/registration/signup-checkout succeeds without a profile_pic (optional)', async () => {
   const school = await getDefaultSchool();
   await query('UPDATE schools SET registration_fee = 20000 WHERE id = $1', [school.id]);
+  jest.spyOn(paymongo, 'createCheckoutSession').mockResolvedValue({ id: 'cs_nopic', checkoutUrl: 'https://checkout.paymongo.com/cs_nopic' });
 
   const res = await request(app)
     .post('/api/registration/signup-checkout')
     .set('Host', hostFor(school))
-    .send({ email: 'new@test.com', password: 'secret123', full_name: 'New Person' });
+    .send({ email: 'nopic@test.com', password: 'secret123', full_name: 'No Pic' });
 
-  expect(res.status).toBe(400);
-  expect(res.body.error).toMatch(/photo/i);
+  expect(res.status).toBe(200);
+  const callArgs = paymongo.createCheckoutSession.mock.calls[0][0];
+  const staged = await query('SELECT * FROM pending_signups WHERE session_token = $1', [callArgs.metadata.session_token]);
+  expect(staged[0].profile_pic).toBeNull();
 });
 
 test('POST /api/registration/signup-checkout creates a checkout session and returns its URL', async () => {

@@ -38,10 +38,6 @@ export default function Register() {
   const onSubmit = async (e) => {
     e.preventDefault();
     setErr('');
-    if (!form.profile_pic) {
-      setErr('Please upload a profile photo');
-      return;
-    }
     setLoading(true);
     try {
       const { data } = await api.post('/registration/signup-checkout', {
