@@ -103,7 +103,7 @@ export default function Register() {
                       <span className="text-xs text-slate-400">No photo</span>
                     )}
                   </div>
-                  <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onFile} />
+                  <input ref={fileRef} type="file" accept="image/*" className="sr-only" onChange={onFile} />
                   <Button type="button" variant="secondary" onClick={() => fileRef.current?.click()}>
                     <Upload size={16} /> Upload Photo
                   </Button>

@@ -114,7 +114,7 @@ export default function Profile() {
               )}
             </div>
             <div className="flex-1">
-              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onFile} />
+              <input ref={fileRef} type="file" accept="image/*" className="sr-only" onChange={onFile} />
               <div className="flex gap-2">
                 <Button type="button" variant="secondary" onClick={() => fileRef.current?.click()}>
                   <Upload size={16} /> Upload Photo

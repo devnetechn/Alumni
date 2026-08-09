@@ -40,7 +40,7 @@ export default function EventPhotosManager({ eventId }) {
     <Panel className="p-6 mb-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-bold text-[var(--brand-ink)]">Photos</h2>
-        <input ref={fileRef} type="file" accept="image/*,video/*" className="hidden" onChange={onPhotoFile} />
+        <input ref={fileRef} type="file" accept="image/*,video/*" className="sr-only" onChange={onPhotoFile} />
         <Button type="button" variant="secondary" onClick={() => fileRef.current?.click()}>
           <Upload size={16} /> Upload Photo/Video
         </Button>
