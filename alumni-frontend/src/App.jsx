@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate, Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from './auth';
-import { GraduationCap, LayoutDashboard, Users, Calendar, Megaphone, Briefcase, UserCircle, IdCard, LogOut, Menu, X, MessageSquare, Shield, FileText, UsersRound, Bell, QrCode } from 'lucide-react';
+import { GraduationCap, LayoutDashboard, Users, Calendar, Megaphone, Briefcase, UserCircle, IdCard, LogOut, Menu, X, MessageSquare, Shield, FileText, UsersRound, Bell, QrCode, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { Wordmark, Button } from './components/ui';
 import PublicHome from './pages/PublicHome';
@@ -28,6 +28,7 @@ import Groups from './pages/Groups';
 import Notifications from './pages/Notifications';
 import EventRegistrations from './pages/EventRegistrations';
 import ScanRedirect from './pages/ScanRedirect';
+import AdminHighlights from './pages/AdminHighlights';
 
 function Protected({ children }) {
   const { user, loading } = useAuth();
@@ -50,6 +51,7 @@ const navItems = [
   { to: '/my-id', label: 'My ID', icon: IdCard },
   { to: '/admin/postings', label: 'Manage Posts', icon: FileText, adminOnly: true },
   { to: '/admin/users', label: 'Users', icon: Shield, adminOnly: true },
+  { to: '/admin/highlights', label: 'Highlights', icon: Sparkles, adminOnly: true },
 ];
 
 function Sidebar({ open, onClose }) {
@@ -190,6 +192,7 @@ export default function App() {
         <Route path="/notifications" element={<Protected><Notifications /></Protected>} />
         <Route path="/admin/users" element={<Protected><AdminUsers /></Protected>} />
         <Route path="/admin/postings" element={<Protected><AdminPostings /></Protected>} />
+        <Route path="/admin/highlights" element={<Protected><AdminHighlights /></Protected>} />
       </Routes>
     </Shell>
   );
