@@ -10,7 +10,7 @@ test('all expected tables exist after migration', async () => {
   expect(names).toEqual([
     'announcements', 'event_checkins', 'event_photos', 'event_rsvps', 'events',
     'group_members', 'group_posts', 'groups', 'jobs',
-    'messages', 'notifications', 'platform_admins', 'processed_webhook_events', 'schools', 'users',
+    'messages', 'notifications', 'pending_signups', 'platform_admins', 'processed_webhook_events', 'schools', 'users',
   ]);
 });
 
@@ -25,7 +25,7 @@ test('schools table exists with the expected columns', async () => {
 test('every tenant table has a school_id column', async () => {
   const tables = [
     'users', 'events', 'event_rsvps', 'event_checkins', 'event_photos', 'jobs',
-    'announcements', 'messages', 'groups', 'group_members', 'group_posts', 'notifications',
+    'announcements', 'messages', 'groups', 'group_members', 'group_posts', 'notifications', 'pending_signups',
   ];
   for (const table of tables) {
     const { rows } = await pool.query(
@@ -39,7 +39,7 @@ test('every tenant table has a school_id column', async () => {
 test('every tenant table has row-level security enabled', async () => {
   const tables = [
     'users', 'events', 'event_rsvps', 'event_checkins', 'event_photos', 'jobs',
-    'announcements', 'messages', 'groups', 'group_members', 'group_posts', 'notifications',
+    'announcements', 'messages', 'groups', 'group_members', 'group_posts', 'notifications', 'pending_signups',
   ];
   for (const table of tables) {
     const { rows } = await pool.query(

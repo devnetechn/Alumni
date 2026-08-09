@@ -30,6 +30,11 @@ async function createCheckoutSession({ lineItems, paymentMethodTypes, successUrl
 
   const body = await res.json();
   if (!res.ok) {
+    console.error('PayMongo checkout session creation failed. Full response:', JSON.stringify(body));
+    console.error('Request metadata keys/lengths:', Object.fromEntries(
+      Object.entries(metadata || {}).map(([k, v]) => [k, String(v).length])
+    ));
+    console.error('Request line_items:', JSON.stringify(lineItems));
     const message = body?.errors?.[0]?.detail || 'PayMongo checkout session creation failed';
     throw new Error(message);
   }

@@ -37,6 +37,30 @@ router.post('/signup-checkout', asyncHandler(async (req, res) => {
   // known until after this call returns.
   const sessionToken = crypto.randomUUID();
 
+  // PayMongo's checkout metadata has an undocumented size/entropy limit
+  // that a real (high-entropy) value like a base64 photo blows past well
+  // under 10KB, even though low-entropy strings of the same length pass
+  // fine (confirmed via direct testing against their API). Stage the full
+  // signup here instead, keyed by session_token, and pass only that small,
+  // low-entropy token through PayMongo metadata; the webhook reads the
+  // rest back from this table.
+  await req.db(
+    `INSERT INTO pending_signups (session_token, school_id, email, password_hash, full_name, batch_year, contact, address, member_type, profile_pic)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+    [
+      sessionToken,
+      req.school.id,
+      email,
+      password_hash,
+      full_name || null,
+      batch_year || null,
+      contact || null,
+      address || null,
+      resolvedMemberType,
+      profile_pic,
+    ]
+  );
+
   const session = await paymongo.createCheckoutSession({
     lineItems: [{
       amount: req.school.registration_fee,
@@ -51,14 +75,6 @@ router.post('/signup-checkout', asyncHandler(async (req, res) => {
       kind: 'signup',
       school_id: String(req.school.id),
       session_token: sessionToken,
-      email,
-      password_hash,
-      profile_pic,
-      full_name: full_name || '',
-      batch_year: batch_year ? String(batch_year) : '',
-      contact: contact || '',
-      address: address || '',
-      member_type: resolvedMemberType,
     },
   });
 

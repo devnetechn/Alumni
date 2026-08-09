@@ -62,11 +62,23 @@ test('POST /api/registration/signup-checkout creates a checkout session and retu
   expect(callArgs.metadata.kind).toBe('signup');
   expect(callArgs.metadata.session_token).toBeTruthy();
   expect(callArgs.successUrl).toContain(`session_id=${callArgs.metadata.session_token}`);
-  expect(callArgs.metadata.email).toBe('new@test.com');
-  expect(callArgs.metadata.member_type).toBe('guest');
-  expect(callArgs.metadata.password_hash).toBeTruthy();
-  expect(callArgs.metadata.password_hash).not.toBe('secret123');
-  expect(callArgs.metadata.profile_pic).toBe('data:image/jpeg;base64,AAAA');
+  // The full signup (including the photo) must NOT ride through PayMongo
+  // metadata -- confirmed via direct testing that PayMongo's checkout
+  // metadata silently fails on real (high-entropy) values like a photo,
+  // even at sizes well under its documented-looking limits. Only the
+  // small, low-entropy session_token goes to PayMongo; everything else
+  // is staged in pending_signups instead.
+  expect(callArgs.metadata.email).toBeUndefined();
+  expect(callArgs.metadata.password_hash).toBeUndefined();
+  expect(callArgs.metadata.profile_pic).toBeUndefined();
+
+  const staged = await query('SELECT * FROM pending_signups WHERE session_token = $1', [callArgs.metadata.session_token]);
+  expect(staged.length).toBe(1);
+  expect(staged[0].email).toBe('new@test.com');
+  expect(staged[0].member_type).toBe('guest');
+  expect(staged[0].password_hash).toBeTruthy();
+  expect(staged[0].password_hash).not.toBe('secret123');
+  expect(staged[0].profile_pic).toBe('data:image/jpeg;base64,AAAA');
 });
 
 test('POST /api/registration/signup-checkout rejects a duplicate email', async () => {

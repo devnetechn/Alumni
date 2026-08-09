@@ -29,23 +29,32 @@ router.post('/webhook', asyncHandler(async (req, res) => {
   const schoolId = Number(metadata.school_id);
 
   if (metadata.kind === 'signup') {
-    await queryForSchool(
+    const pending = await queryForSchool(
       schoolId,
-      `INSERT INTO users (school_id, email, password_hash, full_name, batch_year, contact, address, member_type, profile_pic, registration_paid_until, paymongo_checkout_session_id)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9, now() + interval '2 years', $10)`,
-      [
-        schoolId,
-        metadata.email,
-        metadata.password_hash,
-        metadata.full_name || null,
-        metadata.batch_year ? Number(metadata.batch_year) : null,
-        metadata.contact || null,
-        metadata.address || null,
-        metadata.member_type,
-        metadata.profile_pic || null,
-        metadata.session_token,
-      ]
+      `SELECT * FROM pending_signups WHERE session_token = $1`,
+      [metadata.session_token]
     );
+    if (pending.length > 0) {
+      const signup = pending[0];
+      await queryForSchool(
+        schoolId,
+        `INSERT INTO users (school_id, email, password_hash, full_name, batch_year, contact, address, member_type, profile_pic, registration_paid_until, paymongo_checkout_session_id)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9, now() + interval '2 years', $10)`,
+        [
+          schoolId,
+          signup.email,
+          signup.password_hash,
+          signup.full_name,
+          signup.batch_year,
+          signup.contact,
+          signup.address,
+          signup.member_type,
+          signup.profile_pic,
+          metadata.session_token,
+        ]
+      );
+      await queryForSchool(schoolId, `DELETE FROM pending_signups WHERE session_token = $1`, [metadata.session_token]);
+    }
   } else if (metadata.kind === 'renewal') {
     await queryForSchool(
       schoolId,

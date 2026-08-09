@@ -11,7 +11,7 @@ async function resetDb() {
       notifications, group_posts, group_members, groups,
       messages, announcements, jobs,
       event_photos, event_checkins, event_rsvps, events, users, schools, platform_admins,
-      processed_webhook_events
+      processed_webhook_events, pending_signups
     RESTART IDENTITY CASCADE
   `);
 }

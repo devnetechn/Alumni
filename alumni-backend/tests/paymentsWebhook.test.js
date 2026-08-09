@@ -41,21 +41,21 @@ test('rejects a request with a missing/invalid signature', async () => {
   expect(res.status).toBe(400);
 });
 
-test('creates a new user from a signup webhook event', async () => {
+test('creates a new user from a signup webhook event, reading the staged pending_signups row', async () => {
   const school = await getDefaultSchool();
   const password_hash = await hashPassword('secret123');
+  await query(
+    `INSERT INTO pending_signups (session_token, school_id, email, password_hash, full_name, batch_year, contact, address, member_type, profile_pic)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+    ['token-signup1', school.id, 'webhookuser@test.com', password_hash, 'Webhook User', 2020, '', '', 'alumnus', 'data:image/jpeg;base64,AAAA']
+  );
+  // PayMongo metadata only ever carries the low-entropy correlation
+  // token now -- see registration.js for why the full signup can't ride
+  // through PayMongo metadata.
   const payload = checkoutPaidEvent('evt_signup1', 'cs_signup1', {
     kind: 'signup',
     school_id: String(school.id),
     session_token: 'token-signup1',
-    email: 'webhookuser@test.com',
-    password_hash,
-    full_name: 'Webhook User',
-    batch_year: '2020',
-    contact: '',
-    address: '',
-    member_type: 'alumnus',
-    profile_pic: 'data:image/jpeg;base64,AAAA',
   });
   const { rawBody, header } = signedRequest(payload);
 
@@ -72,6 +72,32 @@ test('creates a new user from a signup webhook event', async () => {
   expect(rows[0].paymongo_checkout_session_id).toBe('token-signup1');
   expect(new Date(rows[0].registration_paid_until) > new Date()).toBe(true);
   expect(rows[0].profile_pic).toBe('data:image/jpeg;base64,AAAA');
+  expect(rows[0].full_name).toBe('Webhook User');
+  expect(rows[0].batch_year).toBe(2020);
+
+  const staged = await query('SELECT * FROM pending_signups WHERE session_token = $1', ['token-signup1']);
+  expect(staged.length).toBe(0);
+});
+
+test('signup webhook event is a no-op if the pending_signups row is missing (e.g. already consumed)', async () => {
+  const school = await getDefaultSchool();
+  const payload = checkoutPaidEvent('evt_signup_missing', 'cs_signup_missing', {
+    kind: 'signup',
+    school_id: String(school.id),
+    session_token: 'token-does-not-exist',
+  });
+  const { rawBody, header } = signedRequest(payload);
+
+  const res = await request(app)
+    .post('/api/payments/webhook')
+    .set('Content-Type', 'application/json')
+    .set('Paymongo-Signature', header)
+    .send(rawBody);
+
+  expect(res.status).toBe(200);
+
+  const rows = await query('SELECT * FROM users WHERE paymongo_checkout_session_id = $1', ['token-does-not-exist']);
+  expect(rows.length).toBe(0);
 });
 
 test('extends registration_paid_until from a renewal webhook event', async () => {

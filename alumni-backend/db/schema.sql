@@ -288,4 +288,33 @@ CREATE POLICY tenant_isolation ON event_photos
   USING (school_id = current_setting('app.school_id', true)::int)
   WITH CHECK (school_id = current_setting('app.school_id', true)::int);
 
+-- PayMongo checkout metadata has an undocumented size/entropy limit that
+-- real (high-entropy) values like a base64-encoded photo blow past well
+-- under 10KB, even though low-entropy strings of the same length pass
+-- fine (confirmed via direct testing against their API). Signup data is
+-- staged here instead, keyed by the low-entropy session_token that IS
+-- safe to pass through PayMongo metadata; the webhook reads the full
+-- signup back from this table instead of from PayMongo metadata.
+CREATE TABLE IF NOT EXISTS pending_signups (
+  session_token TEXT PRIMARY KEY,
+  school_id INTEGER REFERENCES schools(id) ON DELETE CASCADE,
+  email TEXT NOT NULL,
+  password_hash TEXT NOT NULL,
+  full_name TEXT,
+  batch_year INTEGER,
+  contact TEXT,
+  address TEXT,
+  member_type TEXT NOT NULL,
+  profile_pic TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+ALTER TABLE pending_signups ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON pending_signups;
+CREATE POLICY tenant_isolation ON pending_signups
+  USING (school_id = current_setting('app.school_id', true)::int)
+  WITH CHECK (school_id = current_setting('app.school_id', true)::int);
+
+GRANT ALL ON pending_signups TO alumni_app;
+
 GRANT ALL ON event_photos, event_photos_id_seq TO alumni_app;
