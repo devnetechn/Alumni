@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { GraduationCap, ArrowRight, ArrowLeft } from 'lucide-react';
+import { GraduationCap, ArrowRight, ArrowLeft, Upload, Trash2 } from 'lucide-react';
 import { useAuth } from '../auth';
 import { api } from '../api';
 import { Panel, Button, Input, Wordmark } from '../components/ui';
@@ -12,12 +12,51 @@ export default function Register() {
   });
   const [err, setErr] = useState('');
   const [loading, setLoading] = useState(false);
+  const fileRef = useRef(null);
 
   const update = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+
+  const onFile = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setErr('Please select an image file');
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setErr('Image too large (max 2MB)');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        const max = 400;
+        const scale = Math.min(1, max / Math.max(img.width, img.height));
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        setForm((f) => ({ ...f, profile_pic: dataUrl }));
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const clearPhoto = () => setForm((f) => ({ ...f, profile_pic: '' }));
 
   const onSubmit = async (e) => {
     e.preventDefault();
     setErr('');
+    if (!form.profile_pic) {
+      setErr('Please upload a profile photo');
+      return;
+    }
     setLoading(true);
     try {
       const { data } = await api.post('/registration/signup-checkout', {
@@ -70,6 +109,26 @@ export default function Register() {
           {school && school.registration_open && school.registration_fee > 0 && (
           <form onSubmit={onSubmit} className="space-y-5">
             <Section title="Account">
+              <Field label="Profile Photo" span>
+                <div className="flex items-center gap-4">
+                  <div className="w-20 h-20 rounded-[var(--radius)] bg-[var(--brand-surface)] border-2 border-[var(--brand-ink)] overflow-hidden flex items-center justify-center flex-shrink-0">
+                    {form.profile_pic ? (
+                      <img src={form.profile_pic} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-xs text-slate-400">No photo</span>
+                    )}
+                  </div>
+                  <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onFile} />
+                  <Button type="button" variant="secondary" onClick={() => fileRef.current?.click()}>
+                    <Upload size={16} /> Upload Photo
+                  </Button>
+                  {form.profile_pic && (
+                    <Button type="button" variant="secondary" onClick={clearPhoto}>
+                      <Trash2 size={16} />
+                    </Button>
+                  )}
+                </div>
+              </Field>
               <Field label="Full Name" span>
                 <Input value={form.full_name} onChange={update('full_name')} required />
               </Field>
