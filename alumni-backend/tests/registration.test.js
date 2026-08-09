@@ -15,7 +15,7 @@ test('POST /api/registration/signup-checkout rejects when registration is closed
   const res = await request(app)
     .post('/api/registration/signup-checkout')
     .set('Host', hostFor(school))
-    .send({ email: 'new@test.com', password: 'secret123', full_name: 'New Person' });
+    .send({ email: 'new@test.com', password: 'secret123', full_name: 'New Person', profile_pic: 'data:image/jpeg;base64,AAAA' });
 
   expect(res.status).toBe(400);
 });
@@ -26,9 +26,22 @@ test('POST /api/registration/signup-checkout rejects when no fee is configured',
   const res = await request(app)
     .post('/api/registration/signup-checkout')
     .set('Host', hostFor(school))
+    .send({ email: 'new@test.com', password: 'secret123', full_name: 'New Person', profile_pic: 'data:image/jpeg;base64,AAAA' });
+
+  expect(res.status).toBe(400);
+});
+
+test('POST /api/registration/signup-checkout rejects when profile_pic is missing', async () => {
+  const school = await getDefaultSchool();
+  await query('UPDATE schools SET registration_fee = 20000 WHERE id = $1', [school.id]);
+
+  const res = await request(app)
+    .post('/api/registration/signup-checkout')
+    .set('Host', hostFor(school))
     .send({ email: 'new@test.com', password: 'secret123', full_name: 'New Person' });
 
   expect(res.status).toBe(400);
+  expect(res.body.error).toMatch(/photo/i);
 });
 
 test('POST /api/registration/signup-checkout creates a checkout session and returns its URL', async () => {
@@ -39,7 +52,7 @@ test('POST /api/registration/signup-checkout creates a checkout session and retu
   const res = await request(app)
     .post('/api/registration/signup-checkout')
     .set('Host', hostFor(school))
-    .send({ email: 'new@test.com', password: 'secret123', full_name: 'New Person', member_type: 'guest' });
+    .send({ email: 'new@test.com', password: 'secret123', full_name: 'New Person', member_type: 'guest', profile_pic: 'data:image/jpeg;base64,AAAA' });
 
   expect(res.status).toBe(200);
   expect(res.body.checkoutUrl).toBe('https://checkout.paymongo.com/cs_test123');
@@ -53,6 +66,7 @@ test('POST /api/registration/signup-checkout creates a checkout session and retu
   expect(callArgs.metadata.member_type).toBe('guest');
   expect(callArgs.metadata.password_hash).toBeTruthy();
   expect(callArgs.metadata.password_hash).not.toBe('secret123');
+  expect(callArgs.metadata.profile_pic).toBe('data:image/jpeg;base64,AAAA');
 });
 
 test('POST /api/registration/signup-checkout rejects a duplicate email', async () => {
@@ -63,7 +77,7 @@ test('POST /api/registration/signup-checkout rejects a duplicate email', async (
   const res = await request(app)
     .post('/api/registration/signup-checkout')
     .set('Host', hostFor(school))
-    .send({ email: 'dupe@test.com', password: 'secret123', full_name: 'Dupe' });
+    .send({ email: 'dupe@test.com', password: 'secret123', full_name: 'Dupe', profile_pic: 'data:image/jpeg;base64,AAAA' });
 
   expect(res.status).toBe(409);
 });

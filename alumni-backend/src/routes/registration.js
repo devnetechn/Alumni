@@ -9,8 +9,9 @@ const paymongo = require('../lib/paymongo');
 const router = express.Router();
 
 router.post('/signup-checkout', asyncHandler(async (req, res) => {
-  const { email, password, full_name, batch_year, contact, address, member_type } = req.body;
+  const { email, password, full_name, batch_year, contact, address, member_type, profile_pic } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'email and password are required' });
+  if (!profile_pic) return res.status(400).json({ error: 'A profile photo is required' });
 
   if (!req.school.registration_open) {
     return res.status(400).json({ error: 'Registration is currently closed' });
@@ -52,6 +53,7 @@ router.post('/signup-checkout', asyncHandler(async (req, res) => {
       session_token: sessionToken,
       email,
       password_hash,
+      profile_pic,
       full_name: full_name || '',
       batch_year: batch_year ? String(batch_year) : '',
       contact: contact || '',
