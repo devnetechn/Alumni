@@ -10,7 +10,7 @@ async function resetDb() {
     TRUNCATE TABLE
       notifications, group_posts, group_members, groups,
       messages, announcements, jobs,
-      event_checkins, event_rsvps, events, users, schools, platform_admins,
+      event_photos, event_checkins, event_rsvps, events, users, schools, platform_admins,
       processed_webhook_events
     RESTART IDENTITY CASCADE
   `);

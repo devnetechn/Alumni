@@ -271,3 +271,21 @@ CREATE TABLE IF NOT EXISTS processed_webhook_events (
   id TEXT PRIMARY KEY,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+CREATE TABLE IF NOT EXISTS event_photos (
+  id SERIAL PRIMARY KEY,
+  school_id INTEGER REFERENCES schools(id) ON DELETE CASCADE,
+  event_id INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+  media TEXT NOT NULL,
+  media_type TEXT NOT NULL CHECK (media_type IN ('image', 'video')),
+  uploaded_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+ALTER TABLE event_photos ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON event_photos;
+CREATE POLICY tenant_isolation ON event_photos
+  USING (school_id = current_setting('app.school_id', true)::int)
+  WITH CHECK (school_id = current_setting('app.school_id', true)::int);
+
+GRANT ALL ON event_photos, event_photos_id_seq TO alumni_app;
