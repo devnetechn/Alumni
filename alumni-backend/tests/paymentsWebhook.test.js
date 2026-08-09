@@ -55,6 +55,7 @@ test('creates a new user from a signup webhook event', async () => {
     contact: '',
     address: '',
     member_type: 'alumnus',
+    profile_pic: 'data:image/jpeg;base64,AAAA',
   });
   const { rawBody, header } = signedRequest(payload);
 
@@ -70,6 +71,7 @@ test('creates a new user from a signup webhook event', async () => {
   expect(rows.length).toBe(1);
   expect(rows[0].paymongo_checkout_session_id).toBe('token-signup1');
   expect(new Date(rows[0].registration_paid_until) > new Date()).toBe(true);
+  expect(rows[0].profile_pic).toBe('data:image/jpeg;base64,AAAA');
 });
 
 test('extends registration_paid_until from a renewal webhook event', async () => {

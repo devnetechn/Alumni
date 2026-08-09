@@ -31,8 +31,8 @@ router.post('/webhook', asyncHandler(async (req, res) => {
   if (metadata.kind === 'signup') {
     await queryForSchool(
       schoolId,
-      `INSERT INTO users (school_id, email, password_hash, full_name, batch_year, contact, address, member_type, registration_paid_until, paymongo_checkout_session_id)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8, now() + interval '2 years', $9)`,
+      `INSERT INTO users (school_id, email, password_hash, full_name, batch_year, contact, address, member_type, profile_pic, registration_paid_until, paymongo_checkout_session_id)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9, now() + interval '2 years', $10)`,
       [
         schoolId,
         metadata.email,
@@ -42,6 +42,7 @@ router.post('/webhook', asyncHandler(async (req, res) => {
         metadata.contact || null,
         metadata.address || null,
         metadata.member_type,
+        metadata.profile_pic || null,
         metadata.session_token,
       ]
     );
