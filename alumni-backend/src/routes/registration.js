@@ -8,6 +8,16 @@ const paymongo = require('../lib/paymongo');
 
 const router = express.Router();
 
+// The frontend and backend are separate origins in production (e.g. Vercel
+// + Render), so req.headers.host is the *backend's* own host there, not the
+// frontend's -- unlike local dev, where Vite's proxy (no changeOrigin, see
+// vite.config.js) preserves the original browser Host header, making the
+// two coincide. FRONTEND_URL makes the real frontend origin explicit;
+// falling back to req.protocol/req.headers.host keeps local dev unchanged.
+function frontendOrigin(req) {
+  return process.env.FRONTEND_URL || `${req.protocol}://${req.headers.host}`;
+}
+
 router.post('/signup-checkout', asyncHandler(async (req, res) => {
   const { email, password, full_name, batch_year, contact, address, member_type, profile_pic } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'email and password are required' });
@@ -68,8 +78,8 @@ router.post('/signup-checkout', asyncHandler(async (req, res) => {
       quantity: 1,
     }],
     paymentMethodTypes: ['card', 'gcash', 'paymaya', 'grab_pay'],
-    successUrl: `${req.protocol}://${req.headers.host}/register/success?session_id=${sessionToken}`,
-    cancelUrl: `${req.protocol}://${req.headers.host}/register`,
+    successUrl: `${frontendOrigin(req)}/register/success?session_id=${sessionToken}`,
+    cancelUrl: `${frontendOrigin(req)}/register`,
     metadata: {
       kind: 'signup',
       school_id: String(req.school.id),
@@ -105,8 +115,8 @@ router.post('/renew-checkout', requireAuth, asyncHandler(async (req, res) => {
       quantity: 1,
     }],
     paymentMethodTypes: ['card', 'gcash', 'paymaya', 'grab_pay'],
-    successUrl: `${req.protocol}://${req.headers.host}/dashboard`,
-    cancelUrl: `${req.protocol}://${req.headers.host}/dashboard`,
+    successUrl: `${frontendOrigin(req)}/dashboard`,
+    cancelUrl: `${frontendOrigin(req)}/dashboard`,
     metadata: {
       kind: 'renewal',
       school_id: String(req.school.id),

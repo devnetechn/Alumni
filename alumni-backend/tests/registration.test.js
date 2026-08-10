@@ -84,6 +84,28 @@ test('POST /api/registration/signup-checkout creates a checkout session and retu
   expect(staged[0].profile_pic).toBe('data:image/jpeg;base64,AAAA');
 });
 
+test('POST /api/registration/signup-checkout uses FRONTEND_URL for success/cancel URLs when set, not the request Host', async () => {
+  const school = await getDefaultSchool();
+  await query('UPDATE schools SET registration_fee = 20000 WHERE id = $1', [school.id]);
+  jest.spyOn(paymongo, 'createCheckoutSession').mockResolvedValue({ id: 'cs_fe', checkoutUrl: 'https://checkout.paymongo.com/cs_fe' });
+  const originalFrontendUrl = process.env.FRONTEND_URL;
+  process.env.FRONTEND_URL = 'https://alumni-six-wine.vercel.app';
+
+  try {
+    const res = await request(app)
+      .post('/api/registration/signup-checkout')
+      .set('Host', hostFor(school))
+      .send({ email: 'fe-url@test.com', password: 'secret123', full_name: 'FE Url', profile_pic: 'data:image/jpeg;base64,AAAA' });
+
+    expect(res.status).toBe(200);
+    const callArgs = paymongo.createCheckoutSession.mock.calls[0][0];
+    expect(callArgs.successUrl).toBe(`https://alumni-six-wine.vercel.app/register/success?session_id=${callArgs.metadata.session_token}`);
+    expect(callArgs.cancelUrl).toBe('https://alumni-six-wine.vercel.app/register');
+  } finally {
+    process.env.FRONTEND_URL = originalFrontendUrl;
+  }
+});
+
 test('POST /api/registration/signup-checkout rejects a duplicate email', async () => {
   const school = await getDefaultSchool();
   await query('UPDATE schools SET registration_fee = 20000 WHERE id = $1', [school.id]);
@@ -144,4 +166,27 @@ test('POST /api/registration/renew-checkout creates a renewal checkout session',
   const callArgs = paymongo.createCheckoutSession.mock.calls[0][0];
   expect(callArgs.metadata.kind).toBe('renewal');
   expect(callArgs.metadata.user_id).toBe(String(user.id));
+});
+
+test('POST /api/registration/renew-checkout uses FRONTEND_URL for success/cancel URLs when set, not the request Host', async () => {
+  const school = await getDefaultSchool();
+  await query('UPDATE schools SET registration_fee = 20000 WHERE id = $1', [school.id]);
+  const user = await insertUser();
+  jest.spyOn(paymongo, 'createCheckoutSession').mockResolvedValue({ id: 'cs_renew_fe', checkoutUrl: 'https://checkout.paymongo.com/cs_renew_fe' });
+  const originalFrontendUrl = process.env.FRONTEND_URL;
+  process.env.FRONTEND_URL = 'https://alumni-six-wine.vercel.app';
+
+  try {
+    const res = await request(app)
+      .post('/api/registration/renew-checkout')
+      .set('Host', hostFor(school))
+      .set('Authorization', authHeader(user));
+
+    expect(res.status).toBe(200);
+    const callArgs = paymongo.createCheckoutSession.mock.calls[0][0];
+    expect(callArgs.successUrl).toBe('https://alumni-six-wine.vercel.app/dashboard');
+    expect(callArgs.cancelUrl).toBe('https://alumni-six-wine.vercel.app/dashboard');
+  } finally {
+    process.env.FRONTEND_URL = originalFrontendUrl;
+  }
 });
