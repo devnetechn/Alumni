@@ -1,10 +1,13 @@
 import axios from 'axios';
 
-// Same-origin: /api proxied to backend by Vite in dev, and by reverse proxy in prod.
-export const API_BASE = '';
+// In local dev, Vite proxies /api to the backend (see vite.config.js) so this
+// stays relative. In production, VITE_API_BASE_URL points at the deployed
+// backend origin (e.g. https://alumni-backend.onrender.com) — same pattern
+// as VITE_SOCKET_URL in socket.js.
+export const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 
 export const api = axios.create({
-  baseURL: '/api',
+  baseURL: `${API_BASE}/api`,
 });
 
 api.interceptors.request.use((config) => {
