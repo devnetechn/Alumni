@@ -54,6 +54,12 @@ app.use('/api/jobs', jobsRoutes);
 const announcementsRoutes = require('./routes/announcements');
 app.use('/api/announcements', announcementsRoutes);
 
+const partnersRoutes = require('./routes/partners');
+app.use('/api/partners', partnersRoutes);
+
+const officersRoutes = require('./routes/officers');
+app.use('/api/officers', officersRoutes);
+
 const messagesRoutes = require('./routes/messages');
 app.use('/api/messages', messagesRoutes);
 

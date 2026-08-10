@@ -318,3 +318,37 @@ CREATE POLICY tenant_isolation ON pending_signups
 GRANT ALL ON pending_signups TO alumni_app;
 
 GRANT ALL ON event_photos, event_photos_id_seq TO alumni_app;
+
+CREATE TABLE IF NOT EXISTS partners (
+  id SERIAL PRIMARY KEY,
+  school_id INTEGER REFERENCES schools(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  logo TEXT,
+  website_url TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+ALTER TABLE partners ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON partners;
+CREATE POLICY tenant_isolation ON partners
+  USING (school_id = current_setting('app.school_id', true)::int)
+  WITH CHECK (school_id = current_setting('app.school_id', true)::int);
+
+GRANT ALL ON partners, partners_id_seq TO alumni_app;
+
+CREATE TABLE IF NOT EXISTS officers (
+  id SERIAL PRIMARY KEY,
+  school_id INTEGER REFERENCES schools(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  position TEXT NOT NULL,
+  photo TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+ALTER TABLE officers ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON officers;
+CREATE POLICY tenant_isolation ON officers
+  USING (school_id = current_setting('app.school_id', true)::int)
+  WITH CHECK (school_id = current_setting('app.school_id', true)::int);
+
+GRANT ALL ON officers, officers_id_seq TO alumni_app;
