@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Users, Calendar, CheckCircle2, Sparkles } from 'lucide-react';
 import heroPoster from '../assets/hero.png';
 import heroVideoSrc from '../assets/hero.mp4';
@@ -49,11 +50,11 @@ export default function Hero({ stats }) {
           animate="visible"
           custom={1}
           variants={fadeUp}
-          className="font-display text-5xl md:text-6xl mb-6 leading-tight"
+          className="font-editorial text-5xl md:text-6xl mb-6 leading-tight"
         >
-          Welcome home,
+          Where Every Journey Begins,
           <br />
-          <span style={{ color: 'var(--brand-accent)' }}>fellow alumni.</span>
+          and Every Story Continues.
         </motion.h1>
 
         <motion.p
@@ -63,9 +64,30 @@ export default function Hero({ stats }) {
           variants={fadeUp}
           className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-10"
         >
-          Stay connected with your batchmates, discover upcoming events, and explore career
-          opportunities — all in one place.
+          Reconnect with the people, memories, and community that make our
+          alumni family special.
         </motion.p>
+
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          custom={2.5}
+          variants={fadeUp}
+          className="flex flex-wrap items-center justify-center gap-4 mb-10"
+        >
+          <a
+            href="#alumni"
+            className="inline-flex items-center gap-2 bg-[var(--brand-accent)] text-white font-bold px-6 py-3 rounded-[var(--radius)] border-2 border-white hover:opacity-90 transition-opacity"
+          >
+            Explore Our Alumni Community
+          </a>
+          <Link
+            to="/register"
+            className="inline-flex items-center gap-2 bg-transparent text-white font-bold px-6 py-3 rounded-[var(--radius)] border-2 border-white/60 hover:border-white transition-colors"
+          >
+            Join the Alumni Association
+          </Link>
+        </motion.div>
 
         {stats && (
           <motion.div
@@ -80,6 +102,21 @@ export default function Hero({ stats }) {
             <StatBox icon={CheckCircle2} label="Check-ins" value={stats.totalCheckins} />
           </motion.div>
         )}
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8, duration: 0.4 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        >
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+            className="w-6 h-10 rounded-full border-2 border-white/50 flex items-start justify-center p-1.5"
+          >
+            <div className="w-1.5 h-1.5 rounded-full bg-white/80" />
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );

@@ -34,7 +34,7 @@ export default function Login() {
         <div className="relative z-10 flex flex-col justify-between p-12 text-white">
           <Link to="/" className="flex items-center gap-2">
             {school?.logo ? (
-              <img src={school.logo} alt="" className="w-9 h-9 rounded-[var(--radius)] border-2 border-white object-cover" />
+              <img src={school.logo} alt="" className="w-12 h-12 rounded-full object-cover" />
             ) : (
               <div className="bg-[var(--brand-accent)] border-2 border-white p-2 rounded-[var(--radius)]">
                 <GraduationCap size={22} />
@@ -59,7 +59,7 @@ export default function Login() {
         <form onSubmit={onSubmit} className="w-full max-w-md">
           <div className="lg:hidden mb-8 flex items-center gap-2">
             {school?.logo ? (
-              <img src={school.logo} alt="" className="w-9 h-9 rounded-[var(--radius)] border-2 border-[var(--brand-ink)] object-cover" />
+              <img src={school.logo} alt="" className="w-12 h-12 rounded-full object-cover" />
             ) : (
               <div className="bg-[var(--brand-accent)] border-2 border-[var(--brand-ink)] p-2 rounded-[var(--radius)]">
                 <GraduationCap className="text-white" size={22} />

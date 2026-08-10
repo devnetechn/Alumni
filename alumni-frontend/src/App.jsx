@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate, Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from './auth';
-import { GraduationCap, LayoutDashboard, Users, Calendar, Megaphone, Briefcase, UserCircle, IdCard, LogOut, Menu, X, MessageSquare, Shield, FileText, UsersRound, Bell, QrCode, Sparkles } from 'lucide-react';
+import { GraduationCap, LayoutDashboard, Calendar, Megaphone, UserCircle, IdCard, LogOut, Menu, X, MessageSquare, Shield, FileText, UsersRound, Bell, QrCode, Sparkles, Handshake, Users } from 'lucide-react';
 import { useState } from 'react';
 import { Wordmark, Button } from './components/ui';
 import PublicHome from './pages/PublicHome';
@@ -29,6 +29,9 @@ import Notifications from './pages/Notifications';
 import EventRegistrations from './pages/EventRegistrations';
 import ScanRedirect from './pages/ScanRedirect';
 import AdminHighlights from './pages/AdminHighlights';
+import AdminPartnerships from './pages/AdminPartnerships';
+import AdminOfficers from './pages/AdminOfficers';
+import Officers from './pages/Officers';
 
 function Protected({ children }) {
   const { user, loading } = useAuth();
@@ -39,19 +42,19 @@ function Protected({ children }) {
 
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/directory', label: 'Directory', icon: Users },
   { to: '/groups', label: 'Groups', icon: UsersRound },
   { to: '/messages', label: 'Messages', icon: MessageSquare },
   { to: '/notifications', label: 'Notifications', icon: Bell },
   { to: '/scan', label: 'Scan', icon: QrCode, adminOnly: true },
   { to: '/events', label: 'Events', icon: Calendar },
   { to: '/announcements', label: 'Announcements', icon: Megaphone },
-  { to: '/jobs', label: 'Jobs', icon: Briefcase },
   { to: '/profile', label: 'Profile', icon: UserCircle },
   { to: '/my-id', label: 'My ID', icon: IdCard },
   { to: '/admin/postings', label: 'Manage Posts', icon: FileText, adminOnly: true },
   { to: '/admin/users', label: 'Users', icon: Shield, adminOnly: true },
   { to: '/admin/highlights', label: 'Highlights', icon: Sparkles, adminOnly: true },
+  { to: '/admin/partnerships', label: 'Partnerships', icon: Handshake, adminOnly: true },
+  { to: '/admin/officers', label: 'Officers', icon: Users, adminOnly: true },
 ];
 
 function Sidebar({ open, onClose }) {
@@ -65,7 +68,7 @@ function Sidebar({ open, onClose }) {
       <aside className={`fixed lg:sticky lg:flex-shrink-0 top-0 left-0 h-screen w-64 bg-white border-r-[2.5px] border-[var(--brand-ink)] z-40 flex flex-col transition-transform lg:transform-none ${open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         <div className="flex items-center gap-2 px-6 py-5 border-b-[2.5px] border-[var(--brand-ink)] flex-shrink-0">
           {school?.logo ? (
-            <img src={school.logo} alt="" className="w-9 h-9 rounded-[var(--radius)] border-2 border-[var(--brand-ink)] object-cover" />
+            <img src={school.logo} alt="" className="w-12 h-12 rounded-full object-cover" />
           ) : (
             <div className="bg-[var(--brand-accent)] border-2 border-[var(--brand-ink)] rounded-[var(--radius)] p-2">
               <GraduationCap className="text-white" size={22} />
@@ -129,7 +132,7 @@ function MobileHeader({ onMenu }) {
       </button>
       <div className="flex items-center gap-2">
         {school?.logo ? (
-          <img src={school.logo} alt="" className="w-5 h-5 rounded object-cover" />
+          <img src={school.logo} alt="" className="w-8 h-8 rounded-full object-cover" />
         ) : (
           <GraduationCap className="text-[var(--brand-accent)]" size={20} />
         )}
@@ -193,6 +196,9 @@ export default function App() {
         <Route path="/admin/users" element={<Protected><AdminUsers /></Protected>} />
         <Route path="/admin/postings" element={<Protected><AdminPostings /></Protected>} />
         <Route path="/admin/highlights" element={<Protected><AdminHighlights /></Protected>} />
+        <Route path="/admin/partnerships" element={<Protected><AdminPartnerships /></Protected>} />
+        <Route path="/admin/officers" element={<Protected><AdminOfficers /></Protected>} />
+        <Route path="/officers" element={<Officers />} />
       </Routes>
     </Shell>
   );

@@ -92,13 +92,17 @@ export default function Register() {
             <Section title="Account">
               <Field label="Profile Photo" span>
                 <div className="flex items-center gap-4">
-                  <div className="w-20 h-20 rounded-[var(--radius)] bg-[var(--brand-surface)] border-2 border-[var(--brand-ink)] overflow-hidden flex items-center justify-center flex-shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => fileRef.current?.click()}
+                    className="w-20 h-20 rounded-[var(--radius)] bg-[var(--brand-surface)] border-2 border-[var(--brand-ink)] overflow-hidden flex items-center justify-center flex-shrink-0"
+                  >
                     {form.profile_pic ? (
                       <img src={form.profile_pic} alt="" className="w-full h-full object-cover" />
                     ) : (
                       <span className="text-xs text-slate-400">No photo</span>
                     )}
-                  </div>
+                  </button>
                   <input ref={fileRef} type="file" accept="image/*" className="sr-only" onChange={onFile} />
                   <Button type="button" variant="secondary" onClick={() => fileRef.current?.click()}>
                     <Upload size={16} /> Upload Photo

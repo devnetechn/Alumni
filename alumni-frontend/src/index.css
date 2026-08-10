@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Playfair+Display:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -9,10 +9,17 @@
   --brand-ink: #111111;
   --brand-bg: #ffffff;
   --brand-surface: #f7f7f8;
-  --brand-accent: #2b5cff;
+  --brand-accent: #F04E22;
   --brand-accent-ink: #ffffff;
-  --brand-danger: #ff5c35;
+  --brand-danger: #dc2626;
   --brand-success: #16a34a;
+
+  /* Homepage-only editorial palette, additive to the --brand-* tokens above.
+     Used for section backgrounds on the premium alumni homepage; --brand-accent
+     stays the only accent color per the "don't overuse color" design direction. */
+  --editorial-navy: #12233F;
+  --editorial-beige: #F1E9DD;
+  --editorial-gray: #EDEDE8;
 
   --radius: 6px;
   --border-w: 2.5px;
@@ -33,6 +40,10 @@ body {
 
 .font-display {
   font-family: 'Archivo Black', sans-serif;
+}
+
+.font-editorial {
+  font-family: 'Playfair Display', serif;
 }
 
 html {

@@ -1,26 +1,27 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { GraduationCap, Megaphone, Calendar, MapPin, ArrowRight, Sparkles, X, Play } from 'lucide-react';
+import { GraduationCap, ArrowRight, X, LogIn, UserPlus, Menu } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { api } from '../api';
 import { useAuth } from '../auth';
-import PosterBadge from '../components/PosterBadge';
 import Hero from '../components/Hero';
+import AlumniIntro from '../components/home/AlumniIntro';
+import FeaturedAlumni from '../components/home/FeaturedAlumni';
+import AlumniStories from '../components/home/AlumniStories';
+import AnnouncementsSection from '../components/home/AnnouncementsSection';
+import AlumniEventsSection from '../components/home/AlumniEventsSection';
+import BatchExplorer from '../components/home/BatchExplorer';
+import SchoolMemories from '../components/home/SchoolMemories';
+import AlumniImpact from '../components/home/AlumniImpact';
+import OfficersPreview from '../components/home/OfficersPreview';
+import Partnerships from '../components/home/Partnerships';
+import GiveBack from '../components/home/GiveBack';
 import ChatWidget from '../components/ChatWidget';
-import { Panel, Button, Wordmark } from '../components/ui';
+import { Button, Wordmark } from '../components/ui';
 
 const sectionFade = {
   hidden: { opacity: 0, y: 16 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.25, ease: 'easeOut' } },
-};
-
-const cardFade = {
-  hidden: { opacity: 0, y: 12 },
-  visible: (i = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.2, delay: i * 0.05, ease: 'easeOut' },
-  }),
 };
 
 export default function PublicHome() {
@@ -30,13 +31,29 @@ export default function PublicHome() {
   const [stats, setStats] = useState(null);
   const [scrolled, setScrolled] = useState(false);
   const [highlights, setHighlights] = useState([]);
+  const [partners, setPartners] = useState([]);
+  const [officers, setOfficers] = useState([]);
   const [lightbox, setLightbox] = useState(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const navLinks = [
+    ['Home', '#'],
+    ['About', '#about'],
+    ['Alumni', '#alumni'],
+    ['Officers', '/officers'],
+    ['Stories', '#stories'],
+    ['Events', '#events'],
+    ['Memories', '#memories'],
+    ['Give Back', '#give-back'],
+  ];
 
   useEffect(() => {
     api.get('/announcements').then((r) => setAnnouncements(r.data.announcements));
     api.get('/events').then((r) => setEvents(r.data.events));
     api.get('/stats').then((r) => setStats(r.data));
     api.get('/events/highlights').then((r) => setHighlights(r.data.highlights));
+    api.get('/partners').then((r) => setPartners(r.data.partners));
+    api.get('/officers').then((r) => setOfficers(r.data.officers));
   }, []);
 
   useEffect(() => {
@@ -57,7 +74,7 @@ export default function PublicHome() {
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-2">
             {school?.logo ? (
-              <img src={school.logo} alt="" className="h-9 w-9 rounded-[var(--radius)] border-2 border-white object-cover" />
+              <img src={school.logo} alt="" className="h-12 w-12 rounded-full object-cover" />
             ) : (
               <div className="p-2 rounded-[var(--radius)] bg-[var(--brand-accent)] border-2 border-white">
                 <GraduationCap className="text-white" size={22} />
@@ -65,207 +82,141 @@ export default function PublicHome() {
             )}
             <Wordmark className="text-white" />
           </Link>
-          <div className="flex gap-2 items-center">
-            {user ? (
-              <Link to="/dashboard">
-                <Button variant="primary">Dashboard →</Button>
-              </Link>
-            ) : (
-              <>
-                <Link to="/login" className="px-5 py-2 text-white/90 hover:text-white font-bold text-sm">
-                  Login
+          <div className="flex items-center gap-8">
+            <nav className="hidden md:flex items-center gap-6">
+              {navLinks.map(([label, href]) =>
+                href.startsWith('#') ? (
+                  <a key={label} href={href} className="text-sm font-semibold text-white/80 hover:text-white transition-colors">
+                    {label}
+                  </a>
+                ) : (
+                  <Link key={label} to={href} className="text-sm font-semibold text-white/80 hover:text-white transition-colors">
+                    {label}
+                  </Link>
+                )
+              )}
+            </nav>
+            <div className="flex gap-2 items-center">
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen((v) => !v)}
+                className="md:hidden p-2.5 rounded-[var(--radius)] border-2 border-transparent hover:border-white/40 text-white"
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              </button>
+              {user ? (
+                <Link to="/dashboard">
+                  <Button variant="primary">Dashboard →</Button>
                 </Link>
-                <Link to="/register">
-                  <Button variant="primary">Register</Button>
-                </Link>
-              </>
-            )}
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    title="Login"
+                    className="p-2.5 rounded-[var(--radius)] border-2 border-transparent hover:border-white/40 text-white/90 hover:text-white transition-colors"
+                  >
+                    <LogIn size={18} />
+                  </Link>
+                  <Link
+                    to="/register"
+                    title="Register"
+                    className="p-2.5 rounded-[var(--radius)] bg-[var(--brand-accent)] border-2 border-white text-white hover:opacity-90 transition-opacity"
+                  >
+                    <UserPlus size={18} />
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
         </div>
+
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-[var(--brand-ink)] border-t-2 border-white/10 px-6 py-4">
+            <nav className="flex flex-col gap-1">
+              {navLinks.map(([label, href]) =>
+                href.startsWith('#') ? (
+                  <a
+                    key={label}
+                    href={href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="py-2.5 text-sm font-semibold text-white/80 hover:text-white transition-colors"
+                  >
+                    {label}
+                  </a>
+                ) : (
+                  <Link
+                    key={label}
+                    to={href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="py-2.5 text-sm font-semibold text-white/80 hover:text-white transition-colors"
+                  >
+                    {label}
+                  </Link>
+                )
+              )}
+            </nav>
+          </div>
+        )}
       </header>
 
       <Hero stats={stats} />
 
-      {/* Announcements */}
+      <AlumniIntro />
+
+      <FeaturedAlumni />
+
+      <AlumniStories />
+
+      <AnnouncementsSection announcements={announcements} />
+
+      <AlumniEventsSection events={events} />
+
+      <BatchExplorer />
+
+      <SchoolMemories highlights={highlights} onSelect={setLightbox} />
+
+      <AlumniImpact stats={stats} />
+
+      <OfficersPreview officers={officers} />
+
+      <Partnerships partners={partners} />
+
+      <GiveBack />
+
+      {/* Join CTA */}
       <motion.section
         className="max-w-7xl mx-auto px-6 py-16"
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
+        viewport={{ once: true, amount: 0.3 }}
         variants={sectionFade}
       >
-        <div className="flex items-center gap-3 mb-8">
-          <div className="p-2 rounded-[var(--radius)] bg-[var(--brand-accent)] border-2 border-[var(--brand-ink)]">
-            <Megaphone className="text-white" size={22} />
+        <div className="bg-[var(--brand-ink)] border-[2.5px] border-[var(--brand-ink)] rounded-[var(--radius)] p-12 text-center text-white">
+          <h2 className="font-editorial text-4xl md:text-5xl mb-4">Your Story Is Part of Our Story.</h2>
+          <p className="text-white/70 mb-8 text-lg max-w-xl mx-auto">
+            Stay connected, meet fellow alumni, and continue making a difference in the community.
+          </p>
+          <div className="flex flex-wrap gap-4 justify-center">
+            {!user && (
+              <Link to="/register">
+                <Button variant="primary">
+                  Join the Alumni Network
+                  <ArrowRight size={18} />
+                </Button>
+              </Link>
+            )}
+            {user && (
+              <Link to="/profile">
+                <Button variant="primary">
+                  Update Your Profile
+                  <ArrowRight size={18} />
+                </Button>
+              </Link>
+            )}
           </div>
-          <h2 className="font-display text-3xl text-[var(--brand-ink)]">
-            Latest Announcements
-          </h2>
         </div>
-        {announcements.length === 0 ? (
-          <Panel className="p-8 text-slate-500">No announcements yet.</Panel>
-        ) : (
-          <div className="grid md:grid-cols-2 gap-5">
-            {announcements.map((a, i) => (
-              <motion.article
-                key={a.id}
-                custom={i}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.3 }}
-                variants={cardFade}
-                className="group bg-white border-[2.5px] border-[var(--brand-ink)] rounded-[var(--radius)] p-6 hover:shadow-[4px_4px_0_var(--brand-ink)] transition-shadow"
-              >
-                <div className="mb-4">
-                  <PosterBadge
-                    name={a.poster_name}
-                    email={a.poster_email}
-                    pic={a.poster_pic}
-                    role={a.poster_role}
-                    subtitle={a.poster_position}
-                    date={new Date(a.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                    size="sm"
-                  />
-                </div>
-                <h3 className="font-display text-xl mb-2 text-[var(--brand-ink)]">
-                  {a.title}
-                </h3>
-                <p className="text-slate-600 leading-relaxed">{a.body}</p>
-              </motion.article>
-            ))}
-          </div>
-        )}
       </motion.section>
-
-      {/* Events */}
-      <motion.section
-        className="max-w-7xl mx-auto px-6 py-16"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.2 }}
-        variants={sectionFade}
-      >
-        <div className="flex items-center gap-3 mb-8">
-          <div className="p-2 rounded-[var(--radius)] bg-[var(--brand-accent)] border-2 border-[var(--brand-ink)]">
-            <Calendar className="text-white" size={22} />
-          </div>
-          <h2 className="font-display text-3xl text-[var(--brand-ink)]">
-            Upcoming Events
-          </h2>
-        </div>
-        {events.length === 0 ? (
-          <Panel className="p-8 text-slate-500">No events scheduled yet.</Panel>
-        ) : (
-          <div className="grid md:grid-cols-3 gap-5">
-            {events.map((ev, i) => (
-              <motion.div
-                key={ev.id}
-                custom={i}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.3 }}
-                variants={cardFade}
-                className="group bg-white border-[2.5px] border-[var(--brand-ink)] rounded-[var(--radius)] overflow-hidden hover:shadow-[4px_4px_0_var(--brand-ink)] transition-shadow"
-              >
-                <div className="p-6 text-white bg-[var(--brand-ink)]">
-                  <div className="text-xs uppercase tracking-wider opacity-70 mb-1">
-                    {new Date(ev.event_date).toLocaleDateString('en-US', { weekday: 'long' })}
-                  </div>
-                  <div className="font-display text-3xl">
-                    {new Date(ev.event_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                  </div>
-                  <div className="text-sm opacity-70">
-                    {new Date(ev.event_date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                  </div>
-                </div>
-                <div className="p-5">
-                  <h3 className="font-bold text-lg mb-2 text-[var(--brand-ink)]">
-                    {ev.title}
-                  </h3>
-                  {ev.location && (
-                    <div className="flex items-center gap-1.5 text-sm text-slate-500 mb-3">
-                      <MapPin size={14} />
-                      {ev.location}
-                    </div>
-                  )}
-                  <p className="text-sm text-slate-600 line-clamp-2">{ev.description}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        )}
-      </motion.section>
-
-      {/* Highlights */}
-      {highlights.length > 0 && (
-        <motion.section
-          className="max-w-7xl mx-auto px-6 py-16"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          variants={sectionFade}
-        >
-          <div className="flex items-center gap-3 mb-8">
-            <div className="p-2 rounded-[var(--radius)] bg-[var(--brand-accent)] border-2 border-[var(--brand-ink)]">
-              <Sparkles className="text-white" size={22} />
-            </div>
-            <h2 className="font-display text-3xl text-[var(--brand-ink)]">
-              Highlights
-            </h2>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-            {highlights.map((h, i) => (
-              <motion.button
-                key={h.id}
-                type="button"
-                custom={i}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.3 }}
-                variants={cardFade}
-                onClick={() => setLightbox(h)}
-                className="group relative aspect-square rounded-[var(--radius)] overflow-hidden border-[2.5px] border-[var(--brand-ink)] hover:shadow-[4px_4px_0_var(--brand-ink)] transition-shadow text-left"
-              >
-                {h.media_type === 'video' ? (
-                  <>
-                    <video src={h.media} className="w-full h-full object-cover" preload="metadata" />
-                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                      <Play className="text-white" fill="white" size={32} />
-                    </div>
-                  </>
-                ) : (
-                  <img src={h.media} alt="" className="w-full h-full object-cover" />
-                )}
-                <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-2">
-                  {h.event_title} · {new Date(h.event_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                </div>
-              </motion.button>
-            ))}
-          </div>
-        </motion.section>
-      )}
-
-      {/* CTA */}
-      {!user && (
-        <motion.section
-          className="max-w-7xl mx-auto px-6 py-16"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-          variants={sectionFade}
-        >
-          <div className="bg-[var(--brand-ink)] border-[2.5px] border-[var(--brand-ink)] rounded-[var(--radius)] p-12 text-center text-white">
-            <h2 className="font-display text-4xl mb-4">Ready to reconnect?</h2>
-            <p className="text-white/70 mb-8 text-lg">Join thousands of alumni in our growing network.</p>
-            <Link to="/register">
-              <Button variant="primary">
-                Create Your Account
-                <ArrowRight size={18} />
-              </Button>
-            </Link>
-          </div>
-        </motion.section>
-      )}
 
       <footer className="border-t-[2.5px] border-[var(--brand-ink)] py-8 mt-8">
         <div className="max-w-7xl mx-auto px-6 text-center text-sm text-slate-500">

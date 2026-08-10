@@ -106,13 +106,17 @@ export default function Profile() {
 
         <Section title="Profile Photo">
           <div className="col-span-2 flex items-center gap-5">
-            <div className="w-24 h-24 rounded-[var(--radius)] bg-[var(--brand-accent)] border-[2.5px] border-[var(--brand-ink)] overflow-hidden flex items-center justify-center text-white font-extrabold text-4xl flex-shrink-0">
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              className="w-24 h-24 rounded-[var(--radius)] bg-[var(--brand-accent)] border-[2.5px] border-[var(--brand-ink)] overflow-hidden flex items-center justify-center text-white font-extrabold text-4xl flex-shrink-0"
+            >
               {form.profile_pic ? (
                 <img src={form.profile_pic} alt="" className="w-full h-full object-cover" />
               ) : (
                 (form.full_name || me.email)[0].toUpperCase()
               )}
-            </div>
+            </button>
             <div className="flex-1">
               <input ref={fileRef} type="file" accept="image/*" className="sr-only" onChange={onFile} />
               <div className="flex gap-2">
