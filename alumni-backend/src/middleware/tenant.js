@@ -40,6 +40,13 @@ async function resolveTenant(req, res, next) {
       }
     }
 
+    if (!school && process.env.SINGLE_TENANT_SLUG) {
+      const singleTenant = await query('SELECT id, slug, name, logo, plan, trial_ends_at, active, registration_open, registration_fee FROM schools WHERE slug = $1', [process.env.SINGLE_TENANT_SLUG]);
+      if (singleTenant.length > 0 && singleTenant[0].active) {
+        school = singleTenant[0];
+      }
+    }
+
     if (!school) {
       return res.status(404).json({ error: 'Unknown school' });
     }

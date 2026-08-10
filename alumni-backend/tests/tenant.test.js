@@ -59,6 +59,38 @@ test('returns 404 for an inactive school even if the slug matches', async () => 
   expect(res.status).toBe(404);
 });
 
+test('falls back to SINGLE_TENANT_SLUG even in production when Host and token do not resolve', async () => {
+  const school = await makeSchool('single-tenant-test');
+  const app = buildApp();
+  const originalEnv = process.env.NODE_ENV;
+  const originalSlug = process.env.SINGLE_TENANT_SLUG;
+  process.env.NODE_ENV = 'production';
+  process.env.SINGLE_TENANT_SLUG = 'single-tenant-test';
+  try {
+    const res = await request(app).get('/whoami').set('Host', 'unrecognized.example.com');
+    expect(res.status).toBe(200);
+    expect(res.body.schoolId).toBe(school.id);
+  } finally {
+    process.env.NODE_ENV = originalEnv;
+    process.env.SINGLE_TENANT_SLUG = originalSlug;
+  }
+});
+
+test('SINGLE_TENANT_SLUG does not override a resolved subdomain match', async () => {
+  const hostSchool = await makeSchool('host-match-test');
+  await makeSchool('single-tenant-other');
+  const app = buildApp();
+  const originalSlug = process.env.SINGLE_TENANT_SLUG;
+  process.env.SINGLE_TENANT_SLUG = 'single-tenant-other';
+  try {
+    const res = await request(app).get('/whoami').set('Host', 'host-match-test.example.com');
+    expect(res.status).toBe(200);
+    expect(res.body.schoolId).toBe(hostSchool.id);
+  } finally {
+    process.env.SINGLE_TENANT_SLUG = originalSlug;
+  }
+});
+
 const { app: realApp } = require('../src/server');
 
 test('the real app resolves a school before hitting a route', async () => {
