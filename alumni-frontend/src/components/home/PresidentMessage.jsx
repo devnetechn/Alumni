@@ -27,15 +27,17 @@ export default function PresidentMessage() {
       viewport={{ once: true, amount: 0.3 }}
       variants={fadeIn}
     >
-      <div className="max-w-3xl mx-auto text-center">
-        <p className="text-xs font-bold tracking-[0.2em] text-[var(--brand-accent)] mb-6">
-          A WORD FROM OUR PRESIDENT
-        </p>
-        <Quote className="mx-auto mb-6 text-[var(--brand-accent)]" size={36} strokeWidth={2.5} />
-        <p className="font-editorial italic text-2xl md:text-3xl leading-snug text-white mb-8">
-          {PRESIDENT_MESSAGE}
-        </p>
-        <div className="flex flex-col items-center gap-3">
+      <div className="max-w-6xl mx-auto grid md:grid-cols-[1fr_auto] gap-12 items-center">
+        <div>
+          <p className="text-xs font-bold tracking-[0.2em] text-[var(--brand-accent)] mb-6">
+            A WORD FROM OUR PRESIDENT
+          </p>
+          <Quote className="mb-6 text-[var(--brand-accent)]" size={36} strokeWidth={2.5} />
+          <p className="font-editorial italic text-2xl md:text-3xl leading-snug text-white">
+            {PRESIDENT_MESSAGE}
+          </p>
+        </div>
+        <div className="flex flex-col items-center text-center gap-3">
           <Avatar name={PRESIDENT_NAME} size="lg" />
           <div>
             <p className="font-bold text-white">{PRESIDENT_NAME}</p>
