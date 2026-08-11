@@ -6,6 +6,7 @@ import { api } from '../api';
 import { useAuth } from '../auth';
 import Hero from '../components/Hero';
 import AlumniIntro from '../components/home/AlumniIntro';
+import PresidentMessage from '../components/home/PresidentMessage';
 import FeaturedAlumni from '../components/home/FeaturedAlumni';
 import AlumniStories from '../components/home/AlumniStories';
 import AnnouncementsSection from '../components/home/AnnouncementsSection';
@@ -163,6 +164,8 @@ export default function PublicHome() {
       <Hero stats={stats} />
 
       <AlumniIntro />
+
+      <PresidentMessage />
 
       <FeaturedAlumni />
 
