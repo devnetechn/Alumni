@@ -1,15 +1,15 @@
 import { motion } from 'framer-motion';
 import { Quote } from 'lucide-react';
-import Avatar from '../ui/Avatar';
+import presidentPhoto from '../../assets/president.jpg';
 
 const fadeIn = {
   hidden: { opacity: 0, y: 16 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.25, ease: 'easeOut' } },
 };
 
-// Placeholder content — replace with the real president's name, title,
-// message, and photo (pass `pic` to <Avatar> once a photo exists).
-const PRESIDENT_NAME = 'Juan Dela Cruz';
+// Message text is still a placeholder — replace with the president's
+// actual words when available.
+const PRESIDENT_NAME = 'Jason D. Talingting, LPT';
 const PRESIDENT_TITLE = 'President, IHES Alumni Association';
 const PRESIDENT_MESSAGE =
   "Every year, I'm reminded that this association isn't really about " +
@@ -37,8 +37,10 @@ export default function PresidentMessage() {
             {PRESIDENT_MESSAGE}
           </p>
         </div>
-        <div className="flex flex-col items-center text-center gap-3">
-          <Avatar name={PRESIDENT_NAME} size="lg" />
+        <div className="flex flex-col items-center text-center gap-4">
+          <div className="w-44 h-44 rounded-[var(--radius)] overflow-hidden border-2 border-white/20">
+            <img src={presidentPhoto} alt={PRESIDENT_NAME} className="w-full h-full object-cover" />
+          </div>
           <div>
             <p className="font-bold text-white">{PRESIDENT_NAME}</p>
             <p className="text-sm text-white/60">{PRESIDENT_TITLE}</p>
