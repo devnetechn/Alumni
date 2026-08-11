@@ -5,7 +5,10 @@ import { api } from '../api';
 import { useAuth } from '../auth';
 import { Panel, Wordmark } from '../components/ui';
 
-const MAX_ATTEMPTS = 10;
+// The backend can be a cold Render free-tier instance that takes up to ~50s
+// to wake from sleep, so this window needs to comfortably outlast that
+// instead of the few-seconds case it was originally sized for.
+const MAX_ATTEMPTS = 45;
 const POLL_INTERVAL_MS = 2000;
 
 export default function RegisterSuccess() {
@@ -59,14 +62,14 @@ export default function RegisterSuccess() {
             </div>
             <h1 className="font-display text-2xl text-[var(--brand-ink)] mb-2">Still processing</h1>
             <p className="text-slate-600">
-              Your payment may still be confirming. If this takes more than a minute, please try logging in — your account may already be ready.
+              Your payment may still be confirming. If this takes more than a couple of minutes, please try logging in — your account may already be ready.
             </p>
           </>
         ) : (
           <>
             <Loader2 className="mx-auto mb-4 animate-spin text-[var(--brand-accent)]" size={32} />
             <h1 className="font-display text-2xl text-[var(--brand-ink)] mb-2">Confirming your payment...</h1>
-            <p className="text-slate-600">This usually takes a few seconds.</p>
+            <p className="text-slate-600">This usually takes a few seconds, but can take up to a minute if the server was idle.</p>
           </>
         )}
       </Panel>
