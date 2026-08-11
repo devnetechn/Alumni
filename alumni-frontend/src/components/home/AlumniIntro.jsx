@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import heroPoster from '../../assets/hero.png';
+import communityPhoto from '../../assets/community.jpg';
 
 const fadeIn = {
   hidden: { opacity: 0, y: 16 },
@@ -18,7 +18,7 @@ export default function AlumniIntro() {
     >
       <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
         <div className="rounded-[var(--radius)] overflow-hidden border-2 border-[var(--brand-ink)]">
-          <img src={heroPoster} alt="" className="w-full h-full object-cover aspect-[4/3]" />
+          <img src={communityPhoto} alt="" className="w-full h-full object-cover aspect-[4/3]" />
         </div>
         <div>
           <p className="text-xs font-bold tracking-[0.2em] text-[var(--brand-accent)] mb-4">
