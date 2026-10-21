@@ -90,7 +90,9 @@ initSocket(server);
 
 const PORT = process.env.PORT || 4000;
 
-if (require.main === module) {
+// Hosts like Hostinger load the entry file through a wrapper, so
+// require.main !== module there; only skip listening under tests.
+if (require.main === module || process.env.NODE_ENV !== 'test') {
   pool.query('SELECT 1 FROM users LIMIT 1').catch((err) => {
     console.error('Database not migrated or unreachable. Run: npm run migrate');
     console.error(err.message);

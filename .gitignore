@@ -1,3 +1,5 @@
 
 # Superpowers brainstorming companion
 .superpowers/
+.env.*
+!.env.example
