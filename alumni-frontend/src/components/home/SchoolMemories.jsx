@@ -31,7 +31,7 @@ export default function SchoolMemories({ highlights, onSelect }) {
       variants={fadeIn}
     >
       <div className="max-w-7xl mx-auto">
-        <p className="text-xs font-bold tracking-[0.2em] text-[var(--brand-accent)] mb-3">THE ARCHIVE</p>
+        <p className="text-xs font-bold tracking-[0.2em] text-[var(--gold-deep)] mb-3">THE ARCHIVE</p>
         <h2 className="font-editorial text-4xl md:text-5xl text-[var(--brand-ink)] mb-12">
           Moments We'll Always Remember
         </h2>
@@ -46,7 +46,7 @@ export default function SchoolMemories({ highlights, onSelect }) {
               viewport={{ once: true, amount: 0.3 }}
               variants={cardFade}
               onClick={() => onSelect(h)}
-              className={`group relative rounded-[var(--radius)] overflow-hidden border-2 border-[var(--brand-ink)] hover:shadow-[4px_4px_0_var(--brand-ink)] transition-shadow text-left ${SPAN_PATTERN[i % SPAN_PATTERN.length]}`}
+              className={`group relative rounded-[var(--radius)] overflow-hidden border border-[var(--line)] hover:shadow-sm transition-shadow text-left ${SPAN_PATTERN[i % SPAN_PATTERN.length]}`}
             >
               {h.media_type === 'video' ? (
                 <>

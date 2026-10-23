@@ -1,66 +1,97 @@
-@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Playfair+Display:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
+  --navy: #071B35;
+  --navy-2: #102D50;
+  --gold: #FFC928;
+  --gold-deep: #8A6508;
+  --paper: #FFFFFF;
+  --paper-2: #F7F8FA;
+  --text: #111827;
+  --muted: #5B6472;
+  --line: #E3E6EB;
+
+  /* legacy tokens kept so older pages inherit the new identity */
+  --brand-ink: var(--navy);
+  --brand-bg: var(--paper);
+  --brand-surface: var(--paper-2);
+  --brand-accent: var(--gold);
+  --brand-accent-ink: var(--navy);
+  --brand-danger: #B42318;
+  --brand-success: #1B7F4B;
+  --editorial-navy: var(--navy);
+  --editorial-beige: var(--paper-2);
+  --editorial-gray: var(--paper-2);
+
+  --radius: 4px;
+  --shadow: 0 1px 2px rgba(7, 27, 53, 0.06), 0 4px 14px rgba(7, 27, 53, 0.05);
+  --shadow-sm: 0 1px 2px rgba(7, 27, 53, 0.08);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-
-  /* Platform brand tokens — the SaaS product's own identity, not a
-     per-school theme. Per-school branding is a separate future project. */
-  --brand-ink: #111111;
-  --brand-bg: #ffffff;
-  --brand-surface: #f7f7f8;
-  --brand-accent: #F04E22;
-  --brand-accent-ink: #ffffff;
-  --brand-danger: #dc2626;
-  --brand-success: #16a34a;
-
-  /* Homepage-only editorial palette, additive to the --brand-* tokens above.
-     Used for section backgrounds on the premium alumni homepage; --brand-accent
-     stays the only accent color per the "don't overuse color" design direction. */
-  --editorial-navy: #12233F;
-  --editorial-beige: #F1E9DD;
-  --editorial-gray: #EDEDE8;
-
-  --radius: 6px;
-  --border-w: 2.5px;
-  --shadow: 4px 4px 0 var(--brand-ink);
-  --shadow-sm: 3px 3px 0 var(--brand-ink);
 }
+
+html { scroll-behavior: smooth; }
 
 body {
   margin: 0;
-  background: var(--brand-bg);
-  color: #0f172a;
+  background: var(--paper);
+  color: var(--text);
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
-* {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+* { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+
+.font-display, .font-editorial, h1.serif, .serif {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
-.font-display {
-  font-family: 'Archivo Black', sans-serif;
-}
+img { max-width: 100%; }
 
-.font-editorial {
-  font-family: 'Playfair Display', serif;
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
 }
+.on-light :focus-visible, main :focus-visible { outline-color: var(--navy-2); }
 
-html {
-  scroll-behavior: smooth;
+.gold-rule {
+  display: block;
+  width: 56px;
+  height: 2px;
+  background: var(--gold);
 }
+.eyebrow {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+}
+.on-dark .eyebrow { color: var(--gold); }
 
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-::-webkit-scrollbar-track {
-  background: var(--brand-surface);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--brand-ink);
+.card {
+  background: #fff;
+  border: 1px solid var(--line);
   border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
 }
-::-webkit-scrollbar-thumb:hover {
-  background: var(--brand-accent);
+.card-hover { transition: box-shadow .2s ease, transform .2s ease, border-color .2s ease; }
+.card-hover:hover { box-shadow: var(--shadow); border-color: #cfd5de; transform: translateY(-2px); }
+
+.img-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(7,27,53,.55) 0%, rgba(7,27,53,.78) 100%);
 }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--paper-2); }
+::-webkit-scrollbar-thumb { background: #c3c9d3; border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: var(--navy-2); }

@@ -19,6 +19,16 @@ router.patch('/notifications', requireAuth, asyncHandler(async (req, res) => {
   res.status(204).end();
 }));
 
+router.patch('/notifications/:id', requireAuth, asyncHandler(async (req, res) => {
+  if (!/^\d+$/.test(req.params.id)) return res.status(404).json({ error: 'Notification not found' });
+  const rows = await req.db(
+    'UPDATE notifications SET read_at = COALESCE(read_at, now()) WHERE id = $1 AND user_id = $2 RETURNING *',
+    [req.params.id, req.user.id]
+  );
+  if (rows.length === 0) return res.status(404).json({ error: 'Notification not found' });
+  res.json({ notification: rows[0] });
+}));
+
 async function createNotification(db, { userId, type, title, body, link }) {
   const rows = await db(
     `INSERT INTO notifications (user_id, type, title, body, link, school_id)

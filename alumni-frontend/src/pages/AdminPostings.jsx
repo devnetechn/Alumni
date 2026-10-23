@@ -45,19 +45,19 @@ export default function AdminPostings() {
     <div className="p-6 lg:p-10 max-w-6xl mx-auto">
       <div className="mb-8">
         <h1 className="font-display text-3xl text-[var(--brand-ink)] flex items-center gap-2">
-          <Shield className="text-[var(--brand-accent)]" size={28} />
+          <Shield className="text-[var(--gold-deep)]" size={28} />
           Manage Postings
         </h1>
         <p className="text-slate-500 mt-1">All announcements, events, and job postings in one place</p>
       </div>
 
-      <div className="flex gap-2 mb-6 bg-white border-[2.5px] border-[var(--brand-ink)] rounded-[var(--radius)] p-1.5 w-fit">
+      <div className="flex gap-2 mb-6 bg-white border border-[var(--line)] rounded-[var(--radius)] p-1.5 w-fit">
         {tabs.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
             className={`inline-flex items-center gap-2 px-4 py-2 rounded-[var(--radius)] font-bold text-sm transition-colors ${
-              tab === t.id ? 'bg-[var(--brand-accent)] text-white' : 'text-[var(--brand-ink)] hover:bg-[var(--brand-surface)]'
+              tab === t.id ? 'bg-[var(--brand-accent)] text-[var(--navy)]' : 'text-[var(--brand-ink)] hover:bg-[var(--brand-surface)]'
             }`}
           >
             <t.icon size={16} />

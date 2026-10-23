@@ -69,7 +69,7 @@ export default function Jobs() {
           <button
             key={t || 'all'}
             onClick={() => setFilter(t)}
-            className={`px-4 py-1.5 rounded-[var(--radius)] text-sm font-bold border-2 ${filter === t ? 'bg-[var(--brand-accent)] text-white border-[var(--brand-ink)]' : 'bg-white border-[var(--brand-ink)] text-[var(--brand-ink)]'}`}
+            className={`px-4 py-1.5 rounded-[var(--radius)] text-sm font-bold border ${filter === t ? 'bg-[var(--brand-accent)] text-[var(--navy)] border-[var(--line)]' : 'bg-white border-[var(--line)] text-[var(--brand-ink)]'}`}
           >
             {t === '' ? 'All' : t === 'job' ? 'Jobs' : 'Internships'}
           </button>
@@ -85,7 +85,7 @@ export default function Jobs() {
         {jobs.map((j) => (
           <Panel key={j.id} className="p-6 group">
             <div className="flex items-start justify-between gap-3 mb-4">
-              <div className="bg-[var(--brand-accent)] border-2 border-[var(--brand-ink)] p-2.5 rounded-[var(--radius)]">
+              <div className="bg-[var(--brand-accent)] border border-[var(--line)] p-2.5 rounded-[var(--radius)]">
                 <Briefcase className="text-white" size={20} />
               </div>
               {user && (user.role === 'admin' || user.email === j.poster_email) && (
@@ -95,7 +95,7 @@ export default function Jobs() {
               )}
             </div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-xl font-bold text-[var(--brand-ink)] group-hover:text-[var(--brand-accent)] transition-colors">{j.title}</h3>
+              <h3 className="text-xl font-bold text-[var(--brand-ink)] group-hover:text-[var(--gold-deep)] transition-colors">{j.title}</h3>
               {j.job_type === 'internship' && <Badge tone="warning">Internship</Badge>}
               {j.is_referral && <Badge tone="success">Referral</Badge>}
             </div>
@@ -134,10 +134,10 @@ export default function Jobs() {
   }
   return (
     <div className="min-h-screen bg-white">
-      <header className="sticky top-0 z-20 bg-white border-b-[2.5px] border-[var(--brand-ink)]">
+      <header className="sticky top-0 z-20 bg-white border-b-[2.5px] border-[var(--line)]">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-2">
-            <div className="bg-[var(--brand-accent)] border-2 border-[var(--brand-ink)] p-2 rounded-[var(--radius)]">
+            <div className="bg-[var(--brand-accent)] border border-[var(--line)] p-2 rounded-[var(--radius)]">
               <Briefcase className="text-white" size={20} />
             </div>
             <Wordmark />

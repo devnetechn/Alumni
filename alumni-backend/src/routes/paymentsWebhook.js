@@ -2,6 +2,8 @@ const express = require('express');
 const { asyncHandler } = require('../lib/asyncHandler');
 const { query, queryForSchool } = require('../db');
 const paymongo = require('../lib/paymongo');
+const { notifyRequestSubmitted } = require('../lib/batchAccess');
+const { createNotification } = require('./notifications');
 
 const router = express.Router();
 
@@ -36,10 +38,10 @@ router.post('/webhook', asyncHandler(async (req, res) => {
     );
     if (pending.length > 0) {
       const signup = pending[0];
-      await queryForSchool(
+      const [created] = await queryForSchool(
         schoolId,
-        `INSERT INTO users (school_id, email, password_hash, full_name, batch_year, contact, address, member_type, profile_pic, registration_paid_until, paymongo_checkout_session_id)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9, now() + interval '2 years', $10)`,
+        `INSERT INTO users (school_id, email, password_hash, full_name, batch_year, contact, address, member_type, profile_pic, registration_paid_until, paymongo_checkout_session_id, course, requested_batch_year)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9, now() + interval '2 years', $10, $11, $12) RETURNING id`,
         [
           schoolId,
           signup.email,
@@ -51,8 +53,23 @@ router.post('/webhook', asyncHandler(async (req, res) => {
           signup.member_type,
           signup.profile_pic,
           metadata.session_token,
+          signup.course,
+          signup.requested_batch_year,
         ]
       );
+      if (!signup.batch_id && signup.requested_batch_year) {
+        const admins = await queryForSchool(schoolId, "SELECT id FROM users WHERE role = 'admin' AND active = true");
+        for (const a of admins) {
+          await createNotification((t, p) => queryForSchool(schoolId, t, p), { userId: a.id, type: 'membership', title: `Batch ${signup.requested_batch_year} requested`, body: `${signup.full_name || signup.email} registered for a batch that is not listed yet.`, link: '/admin/batches' });
+        }
+      }
+      if (signup.batch_id) {
+        const [batch] = await queryForSchool(schoolId, 'SELECT * FROM batches WHERE id = $1', [signup.batch_id]);
+        if (batch) {
+          await queryForSchool(schoolId, 'INSERT INTO batch_memberships (school_id, batch_id, user_id) VALUES ($1,$2,$3)', [schoolId, batch.id, created.id]);
+          await notifyRequestSubmitted((t, p) => queryForSchool(schoolId, t, p), batch, { id: created.id, full_name: signup.full_name, email: signup.email });
+        }
+      }
       await queryForSchool(schoolId, `DELETE FROM pending_signups WHERE session_token = $1`, [metadata.session_token]);
     }
   } else if (metadata.kind === 'renewal') {

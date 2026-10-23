@@ -3,6 +3,13 @@ import { Link } from 'react-router-dom';
 import { Users, Calendar, CheckCircle2, Sparkles } from 'lucide-react';
 import heroPoster from '../assets/hero.png';
 import heroVideoSrc from '../assets/hero.mp4';
+import heroVideoWebm from '../assets/hero.webm';
+
+// Skip the video for users who prefer reduced motion or have data saver on.
+const showVideo =
+  typeof window !== 'undefined' &&
+  !window.matchMedia('(prefers-reduced-motion: reduce)').matches &&
+  !navigator.connection?.saveData;
 
 const fadeUp = {
   hidden: { opacity: 0, y: 16 },
@@ -17,16 +24,19 @@ export default function Hero({ stats }) {
   return (
     <section className="relative overflow-hidden min-h-[90vh] flex items-center">
       <div className="absolute inset-0">
-        {heroVideoSrc ? (
+        {showVideo ? (
           <video
             className="w-full h-full object-cover"
-            src={heroVideoSrc}
             poster={heroPoster}
             autoPlay
             muted
             loop
             playsInline
-          />
+            preload="metadata"
+          >
+            <source src={heroVideoWebm} type="video/webm" />
+            <source src={heroVideoSrc} type="video/mp4" />
+          </video>
         ) : (
           <img src={heroPoster} alt="" className="w-full h-full object-cover" />
         )}
@@ -39,7 +49,7 @@ export default function Hero({ stats }) {
           animate="visible"
           custom={0}
           variants={fadeUp}
-          className="inline-flex items-center gap-2 bg-[var(--brand-accent)] border-2 border-white px-4 py-1.5 rounded-[var(--radius)] text-sm font-bold mb-6 text-white"
+          className="inline-flex items-center gap-2 bg-[var(--brand-accent)] border border-white px-4 py-1.5 rounded-[var(--radius)] text-sm font-bold mb-6 text-[var(--navy)]"
         >
           <Sparkles size={14} />
           Reconnect. Network. Grow.
@@ -77,13 +87,13 @@ export default function Hero({ stats }) {
         >
           <a
             href="#alumni"
-            className="inline-flex items-center gap-2 bg-[var(--brand-accent)] text-white font-bold px-6 py-3 rounded-[var(--radius)] border-2 border-white hover:opacity-90 transition-opacity"
+            className="inline-flex items-center gap-2 bg-[var(--brand-accent)] text-[var(--navy)] font-bold px-6 py-3 rounded-[var(--radius)] border border-white hover:opacity-90 transition-opacity"
           >
             Explore Our Alumni Community
           </a>
           <Link
             to="/register"
-            className="inline-flex items-center gap-2 bg-transparent text-white font-bold px-6 py-3 rounded-[var(--radius)] border-2 border-white/60 hover:border-white transition-colors"
+            className="inline-flex items-center gap-2 bg-transparent text-white font-bold px-6 py-3 rounded-[var(--radius)] border border-white/60 hover:border-white transition-colors"
           >
             Join the Alumni Association
           </Link>
@@ -112,7 +122,7 @@ export default function Hero({ stats }) {
           <motion.div
             animate={{ y: [0, 8, 0] }}
             transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
-            className="w-6 h-10 rounded-full border-2 border-white/50 flex items-start justify-center p-1.5"
+            className="w-6 h-10 rounded-full border border-white/50 flex items-start justify-center p-1.5"
           >
             <div className="w-1.5 h-1.5 rounded-full bg-white/80" />
           </motion.div>
@@ -124,7 +134,7 @@ export default function Hero({ stats }) {
 
 function StatBox({ icon: Icon, label, value }) {
   return (
-    <div className="bg-white/10 border-2 border-white/40 rounded-[var(--radius)] p-5">
+    <div className="bg-white/10 border border-white/40 rounded-[var(--radius)] p-5">
       <Icon className="mx-auto mb-2 opacity-90" size={20} />
       <p className="font-display text-3xl">{value}</p>
       <p className="text-xs opacity-80 uppercase tracking-wider">{label}</p>

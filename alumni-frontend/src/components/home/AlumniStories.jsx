@@ -54,7 +54,7 @@ export default function AlumniStories() {
       variants={fadeIn}
     >
       <div className="max-w-7xl mx-auto">
-        <p className="text-xs font-bold tracking-[0.2em] text-[var(--brand-accent)] mb-3">FEATURED WRITING</p>
+        <p className="text-xs font-bold tracking-[0.2em] text-[var(--gold-deep)] mb-3">FEATURED WRITING</p>
         <h2 className="font-editorial text-4xl md:text-5xl text-[var(--brand-ink)] mb-12">
           Stories That Inspire
         </h2>
@@ -67,9 +67,9 @@ export default function AlumniStories() {
               whileInView="visible"
               viewport={{ once: true, amount: 0.3 }}
               variants={cardFade}
-              className={`bg-white rounded-[var(--radius)] border-2 border-[var(--brand-ink)] p-8 hover:shadow-[4px_4px_0_var(--brand-ink)] transition-shadow ${s.big ? 'md:col-span-2' : ''}`}
+              className={`bg-white rounded-[var(--radius)] border border-[var(--line)] p-8 hover:shadow-sm transition-shadow ${s.big ? 'md:col-span-2' : ''}`}
             >
-              <p className="text-xs font-bold tracking-wider text-[var(--brand-accent)] mb-3">{s.category.toUpperCase()}</p>
+              <p className="text-xs font-bold tracking-wider text-[var(--gold-deep)] mb-3">{s.category.toUpperCase()}</p>
               <h3 className={`font-editorial text-[var(--brand-ink)] mb-3 ${s.big ? 'text-3xl' : 'text-2xl'}`}>{s.title}</h3>
               <p className="text-slate-600 leading-relaxed mb-4">{s.description}</p>
               <p className="text-xs text-slate-400">{s.date}</p>

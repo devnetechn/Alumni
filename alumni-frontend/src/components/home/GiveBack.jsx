@@ -38,8 +38,8 @@ export default function GiveBack() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-10">
           {WAYS.map(({ icon: Icon, label }) => (
             <div key={label} className="flex flex-col items-center gap-2">
-              <div className="p-3 rounded-full bg-white border-2 border-[var(--brand-ink)]">
-                <Icon size={22} className="text-[var(--brand-accent)]" />
+              <div className="p-3 rounded-full bg-white border border-[var(--line)]">
+                <Icon size={22} className="text-[var(--gold-deep)]" />
               </div>
               <p className="text-sm font-semibold text-[var(--brand-ink)]">{label}</p>
             </div>
@@ -47,7 +47,7 @@ export default function GiveBack() {
         </div>
         <Link
           to="/register"
-          className="inline-flex items-center gap-2 bg-[var(--brand-accent)] text-white font-bold px-8 py-3 rounded-[var(--radius)] border-2 border-[var(--brand-ink)] hover:opacity-90 transition-opacity"
+          className="inline-flex items-center gap-2 bg-[var(--brand-accent)] text-[var(--navy)] font-bold px-8 py-3 rounded-[var(--radius)] border border-[var(--line)] hover:opacity-90 transition-opacity"
         >
           Make a Difference →
         </Link>

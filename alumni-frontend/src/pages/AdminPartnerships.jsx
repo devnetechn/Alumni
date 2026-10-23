@@ -63,7 +63,7 @@ export default function AdminPartnerships() {
     <div className="p-6 lg:p-10 max-w-3xl mx-auto">
       <div className="mb-6">
         <h1 className="font-display text-3xl text-[var(--brand-ink)] flex items-center gap-2">
-          <Handshake className="text-[var(--brand-accent)]" /> Partnerships
+          <Handshake className="text-[var(--gold-deep)]" /> Partnerships
         </h1>
         <p className="text-slate-500 mt-1">Manage the organizations shown on the homepage.</p>
       </div>
@@ -84,7 +84,7 @@ export default function AdminPartnerships() {
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="w-40 h-40 rounded-[var(--radius)] bg-[var(--brand-surface)] border-2 border-dashed border-[var(--brand-ink)]/30 hover:border-[var(--brand-accent)] overflow-hidden flex flex-col items-center justify-center gap-2 transition-colors"
+              className="w-40 h-40 rounded-[var(--radius)] bg-[var(--brand-surface)] border border-dashed border-[var(--line)]/30 hover:border-[var(--brand-accent)] overflow-hidden flex flex-col items-center justify-center gap-2 transition-colors"
             >
               {logo ? (
                 <img src={logo} alt="" className="w-full h-full object-contain p-4" />
@@ -109,7 +109,7 @@ export default function AdminPartnerships() {
         <div className="space-y-3">
           {partners.map((p) => (
             <Panel key={p.id} className="p-4 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-[var(--radius)] bg-[var(--brand-surface)] border-2 border-[var(--brand-ink)] overflow-hidden flex items-center justify-center flex-shrink-0">
+              <div className="w-12 h-12 rounded-[var(--radius)] bg-[var(--brand-surface)] border border-[var(--line)] overflow-hidden flex items-center justify-center flex-shrink-0">
                 {p.logo ? <img src={p.logo} alt="" className="w-full h-full object-cover" /> : <Building2 className="text-slate-400" size={18} />}
               </div>
               <div className="flex-1 min-w-0">

@@ -53,7 +53,7 @@ export default function Groups() {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="font-display text-3xl text-[var(--brand-ink)] flex items-center gap-2">
-            <UsersRound className="text-[var(--brand-accent)]" /> Groups
+            <UsersRound className="text-[var(--gold-deep)]" /> Groups
           </h1>
           <p className="text-slate-500 mt-1">Batch, course, interest & mentorship communities</p>
         </div>
@@ -83,7 +83,7 @@ export default function Groups() {
             <Panel
               key={g.id}
               onClick={() => open(g)}
-              className={`cursor-pointer p-4 transition-all ${selected?.id === g.id ? 'shadow-[4px_4px_0_var(--brand-accent)] border-[var(--brand-accent)]' : ''}`}
+              className={`cursor-pointer p-4 transition-all ${selected?.id === g.id ? 'shadow-sm border-[var(--brand-accent)]' : ''}`}
             >
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-[var(--brand-ink)]">{g.name}</h3>
@@ -95,7 +95,7 @@ export default function Groups() {
                 {user && (g.is_member ? (
                   <button onClick={(e) => { e.stopPropagation(); leave(g.id); }} className="inline-flex items-center gap-1 text-[var(--brand-danger)] hover:underline font-semibold"><LogOut size={12} /> Leave</button>
                 ) : (
-                  <button onClick={(e) => { e.stopPropagation(); join(g.id); }} className="inline-flex items-center gap-1 text-[var(--brand-accent)] hover:underline font-semibold"><LogIn size={12} /> Join</button>
+                  <button onClick={(e) => { e.stopPropagation(); join(g.id); }} className="inline-flex items-center gap-1 text-[var(--gold-deep)] hover:underline font-semibold"><LogIn size={12} /> Join</button>
                 ))}
               </div>
             </Panel>
@@ -106,7 +106,7 @@ export default function Groups() {
           {!selected && <Panel className="p-8 text-center text-slate-500">Select a group to view posts.</Panel>}
           {selected && detail && (
             <Panel>
-              <div className="p-5 border-b-[2.5px] border-[var(--brand-ink)]">
+              <div className="p-5 border-b-[2.5px] border-[var(--line)]">
                 <h2 className="font-display text-xl text-[var(--brand-ink)]">{detail.group.name}</h2>
                 <p className="text-sm text-slate-500">{detail.members.length} members · {detail.group.kind}</p>
               </div>

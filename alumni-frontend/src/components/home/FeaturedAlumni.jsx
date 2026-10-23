@@ -47,7 +47,7 @@ export default function FeaturedAlumni() {
       viewport={{ once: true, amount: 0.2 }}
       variants={fadeIn}
     >
-      <p className="text-xs font-bold tracking-[0.2em] text-[var(--brand-accent)] mb-3">MEET OUR ALUMNI</p>
+      <p className="text-xs font-bold tracking-[0.2em] text-[var(--gold-deep)] mb-3">MEET OUR ALUMNI</p>
       <h2 className="font-editorial text-4xl md:text-5xl text-[var(--brand-ink)] mb-12">
         Faces behind the stories.
       </h2>
@@ -69,7 +69,7 @@ export default function FeaturedAlumni() {
               <p className="font-bold text-lg text-[var(--brand-ink)]">{a.name}</p>
               <p className="text-sm text-slate-500 mb-3">{a.year} · {a.program}</p>
               <p className="text-slate-600 italic leading-relaxed mb-4">&ldquo;{a.quote}&rdquo;</p>
-              <span className="inline-flex items-center gap-1.5 text-sm font-bold text-[var(--brand-ink)] group-hover:text-[var(--brand-accent)] transition-colors cursor-default">
+              <span className="inline-flex items-center gap-1.5 text-sm font-bold text-[var(--brand-ink)] group-hover:text-[var(--gold-deep)] transition-colors cursor-default">
                 Read Story <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
               </span>
             </div>

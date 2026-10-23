@@ -50,7 +50,7 @@ export default function EventPhotosManager({ eventId }) {
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {photos.map((p) => (
-            <div key={p.id} className="relative rounded-[var(--radius)] overflow-hidden border-2 border-[var(--brand-ink)] aspect-square">
+            <div key={p.id} className="relative rounded-[var(--radius)] overflow-hidden border border-[var(--line)] aspect-square">
               {p.media_type === 'video' ? (
                 <video src={p.media} className="w-full h-full object-cover" preload="metadata" />
               ) : (
@@ -58,7 +58,7 @@ export default function EventPhotosManager({ eventId }) {
               )}
               <button
                 onClick={() => deletePhoto(p.id)}
-                className="absolute top-1.5 right-1.5 p-1.5 bg-white/90 border-2 border-[var(--brand-ink)] rounded-[var(--radius)] text-[var(--brand-danger)]"
+                className="absolute top-1.5 right-1.5 p-1.5 bg-white/90 border border-[var(--line)] rounded-[var(--radius)] text-[var(--brand-danger)]"
               >
                 <Trash2 size={14} />
               </button>

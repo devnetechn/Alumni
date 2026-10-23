@@ -24,7 +24,7 @@ export default function AdminHighlights() {
     <div className="p-6 lg:p-10 max-w-3xl mx-auto">
       <div className="mb-6">
         <h1 className="font-display text-3xl text-[var(--brand-ink)] flex items-center gap-2">
-          <Sparkles className="text-[var(--brand-accent)]" /> Highlights
+          <Sparkles className="text-[var(--gold-deep)]" /> Highlights
         </h1>
         <p className="text-slate-500 mt-1">Pick a past event to manage its photos and videos.</p>
       </div>
@@ -37,12 +37,12 @@ export default function AdminHighlights() {
             key={ev.id}
             as="button"
             onClick={() => setSelected(ev)}
-            className={`w-full text-left p-5 hover:shadow-[4px_4px_0_var(--brand-accent)] hover:border-[var(--brand-accent)] transition-all ${
-              selected?.id === ev.id ? 'shadow-[4px_4px_0_var(--brand-accent)] border-[var(--brand-accent)]' : ''
+            className={`w-full text-left p-5 hover:shadow-sm hover:border-[var(--brand-accent)] transition-all ${
+              selected?.id === ev.id ? 'shadow-sm border-[var(--brand-accent)]' : ''
             }`}
           >
             <div className="flex items-center gap-4">
-              <div className="bg-[var(--brand-accent)] border-2 border-[var(--brand-ink)] p-3 rounded-[var(--radius)]">
+              <div className="bg-[var(--brand-accent)] border border-[var(--line)] p-3 rounded-[var(--radius)]">
                 <Calendar className="text-white" size={22} />
               </div>
               <div className="flex-1">

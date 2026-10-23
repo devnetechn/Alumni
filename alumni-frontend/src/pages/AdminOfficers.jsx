@@ -64,7 +64,7 @@ export default function AdminOfficers() {
     <div className="p-6 lg:p-10 max-w-3xl mx-auto">
       <div className="mb-6">
         <h1 className="font-display text-3xl text-[var(--brand-ink)] flex items-center gap-2">
-          <Users className="text-[var(--brand-accent)]" /> Officers
+          <Users className="text-[var(--gold-deep)]" /> Officers
         </h1>
         <p className="text-slate-500 mt-1">Manage the officers & board shown on the homepage and Officers page.</p>
       </div>
@@ -85,7 +85,7 @@ export default function AdminOfficers() {
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="w-40 h-40 rounded-[var(--radius)] bg-[var(--brand-surface)] border-2 border-dashed border-[var(--brand-ink)]/30 hover:border-[var(--brand-accent)] overflow-hidden flex flex-col items-center justify-center gap-2 transition-colors"
+              className="w-40 h-40 rounded-[var(--radius)] bg-[var(--brand-surface)] border border-dashed border-[var(--line)]/30 hover:border-[var(--brand-accent)] overflow-hidden flex flex-col items-center justify-center gap-2 transition-colors"
             >
               {photo ? (
                 <img src={photo} alt="" className="w-full h-full object-cover" />

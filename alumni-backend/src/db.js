@@ -27,11 +27,15 @@ async function platformQuery(text, params) {
   return result.rows;
 }
 
-async function queryForSchool(schoolId, text, params) {
+async function queryForSchool(schoolId, text, params, actor) {
   const client = await appPool.connect();
   try {
     await client.query('BEGIN');
     await client.query(`SELECT set_config('app.school_id', $1, true)`, [String(schoolId)]);
+    await client.query(`SELECT set_config('app.user_id', $1, true), set_config('app.is_admin', $2, true)`, [
+      actor ? String(actor.id) : '',
+      actor && actor.role === 'admin' ? 'true' : 'false',
+    ]);
     const result = await client.query(text, params);
     await client.query('COMMIT');
     return result.rows;

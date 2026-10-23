@@ -1,6 +1,7 @@
 const express = require('express');
 const { requireAuth, requireAdmin } = require('../middleware/auth');
 const { asyncHandler } = require('../lib/asyncHandler');
+const { audit } = require('../lib/batchAccess');
 
 const router = express.Router();
 router.use(requireAuth, requireAdmin);
@@ -55,6 +56,7 @@ router.put('/users/:id', asyncHandler(async (req, res) => {
   if (rows.length === 0) return res.status(404).json({ error: 'User not found' });
   const user = rows[0];
   delete user.password_hash;
+  await audit(req, 'user.update', 'user', user.id, updates);
   res.json({ user });
 }));
 
@@ -63,6 +65,7 @@ router.delete('/users/:id', asyncHandler(async (req, res) => {
     return res.status(400).json({ error: 'Cannot delete your own account' });
   }
   await req.db('DELETE FROM users WHERE id = $1', [req.params.id]);
+  await audit(req, 'user.delete', 'user', Number(req.params.id), null);
   res.status(204).end();
 }));
 

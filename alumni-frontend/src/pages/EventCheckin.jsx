@@ -57,7 +57,7 @@ export default function EventCheckin() {
             <p className="text-sm text-slate-500">{new Date(event.event_date).toLocaleString()}</p>
           </div>
         )}
-        <div className="p-4 bg-white border-[2.5px] border-[var(--brand-ink)] rounded-[var(--radius)]">
+        <div className="p-4 bg-white border border-[var(--line)] rounded-[var(--radius)]">
           <canvas ref={canvasRef} />
         </div>
         <div className="mt-4 flex items-center gap-2 text-sm text-slate-500">
@@ -71,7 +71,7 @@ export default function EventCheckin() {
       {isOfficer && <EventPhotosManager eventId={id} />}
 
       <Panel className="overflow-hidden">
-        <div className="p-6 border-b-[2.5px] border-[var(--brand-ink)] flex items-center justify-between">
+        <div className="p-6 border-b-[2.5px] border-[var(--line)] flex items-center justify-between">
           <h2 className="font-bold text-[var(--brand-ink)]">Attendance List</h2>
           <Badge tone="accent">{attendance.length} checked in</Badge>
         </div>

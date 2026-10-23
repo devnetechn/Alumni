@@ -27,7 +27,7 @@ export default function AnnouncementsSection({ announcements }) {
       variants={sectionFade}
     >
       <div className="flex items-center gap-3 mb-8">
-        <Megaphone className="text-[var(--brand-accent)]" size={26} />
+        <Megaphone className="text-[var(--gold-deep)]" size={26} />
         <h2 className="font-editorial text-3xl md:text-4xl text-[var(--brand-ink)]">
           Latest Announcements
         </h2>
@@ -44,7 +44,7 @@ export default function AnnouncementsSection({ announcements }) {
               whileInView="visible"
               viewport={{ once: true, amount: 0.3 }}
               variants={cardFade}
-              className="group bg-white border-[2.5px] border-[var(--brand-ink)] rounded-[var(--radius)] p-6 hover:shadow-[4px_4px_0_var(--brand-ink)] transition-shadow min-w-0"
+              className="group bg-white border border-[var(--line)] rounded-[var(--radius)] p-6 hover:shadow-sm transition-shadow min-w-0"
             >
               <div className="mb-4">
                 <PosterBadge

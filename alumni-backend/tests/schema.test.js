@@ -8,10 +8,10 @@ test('all expected tables exist after migration', async () => {
   );
   const names = rows.map((r) => r.table_name).sort();
   expect(names).toEqual([
-    'announcements', 'event_checkins', 'event_photos', 'event_rsvps', 'events',
+    'announcements', 'audit_logs', 'batch_comments', 'batch_likes', 'batch_memberships', 'batch_posts', 'batches', 'officers', 'partners', 'event_checkins', 'event_photos', 'event_rsvps', 'events',
     'group_members', 'group_posts', 'groups', 'jobs',
     'messages', 'notifications', 'pending_signups', 'platform_admins', 'processed_webhook_events', 'schools', 'users',
-  ]);
+  ].sort());
 });
 
 test('schools table exists with the expected columns', async () => {
@@ -19,7 +19,7 @@ test('schools table exists with the expected columns', async () => {
     `SELECT column_name FROM information_schema.columns WHERE table_name = 'schools'`
   );
   const names = rows.map((r) => r.column_name).sort();
-  expect(names).toEqual(['active', 'created_at', 'id', 'logo', 'name', 'plan', 'registration_fee', 'registration_open', 'slug', 'trial_ends_at']);
+  expect(names).toEqual(['about', 'active', 'contact_address', 'contact_email', 'contact_phone', 'created_at', 'facebook_url', 'id', 'logo', 'name', 'plan', 'registration_fee', 'registration_open', 'slug', 'trial_ends_at']);
 });
 
 test('every tenant table has a school_id column', async () => {

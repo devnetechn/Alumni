@@ -28,12 +28,12 @@ export default function Officers() {
   return (
     <div className="min-h-screen py-16 px-6" style={{ background: 'var(--brand-bg)' }}>
       <div className="max-w-5xl mx-auto">
-        <Link to="/" className="inline-flex items-center gap-2 text-[var(--brand-ink)] hover:text-[var(--brand-accent)] mb-8 text-sm font-bold">
+        <Link to="/" className="inline-flex items-center gap-2 text-[var(--brand-ink)] hover:text-[var(--gold-deep)] mb-8 text-sm font-bold">
           <ArrowLeft size={16} /> Back to home
         </Link>
 
         <div className="flex items-center gap-3 mb-2">
-          <Users className="text-[var(--brand-accent)]" size={28} />
+          <Users className="text-[var(--gold-deep)]" size={28} />
           <h1 className="font-editorial text-4xl md:text-5xl text-[var(--brand-ink)]">Officers & Board</h1>
         </div>
         <p className="text-slate-500 mb-10">The people leading the Alumni Association.</p>
@@ -52,7 +52,7 @@ export default function Officers() {
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.3 }}
                 variants={cardFade}
-                className="bg-white border-[2.5px] border-[var(--brand-ink)] rounded-[var(--radius)] p-6 text-center hover:shadow-[4px_4px_0_var(--brand-ink)] transition-shadow"
+                className="bg-white border border-[var(--line)] rounded-[var(--radius)] p-6 text-center hover:shadow-sm transition-shadow"
               >
                 <div className="flex justify-center mb-4">
                   <Avatar name={o.name} pic={o.photo} size="lg" />

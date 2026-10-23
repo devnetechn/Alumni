@@ -10,8 +10,9 @@ const connectionString =
 
 async function migrate() {
   const pool = new Pool({ connectionString });
-  const sql = fs.readFileSync(path.join(__dirname, '../db/schema.sql'), 'utf8');
-  await pool.query(sql);
+  for (const file of ['schema.sql', 'migrations_premium.sql']) {
+    await pool.query(fs.readFileSync(path.join(__dirname, '../db', file), 'utf8'));
+  }
   await pool.end();
   console.log('Migration complete.');
 }

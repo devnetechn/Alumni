@@ -190,3 +190,26 @@ test('POST /api/registration/renew-checkout uses FRONTEND_URL for success/cancel
     process.env.FRONTEND_URL = originalFrontendUrl;
   }
 });
+
+test('signup-checkout stages a not-listed batch year so the registrant still pays first', async () => {
+  const school = await getDefaultSchool();
+  await query('UPDATE schools SET registration_fee = 20000 WHERE id = $1', [school.id]);
+  jest.spyOn(paymongo, 'createCheckoutSession').mockResolvedValue({ id: 'cs_unlisted', checkoutUrl: 'https://checkout.paymongo.com/cs_unlisted' });
+
+  const bad = await request(app)
+    .post('/api/registration/signup-checkout')
+    .set('Host', hostFor(school))
+    .send({ email: 'bad@test.com', password: 'secret123', requested_batch_year: '1800' });
+  expect(bad.status).toBe(400);
+
+  const res = await request(app)
+    .post('/api/registration/signup-checkout')
+    .set('Host', hostFor(school))
+    .send({ email: 'unlisted@test.com', password: 'secret123', full_name: 'Unlisted', requested_batch_year: '2012' });
+  expect(res.status).toBe(200);
+  const token = paymongo.createCheckoutSession.mock.calls[0][0].metadata.session_token;
+  const [staged] = await query('SELECT batch_id, batch_year, requested_batch_year FROM pending_signups WHERE session_token = $1', [token]);
+  expect(staged.batch_id).toBeNull();
+  expect(staged.requested_batch_year).toBe(2012);
+  expect(staged.batch_year).toBe(2012);
+});

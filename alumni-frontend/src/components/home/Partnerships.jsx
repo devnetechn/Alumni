@@ -27,7 +27,7 @@ export default function Partnerships({ partners }) {
       variants={sectionFade}
     >
       <div className="flex items-center gap-3 mb-3">
-        <Handshake className="text-[var(--brand-accent)]" size={26} />
+        <Handshake className="text-[var(--gold-deep)]" size={26} />
         <h2 className="font-editorial text-3xl md:text-4xl text-[var(--brand-ink)]">Partnerships</h2>
       </div>
       <p className="text-slate-600 max-w-2xl mb-8">

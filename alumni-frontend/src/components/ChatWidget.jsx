@@ -47,7 +47,7 @@ export default function ChatWidget() {
   return (
     <div className="fixed bottom-6 right-6 z-40">
       {open && (
-        <div className="mb-3 w-80 bg-white border-[2.5px] border-[var(--brand-ink)] rounded-[var(--radius)] shadow-[4px_4px_0_var(--brand-ink)] flex flex-col overflow-hidden">
+        <div className="mb-3 w-80 bg-white border border-[var(--line)] rounded-[var(--radius)] shadow-sm flex flex-col overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 bg-[var(--brand-ink)] text-white">
             <span className="font-display text-sm">Ask us anything</span>
             <button onClick={() => setOpen(false)} className="text-white/70 hover:text-white">
@@ -62,15 +62,15 @@ export default function ChatWidget() {
             )}
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] px-3 py-2 rounded-[var(--radius)] border-2 border-[var(--brand-ink)] text-xs ${
-                  m.role === 'user' ? 'bg-[var(--brand-accent)] text-white' : 'bg-white text-[var(--brand-ink)]'
+                <div className={`max-w-[85%] px-3 py-2 rounded-[var(--radius)] border border-[var(--line)] text-xs ${
+                  m.role === 'user' ? 'bg-[var(--brand-accent)] text-[var(--navy)]' : 'bg-white text-[var(--brand-ink)]'
                 }`}>
                   {m.content}
                 </div>
               </div>
             ))}
           </div>
-          <form onSubmit={send} className="p-2 border-t-[2.5px] border-[var(--brand-ink)] flex gap-2">
+          <form onSubmit={send} className="p-2 border-t-[2.5px] border-[var(--line)] flex gap-2">
             <Input
               className="text-sm"
               value={input}
@@ -87,7 +87,7 @@ export default function ChatWidget() {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="w-14 h-14 rounded-[var(--radius)] bg-[var(--brand-accent)] border-[2.5px] border-[var(--brand-ink)] shadow-[4px_4px_0_var(--brand-ink)] flex items-center justify-center text-white hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[3px_3px_0_var(--brand-ink)] transition-all"
+          className="w-14 h-14 rounded-[var(--radius)] bg-[var(--brand-accent)] border border-[var(--line)] shadow-sm flex items-center justify-center text-[var(--navy)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-sm transition-all"
           aria-label="Open AI chat"
         >
           <Bot size={24} />

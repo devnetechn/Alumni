@@ -43,7 +43,7 @@ export default function EventRegistrations() {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="font-display text-3xl text-[var(--brand-ink)] flex items-center gap-2">
-            <ClipboardCheck className="text-[var(--brand-accent)]" /> Event Registrations
+            <ClipboardCheck className="text-[var(--gold-deep)]" /> Event Registrations
           </h1>
           <p className="text-slate-500 mt-1">
             {isAdmin ? 'Mark attendees as paid before the event' : 'View-only — only admin/president can mark payment'}
@@ -52,7 +52,7 @@ export default function EventRegistrations() {
       </div>
 
       {err && (
-        <div className="bg-white border-2 border-[var(--brand-danger)] text-[var(--brand-danger)] font-semibold p-4 rounded-[var(--radius)] mb-4">{err}</div>
+        <div className="bg-white border border-[var(--brand-danger)] text-[var(--brand-danger)] font-semibold p-4 rounded-[var(--radius)] mb-4">{err}</div>
       )}
 
       <Panel className="overflow-hidden">

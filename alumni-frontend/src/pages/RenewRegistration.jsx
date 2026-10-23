@@ -27,7 +27,7 @@ export default function RenewRegistration() {
         <div className="mb-4 inline-flex items-center gap-2">
           <Wordmark />
         </div>
-        <div className="mx-auto mb-4 w-14 h-14 rounded-[var(--radius)] bg-[var(--brand-danger)] border-2 border-[var(--brand-ink)] flex items-center justify-center">
+        <div className="mx-auto mb-4 w-14 h-14 rounded-[var(--radius)] bg-[var(--brand-danger)] border border-[var(--line)] flex items-center justify-center">
           <CreditCard className="text-white" size={26} />
         </div>
         <h1 className="font-display text-2xl text-[var(--brand-ink)] mb-2">Registration expired</h1>

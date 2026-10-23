@@ -1,74 +1,67 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, CheckCheck } from 'lucide-react';
+import { CheckCheck } from 'lucide-react';
 import { api } from '../api';
+import { useAuth } from '../auth';
 import { getSocket } from '../socket';
-import { Panel, Button } from '../components/ui';
+import { Button } from '../components/ui';
+import { Empty, Loading } from '../components/PageHeader';
 
 export default function Notifications() {
-  const [items, setItems] = useState([]);
-  const [unread, setUnread] = useState(0);
+  const { setUnread } = useAuth();
+  const [items, setItems] = useState(null);
+  const [error, setError] = useState('');
 
-  const load = async () => {
-    const { data } = await api.get('/notifications');
-    setItems(data.notifications);
-    setUnread(data.unread);
-  };
+  const load = useCallback(async () => {
+    try {
+      const { data } = await api.get('/notifications');
+      setItems(data.notifications);
+      setUnread(data.unread);
+    } catch { setError('Could not load notifications.'); }
+  }, [setUnread]);
 
-  const markAll = async () => {
-    await api.patch('/notifications', {});
-    load();
-  };
-
-  useEffect(() => { load(); }, []);
-
+  useEffect(() => { load(); }, [load]);
   useEffect(() => {
     const socket = getSocket();
     if (!socket) return;
-    const onNewNotification = () => load();
-    socket.on('notification:new', onNewNotification);
-    return () => socket.off('notification:new', onNewNotification);
-  }, []);
+    socket.on('notification:new', load);
+    return () => socket.off('notification:new', load);
+  }, [load]);
+
+  const markAll = async () => { await api.patch('/notifications', {}); load(); };
+  const markOne = async (n) => { if (!n.read_at) { await api.patch(`/notifications/${n.id}`); load(); } };
+  const unread = (items || []).filter((n) => !n.read_at).length;
 
   return (
     <div className="p-6 lg:p-10 max-w-3xl mx-auto">
-      <div className="mb-8 flex items-center justify-between">
+      <div className="flex items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl text-[var(--brand-ink)] flex items-center gap-2">
-            <Bell className="text-[var(--brand-accent)]" /> Notifications
-          </h1>
-          <p className="text-slate-500 mt-1">{unread} unread</p>
+          <p className="eyebrow mb-2">Inbox</p>
+          <h1 className="serif text-3xl text-[var(--navy)]">Notifications</h1>
+          <span className="gold-rule mt-4" />
         </div>
-        {unread > 0 && (
-          <Button onClick={markAll} className="text-sm">
-            <CheckCheck size={16} /> Mark all read
-          </Button>
-        )}
+        {unread > 0 && <Button variant="secondary" onClick={markAll}><CheckCheck size={16} aria-hidden="true" /> Mark all read</Button>}
       </div>
 
-      <div className="space-y-3">
-        {items.length === 0 && (
-          <Panel className="p-8 text-center text-slate-500">
-            No notifications yet.
-          </Panel>
-        )}
-        {items.map((n) => (
-          <Link key={n.id} to={n.link || '#'}>
-            <Panel className={`p-5 transition-all ${n.read_at ? '' : 'shadow-[4px_4px_0_var(--brand-accent)] border-[var(--brand-accent)]'}`}>
-              <div className="flex items-start gap-3">
-                <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${n.read_at ? 'bg-slate-300' : 'bg-[var(--brand-accent)]'}`} />
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-[var(--brand-ink)]">{n.title}</h3>
-                    <span className="text-xs text-slate-400 capitalize">{n.type}</span>
-                  </div>
-                  {n.body && <p className="text-sm text-slate-600 mt-1 line-clamp-2">{n.body}</p>}
-                  <p className="text-xs text-slate-400 mt-1">{new Date(n.created_at).toLocaleString()}</p>
-                </div>
+      <div className="mt-8 space-y-3">
+        {error && <p role="alert" className="text-[var(--brand-danger)]">{error}</p>}
+        {items === null && !error ? <Loading /> : items && items.length === 0 ? <Empty title="No notifications yet">Membership decisions, announcements and replies will appear here.</Empty> : (items || []).map((n) => {
+          const inner = (
+            <>
+              <span className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${n.read_at ? 'bg-transparent' : 'bg-[var(--gold)]'}`} aria-hidden="true" />
+              <div className="min-w-0">
+                <p className={`text-sm ${n.read_at ? 'text-[var(--muted)]' : 'text-[var(--navy)] font-semibold'}`}>{n.title}{!n.read_at && <span className="sr-only"> (unread)</span>}</p>
+                {n.body && <p className="text-sm text-[var(--muted)] mt-0.5">{n.body}</p>}
+                <p className="text-xs text-[var(--muted)] mt-1">{new Date(n.created_at).toLocaleString()}</p>
               </div>
-            </Panel>
-          </Link>
-        ))}
+            </>
+          );
+          return n.link ? (
+            <Link key={n.id} to={n.link} onClick={() => markOne(n)} className="card card-hover p-4 flex gap-3">{inner}</Link>
+          ) : (
+            <button key={n.id} onClick={() => markOne(n)} className="card p-4 flex gap-3 text-left w-full">{inner}</button>
+          );
+        })}
       </div>
     </div>
   );

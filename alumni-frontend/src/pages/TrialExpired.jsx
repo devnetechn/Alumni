@@ -12,7 +12,7 @@ export default function TrialExpired() {
         <div className="mb-4 inline-flex items-center gap-2">
           <Wordmark />
         </div>
-        <div className="mx-auto mb-4 w-14 h-14 rounded-[var(--radius)] bg-[var(--brand-danger)] border-2 border-[var(--brand-ink)] flex items-center justify-center">
+        <div className="mx-auto mb-4 w-14 h-14 rounded-[var(--radius)] bg-[var(--brand-danger)] border border-[var(--line)] flex items-center justify-center">
           <Clock className="text-white" size={26} />
         </div>
         <h1 className="font-display text-2xl text-[var(--brand-ink)] mb-2">Trial expired</h1>
@@ -26,7 +26,7 @@ export default function TrialExpired() {
             <p className="text-slate-600 mb-6">Your school's trial has ended. Contact us to continue using the platform.</p>
             <a
               href="mailto:hello@yourapp.com?subject=Continue%20my%20school's%20subscription"
-              className="inline-flex items-center gap-2 border-[2.5px] border-[var(--brand-ink)] rounded-[var(--radius)] font-bold text-xs uppercase tracking-wide px-4 py-2.5 bg-[var(--brand-accent)] text-white shadow-[3px_3px_0_var(--brand-ink)]"
+              className="inline-flex items-center gap-2 border border-[var(--line)] rounded-[var(--radius)] font-bold text-xs uppercase tracking-wide px-4 py-2.5 bg-[var(--brand-accent)] text-[var(--navy)] shadow-sm"
             >
               <Mail size={16} /> Contact us
             </a>

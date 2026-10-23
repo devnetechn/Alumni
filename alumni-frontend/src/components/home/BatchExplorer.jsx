@@ -31,7 +31,7 @@ export default function BatchExplorer() {
       viewport={{ once: true, amount: 0.2 }}
       variants={fadeIn}
     >
-      <p className="text-xs font-bold tracking-[0.2em] text-[var(--brand-accent)] mb-3">FIND YOUR YEARS</p>
+      <p className="text-xs font-bold tracking-[0.2em] text-[var(--gold-deep)] mb-3">FIND YOUR YEARS</p>
       <h2 className="font-editorial text-4xl md:text-5xl text-[var(--brand-ink)] mb-12">
         Explore Your Batch
       </h2>
@@ -44,7 +44,7 @@ export default function BatchExplorer() {
             whileInView="visible"
             viewport={{ once: true, amount: 0.3 }}
             variants={cardFade}
-            className="group relative aspect-[3/4] rounded-[var(--radius)] overflow-hidden border-2 border-[var(--brand-ink)] cursor-default"
+            className="group relative aspect-[3/4] rounded-[var(--radius)] overflow-hidden border border-[var(--line)] cursor-default"
             style={{ background: 'var(--editorial-navy)' }}
           >
             <div className="absolute inset-0 flex items-center justify-center">
@@ -54,7 +54,7 @@ export default function BatchExplorer() {
               <p className="font-editorial text-3xl text-white">{b.count}</p>
               <p className="text-xs text-white/70 uppercase tracking-wider">Alumni</p>
               <p className="text-sm text-white/90 mt-2">{b.reunion}</p>
-              <span className="inline-flex items-center gap-1 text-xs font-bold text-[var(--brand-accent)] mt-2">
+              <span className="inline-flex items-center gap-1 text-xs font-bold text-[var(--gold-deep)] mt-2">
                 Explore <ArrowRight size={12} />
               </span>
             </div>

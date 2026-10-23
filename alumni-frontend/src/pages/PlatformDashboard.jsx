@@ -70,7 +70,7 @@ export default function PlatformDashboard() {
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-2">
-            <div className="bg-[var(--brand-accent)] border-2 border-[var(--brand-ink)] p-2 rounded-[var(--radius)]">
+            <div className="bg-[var(--brand-accent)] border border-[var(--line)] p-2 rounded-[var(--radius)]">
               <Shield className="text-white" size={22} />
             </div>
             <div>
@@ -92,7 +92,7 @@ export default function PlatformDashboard() {
             <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b-[2.5px] border-[var(--brand-ink)] text-[var(--brand-ink)] text-xs uppercase tracking-wider">
+                <tr className="border-b-[2.5px] border-[var(--line)] text-[var(--brand-ink)] text-xs uppercase tracking-wider">
                   <th className="py-3 px-4 text-left font-bold">School</th>
                   <th className="py-3 px-4 text-left font-bold">Status</th>
                   <th className="py-3 px-4 text-left font-bold">Alumni</th>
@@ -116,20 +116,20 @@ export default function PlatformDashboard() {
                       <td className="py-3 px-4 text-slate-500 text-xs">{new Date(s.trial_ends_at).toLocaleDateString()}</td>
                       <td className="py-3 px-4">
                         <div className="flex items-center justify-end gap-1 flex-wrap">
-                          <button onClick={() => toggleActive(s)} title={s.active ? 'Deactivate' : 'Activate'} className="p-2 border-2 border-transparent hover:border-[var(--brand-ink)] rounded-[var(--radius)] text-[var(--brand-ink)]">
+                          <button onClick={() => toggleActive(s)} title={s.active ? 'Deactivate' : 'Activate'} className="p-2 border border-transparent hover:border-[var(--line)] rounded-[var(--radius)] text-[var(--brand-ink)]">
                             <Power size={16} />
                           </button>
                           {s.plan === 'trial' && (
                             <>
-                              <button onClick={() => markActive(s)} title="Mark plan active" className="p-2 border-2 border-transparent hover:border-[var(--brand-ink)] rounded-[var(--radius)] text-[var(--brand-ink)]">
+                              <button onClick={() => markActive(s)} title="Mark plan active" className="p-2 border border-transparent hover:border-[var(--line)] rounded-[var(--radius)] text-[var(--brand-ink)]">
                                 <CreditCard size={16} />
                               </button>
-                              <button onClick={() => extendTrial(s)} title="Extend trial 30 days" className="p-2 border-2 border-transparent hover:border-[var(--brand-ink)] rounded-[var(--radius)] text-[var(--brand-ink)]">
+                              <button onClick={() => extendTrial(s)} title="Extend trial 30 days" className="p-2 border border-transparent hover:border-[var(--line)] rounded-[var(--radius)] text-[var(--brand-ink)]">
                                 <Clock size={16} />
                               </button>
                             </>
                           )}
-                          <button onClick={() => { setDeleteTarget(s); setConfirmSlug(''); setDeleteErr(''); }} title="Delete school" className="p-2 border-2 border-transparent hover:border-[var(--brand-danger)] rounded-[var(--radius)] text-[var(--brand-danger)]">
+                          <button onClick={() => { setDeleteTarget(s); setConfirmSlug(''); setDeleteErr(''); }} title="Delete school" className="p-2 border border-transparent hover:border-[var(--brand-danger)] rounded-[var(--radius)] text-[var(--brand-danger)]">
                             <Trash2 size={16} />
                           </button>
                         </div>
@@ -152,7 +152,7 @@ export default function PlatformDashboard() {
               This permanently deletes the school and every alumni, event, job, and message that belongs to it. Type <span className="font-mono font-bold">{deleteTarget.slug}</span> to confirm.
             </p>
             {deleteErr && (
-              <div className="bg-white border-2 border-[var(--brand-danger)] text-[var(--brand-danger)] font-semibold p-2 rounded-[var(--radius)] mb-3 text-xs">
+              <div className="bg-white border border-[var(--brand-danger)] text-[var(--brand-danger)] font-semibold p-2 rounded-[var(--radius)] mb-3 text-xs">
                 {deleteErr}
               </div>
             )}

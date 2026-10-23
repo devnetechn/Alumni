@@ -19,8 +19,20 @@ function frontendOrigin(req) {
 }
 
 router.post('/signup-checkout', asyncHandler(async (req, res) => {
-  const { email, password, full_name, batch_year, contact, address, member_type, profile_pic } = req.body;
+  const { email, password, full_name, batch_year, contact, address, member_type, profile_pic, batch_id, course, requested_batch_year } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'email and password are required' });
+  if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
+  let batch = null;
+  if (batch_id) {
+    batch = (await req.db('SELECT * FROM batches WHERE id = $1', [batch_id]))[0];
+    if (!batch) return res.status(400).json({ error: 'The selected batch does not exist' });
+  }
+  // Registrants whose batch is not listed yet still pay first; the admin
+  // creates the batch and assigns them afterwards.
+  const requestedYear = !batch && requested_batch_year ? parseInt(requested_batch_year, 10) : null;
+  if (requested_batch_year && !batch && !(requestedYear >= 1900 && requestedYear <= 2100)) {
+    return res.status(400).json({ error: 'Enter a valid graduation year' });
+  }
 
   if (!req.school.registration_open) {
     return res.status(400).json({ error: 'Registration is currently closed' });
@@ -54,19 +66,22 @@ router.post('/signup-checkout', asyncHandler(async (req, res) => {
   // low-entropy token through PayMongo metadata; the webhook reads the
   // rest back from this table.
   await req.db(
-    `INSERT INTO pending_signups (session_token, school_id, email, password_hash, full_name, batch_year, contact, address, member_type, profile_pic)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+    `INSERT INTO pending_signups (session_token, school_id, email, password_hash, full_name, batch_year, contact, address, member_type, profile_pic, batch_id, course, requested_batch_year)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`,
     [
       sessionToken,
       req.school.id,
       email,
       password_hash,
       full_name || null,
-      batch_year || null,
+      batch ? batch.year : (batch_year || requestedYear || null),
       contact || null,
       address || null,
       resolvedMemberType,
       profile_pic || null,
+      batch ? batch.id : null,
+      course || null,
+      requestedYear,
     ]
   );
 

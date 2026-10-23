@@ -10,7 +10,7 @@ async function resolveTenant(req, res, next) {
     const slug = subdomainFrom(req.headers.host);
     let school = null;
 
-    const bySlug = await query('SELECT id, slug, name, logo, plan, trial_ends_at, active, registration_open, registration_fee FROM schools WHERE slug = $1', [slug]);
+    const bySlug = await query('SELECT id, slug, name, logo, about, contact_email, contact_phone, contact_address, facebook_url, plan, trial_ends_at, active, registration_open, registration_fee FROM schools WHERE slug = $1', [slug]);
     if (bySlug.length > 0 && bySlug[0].active) {
       school = bySlug[0];
     }
@@ -22,7 +22,7 @@ async function resolveTenant(req, res, next) {
         try {
           const payload = verifyToken(token);
           if (payload.school_id) {
-            const byId = await query('SELECT id, slug, name, logo, plan, trial_ends_at, active, registration_open, registration_fee FROM schools WHERE id = $1', [payload.school_id]);
+            const byId = await query('SELECT id, slug, name, logo, about, contact_email, contact_phone, contact_address, facebook_url, plan, trial_ends_at, active, registration_open, registration_fee FROM schools WHERE id = $1', [payload.school_id]);
             if (byId.length > 0 && byId[0].active) {
               school = byId[0];
             }
@@ -34,14 +34,14 @@ async function resolveTenant(req, res, next) {
     }
 
     if (!school && process.env.NODE_ENV !== 'production' && process.env.DEFAULT_SCHOOL_SLUG) {
-      const fallback = await query('SELECT id, slug, name, logo, plan, trial_ends_at, active, registration_open, registration_fee FROM schools WHERE slug = $1', [process.env.DEFAULT_SCHOOL_SLUG]);
+      const fallback = await query('SELECT id, slug, name, logo, about, contact_email, contact_phone, contact_address, facebook_url, plan, trial_ends_at, active, registration_open, registration_fee FROM schools WHERE slug = $1', [process.env.DEFAULT_SCHOOL_SLUG]);
       if (fallback.length > 0 && fallback[0].active) {
         school = fallback[0];
       }
     }
 
     if (!school && process.env.SINGLE_TENANT_SLUG) {
-      const singleTenant = await query('SELECT id, slug, name, logo, plan, trial_ends_at, active, registration_open, registration_fee FROM schools WHERE slug = $1', [process.env.SINGLE_TENANT_SLUG]);
+      const singleTenant = await query('SELECT id, slug, name, logo, about, contact_email, contact_phone, contact_address, facebook_url, plan, trial_ends_at, active, registration_open, registration_fee FROM schools WHERE slug = $1', [process.env.SINGLE_TENANT_SLUG]);
       if (singleTenant.length > 0 && singleTenant[0].active) {
         school = singleTenant[0];
       }

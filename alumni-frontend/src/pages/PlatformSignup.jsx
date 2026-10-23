@@ -34,7 +34,7 @@ export default function PlatformSignup() {
     <div className="min-h-screen flex items-center justify-center bg-[var(--brand-ink)] p-6">
       <Panel className="max-w-md w-full p-8">
         <div className="flex items-center gap-2 mb-6">
-          <div className="bg-[var(--brand-accent)] border-2 border-[var(--brand-ink)] p-2 rounded-[var(--radius)]">
+          <div className="bg-[var(--brand-accent)] border border-[var(--line)] p-2 rounded-[var(--radius)]">
             <Shield className="text-white" size={22} />
           </div>
           <div>
@@ -57,7 +57,7 @@ export default function PlatformSignup() {
             <p className="text-slate-500 mb-6 text-sm">One-time setup. This form closes itself after the first account.</p>
 
             {err && (
-              <div className="bg-white border-2 border-[var(--brand-danger)] text-[var(--brand-danger)] font-semibold p-3 rounded-[var(--radius)] mb-4 text-sm">
+              <div className="bg-white border border-[var(--brand-danger)] text-[var(--brand-danger)] font-semibold p-3 rounded-[var(--radius)] mb-4 text-sm">
                 {err}
               </div>
             )}

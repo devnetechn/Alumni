@@ -17,11 +17,11 @@ export default function AlumniIntro() {
       variants={fadeIn}
     >
       <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
-        <div className="rounded-[var(--radius)] overflow-hidden border-2 border-[var(--brand-ink)]">
+        <div className="rounded-[var(--radius)] overflow-hidden border border-[var(--line)]">
           <img src={communityPhoto} alt="" className="w-full h-full object-cover aspect-[4/3]" />
         </div>
         <div>
-          <p className="text-xs font-bold tracking-[0.2em] text-[var(--brand-accent)] mb-4">
+          <p className="text-xs font-bold tracking-[0.2em] text-[var(--gold-deep)] mb-4">
             OUR COMMUNITY
           </p>
           <h2 className="font-editorial text-4xl md:text-5xl leading-tight text-[var(--brand-ink)] mb-6">
@@ -34,7 +34,7 @@ export default function AlumniIntro() {
             decades ago, this is your space to reconnect, celebrate
             milestones, and give back to the community that shaped you.
           </p>
-          <a href="#alumni" className="inline-flex items-center gap-2 font-bold text-[var(--brand-ink)] hover:text-[var(--brand-accent)] transition-colors">
+          <a href="#alumni" className="inline-flex items-center gap-2 font-bold text-[var(--brand-ink)] hover:text-[var(--gold-deep)] transition-colors">
             Learn More →
           </a>
         </div>

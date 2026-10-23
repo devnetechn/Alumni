@@ -26,7 +26,7 @@ export default function AlumniEventsSection({ events }) {
       viewport={{ once: true, amount: 0.2 }}
       variants={sectionFade}
     >
-      <p className="text-xs font-bold tracking-[0.2em] text-[var(--brand-accent)] mb-3">UPCOMING</p>
+      <p className="text-xs font-bold tracking-[0.2em] text-[var(--gold-deep)] mb-3">UPCOMING</p>
       <h2 className="font-editorial text-3xl md:text-4xl text-[var(--brand-ink)] mb-8">
         Reconnect. Celebrate. Belong.
       </h2>
@@ -42,7 +42,7 @@ export default function AlumniEventsSection({ events }) {
               whileInView="visible"
               viewport={{ once: true, amount: 0.3 }}
               variants={cardFade}
-              className="group bg-white border-[2.5px] border-[var(--brand-ink)] rounded-[var(--radius)] overflow-hidden hover:shadow-[4px_4px_0_var(--brand-ink)] transition-shadow"
+              className="group bg-white border border-[var(--line)] rounded-[var(--radius)] overflow-hidden hover:shadow-sm transition-shadow"
             >
               <div className="p-6 text-white" style={{ background: 'var(--editorial-navy)' }}>
                 <div className="text-xs uppercase tracking-wider opacity-70 mb-1">

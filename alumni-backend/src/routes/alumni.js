@@ -45,6 +45,9 @@ router.get('/alumni', requireAuth, asyncHandler(async (req, res) => {
      FROM users ${where} ORDER BY full_name NULLS LAST`,
     values
   );
+  if (req.user.role !== 'admin') {
+    for (const r of rows) { delete r.email; delete r.contact; delete r.nfc_uid; }
+  }
   res.json({ alumni: rows });
 }));
 

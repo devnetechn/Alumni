@@ -29,16 +29,16 @@ export default function PresidentMessage() {
     >
       <div className="max-w-6xl mx-auto grid md:grid-cols-[1fr_auto] gap-12 items-center">
         <div>
-          <p className="text-xs font-bold tracking-[0.2em] text-[var(--brand-accent)] mb-6">
+          <p className="text-xs font-bold tracking-[0.2em] text-[var(--gold-deep)] mb-6">
             A WORD FROM OUR PRESIDENT
           </p>
-          <Quote className="mb-6 text-[var(--brand-accent)]" size={36} strokeWidth={2.5} />
+          <Quote className="mb-6 text-[var(--gold-deep)]" size={36} strokeWidth={2.5} />
           <p className="font-editorial italic text-2xl md:text-3xl leading-snug text-white">
             {PRESIDENT_MESSAGE}
           </p>
         </div>
         <div className="flex flex-col items-center text-center gap-4">
-          <div className="w-44 h-44 rounded-[var(--radius)] overflow-hidden border-2 border-white/20">
+          <div className="w-44 h-44 rounded-[var(--radius)] overflow-hidden border border-white/20">
             <img src={presidentPhoto} alt={PRESIDENT_NAME} className="w-full h-full object-cover" />
           </div>
           <div>

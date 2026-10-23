@@ -32,10 +32,10 @@ export default function OfficersPreview({ officers }) {
     >
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
-          <Users className="text-[var(--brand-accent)]" size={26} />
+          <Users className="text-[var(--gold-deep)]" size={26} />
           <h2 className="font-editorial text-3xl md:text-4xl text-[var(--brand-ink)]">Officers & Board</h2>
         </div>
-        <Link to="/officers" className="hidden sm:inline-flex items-center gap-1.5 text-sm font-bold text-[var(--brand-accent)] hover:underline">
+        <Link to="/officers" className="hidden sm:inline-flex items-center gap-1.5 text-sm font-bold text-[var(--gold-deep)] hover:underline">
           See all officers <ArrowRight size={14} />
         </Link>
       </div>
@@ -48,7 +48,7 @@ export default function OfficersPreview({ officers }) {
             whileInView="visible"
             viewport={{ once: true, amount: 0.3 }}
             variants={cardFade}
-            className="bg-white border-[2.5px] border-[var(--brand-ink)] rounded-[var(--radius)] p-6 text-center hover:shadow-[4px_4px_0_var(--brand-ink)] transition-shadow"
+            className="bg-white border border-[var(--line)] rounded-[var(--radius)] p-6 text-center hover:shadow-sm transition-shadow"
           >
             <div className="flex justify-center mb-4">
               <Avatar name={o.name} pic={o.photo} size="lg" />
@@ -58,7 +58,7 @@ export default function OfficersPreview({ officers }) {
           </motion.div>
         ))}
       </div>
-      <Link to="/officers" className="sm:hidden mt-6 inline-flex items-center gap-1.5 text-sm font-bold text-[var(--brand-accent)] hover:underline">
+      <Link to="/officers" className="sm:hidden mt-6 inline-flex items-center gap-1.5 text-sm font-bold text-[var(--gold-deep)] hover:underline">
         See all officers <ArrowRight size={14} />
       </Link>
     </motion.section>

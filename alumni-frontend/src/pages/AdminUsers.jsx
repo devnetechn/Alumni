@@ -58,7 +58,7 @@ export default function AdminUsers() {
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
       <div className="mb-8">
         <h1 className="font-display text-3xl text-[var(--brand-ink)] flex items-center gap-2">
-          <Shield className="text-[var(--brand-accent)]" size={28} />
+          <Shield className="text-[var(--gold-deep)]" size={28} />
           User Management
         </h1>
         <p className="text-slate-500 mt-1">Manage alumni accounts, roles, and membership status</p>
@@ -93,7 +93,7 @@ export default function AdminUsers() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b-[2.5px] border-[var(--brand-ink)] text-[var(--brand-ink)] text-xs uppercase tracking-wider">
+              <tr className="border-b-[2.5px] border-[var(--line)] text-[var(--brand-ink)] text-xs uppercase tracking-wider">
                 <th className="py-3 px-6 text-left font-bold">User</th>
                 <th className="py-3 px-6 text-left font-bold">Batch</th>
                 <th className="py-3 px-6 text-left font-bold">Role</th>
@@ -140,26 +140,26 @@ export default function AdminUsers() {
                   </td>
                   <td className="py-3 px-6 text-right">
                     <div className="inline-flex gap-1">
-                      <button onClick={() => toggleRole(u)} title="Toggle admin" className="p-2 border-2 border-transparent hover:border-[var(--brand-ink)] rounded-[var(--radius)] text-[var(--brand-ink)]">
+                      <button onClick={() => toggleRole(u)} title="Toggle admin" className="p-2 border border-transparent hover:border-[var(--line)] rounded-[var(--radius)] text-[var(--brand-ink)]">
                         <Crown size={16} />
                       </button>
-                      <button onClick={() => toggleActive(u)} title="Toggle active" className="p-2 border-2 border-transparent hover:border-[var(--brand-ink)] rounded-[var(--radius)] text-[var(--brand-ink)]">
+                      <button onClick={() => toggleActive(u)} title="Toggle active" className="p-2 border border-transparent hover:border-[var(--line)] rounded-[var(--radius)] text-[var(--brand-ink)]">
                         {u.active ? <UserX size={16} /> : <UserCheck size={16} />}
                       </button>
                       <button
                         onClick={() => toggleLeader(u)}
                         disabled={u.member_type === 'guest'}
                         title={u.member_type === 'guest' ? 'Guests cannot be batch leaders' : 'Toggle batch leader'}
-                        className={`p-2 border-2 border-transparent rounded-[var(--radius)] ${
+                        className={`p-2 border border-transparent rounded-[var(--radius)] ${
                           u.member_type === 'guest'
                             ? 'text-slate-300 cursor-not-allowed'
-                            : `hover:border-[var(--brand-ink)] ${u.is_batch_leader ? 'text-[#b8860b]' : 'text-[var(--brand-ink)]'}`
+                            : `hover:border-[var(--line)] ${u.is_batch_leader ? 'text-[#b8860b]' : 'text-[var(--brand-ink)]'}`
                         }`}
                       >
                         <Star size={16} />
                       </button>
                       {u.id !== me.id && (
-                        <button onClick={() => remove(u)} title="Delete" className="p-2 border-2 border-transparent hover:border-[var(--brand-danger)] rounded-[var(--radius)] text-[var(--brand-danger)]">
+                        <button onClick={() => remove(u)} title="Delete" className="p-2 border border-transparent hover:border-[var(--brand-danger)] rounded-[var(--radius)] text-[var(--brand-danger)]">
                           <Trash2 size={16} />
                         </button>
                       )}

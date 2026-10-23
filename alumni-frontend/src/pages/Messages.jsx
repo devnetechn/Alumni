@@ -99,8 +99,8 @@ export default function Messages() {
       </div>
 
       <Panel className="overflow-hidden flex h-[calc(100vh-220px)] min-h-[500px]">
-        <div className="w-80 border-r-[2.5px] border-[var(--brand-ink)] flex flex-col">
-          <div className="p-4 border-b-[2.5px] border-[var(--brand-ink)]">
+        <div className="w-80 border-r-[2.5px] border-[var(--line)] flex flex-col">
+          <div className="p-4 border-b-[2.5px] border-[var(--line)]">
             <Button className="w-full" onClick={() => setSearching(!searching)}>
               <MessageSquare size={16} />
               {searching ? 'Cancel' : 'New Message'}
@@ -108,7 +108,7 @@ export default function Messages() {
           </div>
 
           {searching && (
-            <div className="p-3 border-b-[2.5px] border-[var(--brand-ink)]">
+            <div className="p-3 border-b-[2.5px] border-[var(--line)]">
               <div className="relative">
                 <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
                 <Input className="pl-9" placeholder="Search alumni..." value={searchQ} onChange={(e) => searchAlumni(e.target.value)} />
@@ -163,7 +163,7 @@ export default function Messages() {
             </div>
           ) : (
             <>
-              <div className="px-6 py-4 border-b-[2.5px] border-[var(--brand-ink)]">
+              <div className="px-6 py-4 border-b-[2.5px] border-[var(--line)]">
                 <p className="font-bold text-[var(--brand-ink)]">{other?.full_name || other?.email}</p>
                 <p className="text-xs text-slate-500">Batch {other?.batch_year || '—'} · {other?.course || ''}</p>
               </div>
@@ -172,8 +172,8 @@ export default function Messages() {
                   const mine = m.receiver_id === active;
                   return (
                     <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-md px-4 py-2.5 rounded-[var(--radius)] border-2 border-[var(--brand-ink)] ${
-                        mine ? 'bg-[var(--brand-accent)] text-white' : 'bg-white text-[var(--brand-ink)]'
+                      <div className={`max-w-md px-4 py-2.5 rounded-[var(--radius)] border border-[var(--line)] ${
+                        mine ? 'bg-[var(--brand-accent)] text-[var(--navy)]' : 'bg-white text-[var(--brand-ink)]'
                       }`}>
                         <p className="whitespace-pre-wrap text-sm">{m.body}</p>
                         <p className={`text-xs mt-1 ${mine ? 'text-white/70' : 'text-slate-400'}`}>
@@ -185,13 +185,13 @@ export default function Messages() {
                 })}
                 {active === botInfo?.id && botTyping && (
                   <div className="flex justify-start">
-                    <div className="max-w-md px-4 py-2.5 rounded-[var(--radius)] border-2 border-[var(--brand-ink)] bg-white text-slate-400 text-sm italic">
+                    <div className="max-w-md px-4 py-2.5 rounded-[var(--radius)] border border-[var(--line)] bg-white text-slate-400 text-sm italic">
                       IHES Assistant is typing…
                     </div>
                   </div>
                 )}
               </div>
-              <form onSubmit={send} className="p-4 border-t-[2.5px] border-[var(--brand-ink)] flex gap-2">
+              <form onSubmit={send} className="p-4 border-t-[2.5px] border-[var(--line)] flex gap-2">
                 <Input placeholder="Type a message..." value={body} onChange={(e) => setBody(e.target.value)} />
                 <Button type="submit" className="px-4">
                   <Send size={18} />

@@ -50,7 +50,7 @@ export default function AlumniId() {
       </div>
 
       <div className="flex justify-center">
-        <div id="id-card" className="relative bg-[var(--brand-ink)] text-white border-[2.5px] border-[var(--brand-ink)] rounded-[var(--radius)] shadow-[6px_6px_0_var(--brand-accent)] w-full max-w-sm overflow-hidden">
+        <div id="id-card" className="relative bg-[var(--brand-ink)] text-white border border-[var(--line)] rounded-[var(--radius)] shadow-sm w-full max-w-sm overflow-hidden">
           <div className="h-2 bg-[var(--brand-accent)]" />
           <div className="relative z-10 p-6">
             <div className="flex justify-between items-center mb-5">
@@ -66,7 +66,7 @@ export default function AlumniId() {
             </div>
 
             <div className="flex justify-center mb-4">
-              <div className="w-32 h-32 rounded-[var(--radius)] bg-white/10 border-2 border-white/30 overflow-hidden flex items-center justify-center">
+              <div className="w-32 h-32 rounded-[var(--radius)] bg-white/10 border border-white/30 overflow-hidden flex items-center justify-center">
                 {me.profile_pic ? (
                   <img src={me.profile_pic} alt={me.full_name} className="w-full h-full object-cover" />
                 ) : (
@@ -84,7 +84,7 @@ export default function AlumniId() {
             </div>
 
             <div className="flex justify-center mb-4">
-              <div className="bg-white p-2.5 rounded-[var(--radius)] border-2 border-white">
+              <div className="bg-white p-2.5 rounded-[var(--radius)] border border-white">
                 <canvas ref={canvasRef} />
               </div>
             </div>

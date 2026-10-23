@@ -10,17 +10,25 @@ export function AuthProvider({ children }) {
   const [school, setSchool] = useState(null);
   const [trialExpired, setTrialExpired] = useState(null);
   const [registrationExpired, setRegistrationExpired] = useState(null);
+  const [membership, setMembership] = useState(null);
+  const [managedBatches, setManagedBatches] = useState([]);
+  const [unread, setUnread] = useState(0);
+  const [meReady, setMeReady] = useState(false);
 
   // Enrich token user with alumni profile fields (is_batch_leader etc.)
   const refresh = async () => {
     try {
       const { data } = await api.get('/me');
+      setMembership(data.membership);
+      setManagedBatches(data.managedBatches || []);
+      api.get('/notifications').then((r) => setUnread(r.data.unread)).catch(() => {});
       setUser((prev) => {
-        const next = { ...(prev || {}), is_batch_leader: !!data.me?.is_batch_leader };
+        const next = { ...(prev || {}), is_batch_leader: !!data.me?.is_batch_leader, full_name: data.me?.full_name, profile_pic: data.me?.profile_pic, batch_year: data.me?.batch_year };
         localStorage.setItem('user', JSON.stringify(next));
         return next;
       });
     } catch {}
+    setMeReady(true);
   };
 
   useEffect(() => {
@@ -29,6 +37,8 @@ export function AuthProvider({ children }) {
     if (stored) {
       setUser(JSON.parse(stored));
       refresh();
+    } else {
+      setMeReady(true);
     }
     if (token) connectSocket(token);
     setLoading(false);
@@ -68,10 +78,13 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('user');
     disconnectSocket();
     setUser(null);
+    setMembership(null);
+    setManagedBatches([]);
+    setUnread(0);
   };
 
   return (
-    <AuthCtx.Provider value={{ user, login, register, logout, loading, refresh, refreshSchool, school, trialExpired, registrationExpired, setSession }}>
+    <AuthCtx.Provider value={{ user, meReady, membership, managedBatches, unread, setUnread, login, register, logout, loading, refresh, refreshSchool, school, trialExpired, registrationExpired, setSession }}>
       {children}
     </AuthCtx.Provider>
   );

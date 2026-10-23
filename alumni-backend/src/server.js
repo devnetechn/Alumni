@@ -63,6 +63,15 @@ app.use('/api/officers', officersRoutes);
 const messagesRoutes = require('./routes/messages');
 app.use('/api/messages', messagesRoutes);
 
+const batchesRoutes = require('./routes/batches');
+app.use('/api/batches', batchesRoutes);
+
+const publicStatsRoutes = require('./routes/publicStats');
+app.use('/api/public-stats', publicStatsRoutes);
+
+const directoryRoutes = require('./routes/directory');
+app.use('/api/directory', directoryRoutes);
+
 const groupsRoutes = require('./routes/groups');
 app.use('/api/groups', groupsRoutes);
 

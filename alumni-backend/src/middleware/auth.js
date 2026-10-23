@@ -1,5 +1,5 @@
 const { verifyToken } = require('../lib/token');
-const { query } = require('../db');
+const { query, queryForSchool } = require('../db');
 
 async function requireAuth(req, res, next) {
   const header = req.headers.authorization || '';
@@ -26,6 +26,9 @@ async function requireAuth(req, res, next) {
     delete user.password_hash;
     if (!user.active) return res.status(403).json({ error: 'Account is deactivated' });
     req.user = user;
+    if (req.school) {
+      req.db = (text, params) => queryForSchool(req.school.id, text, params, { id: user.id, role: user.role });
+    }
 
     const REGISTRATION_ALLOWLIST = ['/api/me', '/api/school', '/api/registration/renew-checkout'];
     const requestPath = req.originalUrl.split('?')[0];
@@ -37,6 +40,27 @@ async function requireAuth(req, res, next) {
   } catch (err) {
     return res.status(500).json({ error: 'Internal server error' });
   }
+}
+
+// Attaches req.user when a valid token is present, otherwise continues anonymously.
+async function optionalAuth(req, res, next) {
+  const header = req.headers.authorization || '';
+  if (!header.startsWith('Bearer ')) return next();
+  try {
+    const payload = verifyToken(header.slice(7));
+    if (req.school && payload.school_id !== req.school.id) return next();
+    const rows = await (req.db || query)('SELECT * FROM users WHERE id = $1', [payload.id]);
+    const user = rows[0];
+    if (!user || !user.active) return next();
+    delete user.password_hash;
+    req.user = user;
+    if (req.school) {
+      req.db = (text, params) => queryForSchool(req.school.id, text, params, { id: user.id, role: user.role });
+    }
+  } catch {
+    // invalid token: treat as anonymous
+  }
+  next();
 }
 
 function requireAdmin(req, res, next) {
@@ -51,4 +75,4 @@ function requireOfficer(req, res, next) {
   next();
 }
 
-module.exports = { requireAuth, requireAdmin, requireOfficer };
+module.exports = { requireAuth, optionalAuth, requireAdmin, requireOfficer };

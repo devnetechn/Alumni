@@ -39,7 +39,7 @@ router.get('/highlights', asyncHandler(async (req, res) => {
     `SELECT ep.id, ep.media, ep.media_type, ep.created_at, e.title AS event_title, e.event_date
      FROM event_photos ep
      JOIN events e ON e.id = ep.event_id
-     WHERE e.event_date < now()
+     WHERE e.event_date < now() AND e.batch_id IS NULL
      ORDER BY ep.created_at DESC
      LIMIT 12`
   );

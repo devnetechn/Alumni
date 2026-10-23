@@ -1,47 +1,99 @@
 const express = require('express');
-const { requireAuth, requireAdmin, requireOfficer } = require('../middleware/auth');
+const { requireAuth, optionalAuth, requireAdmin, requireOfficer } = require('../middleware/auth');
 const { asyncHandler } = require('../lib/asyncHandler');
 const { createNotification } = require('./notifications');
+const { audit } = require('../lib/batchAccess');
 
 const router = express.Router();
 
-router.get('/', asyncHandler(async (req, res) => {
-  const events = await req.db('SELECT * FROM events ORDER BY event_date ASC');
+const EVENT_SELECT = `
+  SELECT e.*, b.name AS batch_name,
+         (SELECT COUNT(*) FROM event_rsvps r WHERE r.event_id = e.id AND r.status = 'going')::int AS going_count
+  FROM events e LEFT JOIN batches b ON b.id = e.batch_id`;
+
+// Batch-scoped events are private: only admins, the batch president and approved members may see them.
+async function canSeeEvent(req, event) {
+  if (!event.batch_id) return true;
+  if (!req.user) return false;
+  if (req.user.role === 'admin') return true;
+  const rows = await req.db(
+    `SELECT 1 FROM batch_memberships WHERE batch_id = $1 AND user_id = $2 AND status = 'approved'
+     UNION SELECT 1 FROM batches WHERE id = $1 AND president_id = $2`,
+    [event.batch_id, req.user.id]
+  );
+  return rows.length > 0;
+}
+
+async function canManageEvent(req, batchId) {
+  if (req.user.role === 'admin') return true;
+  if (!batchId) return false;
+  const rows = await req.db('SELECT 1 FROM batches WHERE id = $1 AND president_id = $2', [batchId, req.user.id]);
+  return rows.length > 0;
+}
+
+router.get('/', optionalAuth, asyncHandler(async (req, res) => {
+  const all = await req.db(`${EVENT_SELECT} ORDER BY e.event_date ASC`);
+  const events = [];
+  for (const e of all) if (await canSeeEvent(req, e)) events.push(e);
   res.json({ events });
 }));
 
-router.get('/:id', requireAuth, asyncHandler(async (req, res) => {
-  const rows = await req.db('SELECT * FROM events WHERE id = $1', [req.params.id]);
-  if (rows.length === 0) return res.status(404).json({ error: 'Event not found' });
-  res.json({ event: rows[0] });
+router.get('/:id', optionalAuth, asyncHandler(async (req, res, next) => {
+  if (!/^\d+$/.test(req.params.id)) return next();
+  const rows = await req.db(`${EVENT_SELECT} WHERE e.id = $1`, [req.params.id]);
+  if (rows.length === 0 || !(await canSeeEvent(req, rows[0]))) return res.status(404).json({ error: 'Event not found' });
+  const event = rows[0];
+  let myStatus = null;
+  if (req.user) {
+    const mine = await req.db('SELECT status FROM event_rsvps WHERE event_id = $1 AND user_id = $2', [event.id, req.user.id]);
+    myStatus = mine[0] ? mine[0].status : null;
+  }
+  res.json({ event, myStatus, canManage: req.user ? await canManageEvent(req, event.batch_id) : false });
 }));
 
-router.post('/', requireAuth, requireAdmin, asyncHandler(async (req, res) => {
-  const { title, description, location, event_date } = req.body;
+router.post('/', requireAuth, asyncHandler(async (req, res) => {
+  const { title, description, location, event_date, cover_image, registration_deadline, capacity, kind } = req.body;
+  const batchId = req.body.batch_id ? parseInt(req.body.batch_id, 10) : null;
+  if (!(await canManageEvent(req, batchId))) return res.status(403).json({ error: 'Not allowed to create this event' });
   if (!title || !event_date) return res.status(400).json({ error: 'title and event_date are required' });
+  if (Number.isNaN(Date.parse(event_date))) return res.status(400).json({ error: 'Invalid event date' });
+  if (registration_deadline && Date.parse(registration_deadline) > Date.parse(event_date)) {
+    return res.status(400).json({ error: 'Registration deadline must be before the event' });
+  }
+  if (capacity && !(parseInt(capacity, 10) > 0)) return res.status(400).json({ error: 'Capacity must be a positive number' });
+  if (cover_image && !/^data:image\/(png|jpe?g|webp);base64,/.test(cover_image)) return res.status(400).json({ error: 'Cover must be an image' });
+
   const rows = await req.db(
-    `INSERT INTO events (school_id, title, description, location, event_date, created_by)
-     VALUES ($1,$2,$3,$4,$5,$6) RETURNING *`,
-    [req.school.id, title, description || null, location || null, event_date, req.user.id]
+    `INSERT INTO events (school_id, title, description, location, event_date, created_by, cover_image, registration_deadline, capacity, kind, batch_id)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *`,
+    [req.school.id, title, description || null, location || null, event_date, req.user.id, cover_image || null,
+      registration_deadline || null, capacity ? parseInt(capacity, 10) : null, kind || 'general', batchId]
   );
   const event = rows[0];
 
-  const others = await req.db('SELECT id FROM users WHERE active = true');
-  for (const u of others) {
+  const recipients = batchId
+    ? await req.db(`SELECT user_id AS id FROM batch_memberships WHERE batch_id = $1 AND status = 'approved' AND user_id <> $2`, [batchId, req.user.id])
+    : await req.db('SELECT id FROM users WHERE active = true');
+  for (const u of recipients) {
     await createNotification(req.db, {
       userId: u.id,
       type: 'event',
       title: 'New event: ' + title,
       body: description || null,
-      link: `/events`,
+      link: `/events/${event.id}`,
     });
   }
+  await audit(req, 'event.create', 'event', event.id, { batch_id: batchId });
 
   res.status(201).json({ event });
 }));
 
-router.delete('/:id', requireAuth, requireAdmin, asyncHandler(async (req, res) => {
+router.delete('/:id', requireAuth, asyncHandler(async (req, res) => {
+  const rows = await req.db('SELECT batch_id FROM events WHERE id = $1', [req.params.id]);
+  if (rows.length === 0) return res.status(404).json({ error: 'Event not found' });
+  if (!(await canManageEvent(req, rows[0].batch_id))) return res.status(403).json({ error: 'Not allowed to delete this event' });
   await req.db('DELETE FROM events WHERE id = $1', [req.params.id]);
+  await audit(req, 'event.delete', 'event', Number(req.params.id), null);
   res.status(204).end();
 }));
 
@@ -58,6 +110,23 @@ router.post('/:id/rsvp', requireAuth, asyncHandler(async (req, res) => {
   const { status } = req.body;
   if (!['going', 'maybe', 'not_going'].includes(status)) {
     return res.status(400).json({ error: 'Invalid status' });
+  }
+  const events = await req.db('SELECT * FROM events WHERE id = $1', [req.params.id]);
+  if (events.length === 0 || !(await canSeeEvent(req, events[0]))) return res.status(404).json({ error: 'Event not found' });
+  const event = events[0];
+
+  if (status !== 'not_going') {
+    if (event.registration_deadline && new Date(event.registration_deadline) < new Date()) {
+      return res.status(400).json({ error: 'Registration for this event has closed' });
+    }
+    if (new Date(event.event_date) < new Date()) return res.status(400).json({ error: 'This event has already taken place' });
+  }
+  if (status === 'going' && event.capacity) {
+    const [{ c }] = await req.db(
+      "SELECT COUNT(*)::int AS c FROM event_rsvps WHERE event_id = $1 AND status = 'going' AND user_id <> $2",
+      [event.id, req.user.id]
+    );
+    if (c >= event.capacity) return res.status(409).json({ error: 'This event is at full capacity' });
   }
   const rows = await req.db(
     `INSERT INTO event_rsvps (school_id, event_id, user_id, status, paid)

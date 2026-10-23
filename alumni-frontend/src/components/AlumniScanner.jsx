@@ -97,7 +97,7 @@ export default function AlumniScanner({ eventId, onCheckedIn }) {
 
       {banner && (
         <div
-          className={`mb-4 p-3 rounded-[var(--radius)] border-2 font-semibold text-sm ${
+          className={`mb-4 p-3 rounded-[var(--radius)] border font-semibold text-sm ${
             banner.type === 'ok'
               ? 'bg-[var(--brand-success)]/10 border-[var(--brand-success)] text-[var(--brand-success)]'
               : 'bg-[var(--brand-danger)]/10 border-[var(--brand-danger)] text-[var(--brand-danger)]'
@@ -121,7 +121,7 @@ export default function AlumniScanner({ eventId, onCheckedIn }) {
 
       {scanning ? (
         <div>
-          <div id={SCANNER_ELEMENT_ID} className="rounded-[var(--radius)] overflow-hidden border-[2.5px] border-[var(--brand-ink)]" />
+          <div id={SCANNER_ELEMENT_ID} className="rounded-[var(--radius)] overflow-hidden border border-[var(--line)]" />
           <Button type="button" variant="secondary" className="mt-4" onClick={() => setScanning(false)}>
             <Square size={16} />
             Stop Scanning

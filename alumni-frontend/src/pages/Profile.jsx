@@ -80,7 +80,7 @@ export default function Profile() {
       </div>
 
       {msg && (
-        <div className={`flex items-center gap-2 p-4 rounded-[var(--radius)] mb-6 border-2 font-semibold ${
+        <div className={`flex items-center gap-2 p-4 rounded-[var(--radius)] mb-6 border font-semibold ${
           msg.type === 'ok' ? 'bg-white border-[var(--brand-success)] text-[var(--brand-success)]' : 'bg-white border-[var(--brand-danger)] text-[var(--brand-danger)]'
         }`}>
           <MsgIcon size={20} />
@@ -90,7 +90,7 @@ export default function Profile() {
 
       <form onSubmit={submit} className="space-y-6">
         <Panel className="p-6 flex items-center gap-5">
-          <div className="w-20 h-20 rounded-[var(--radius)] bg-[var(--brand-accent)] border-2 border-[var(--brand-ink)] overflow-hidden flex items-center justify-center text-white font-extrabold text-3xl flex-shrink-0">
+          <div className="w-20 h-20 rounded-[var(--radius)] bg-[var(--brand-accent)] border border-[var(--line)] overflow-hidden flex items-center justify-center text-[var(--navy)] font-extrabold text-3xl flex-shrink-0">
             {form.profile_pic ? (
               <img src={form.profile_pic} alt="" className="w-full h-full object-cover" />
             ) : (
@@ -100,7 +100,7 @@ export default function Profile() {
           <div>
             <h2 className="font-display text-2xl text-[var(--brand-ink)]">{me.full_name || 'Complete your profile'}</h2>
             <p className="text-slate-500">{me.email}</p>
-            {me.role === 'admin' && <span className="inline-block mt-1 bg-[var(--brand-accent)] text-white text-xs px-2 py-0.5 rounded border-2 border-[var(--brand-ink)] font-bold">ADMIN</span>}
+            {me.role === 'admin' && <span className="inline-block mt-1 bg-[var(--brand-accent)] text-[var(--navy)] text-xs px-2 py-0.5 rounded border border-[var(--line)] font-bold">ADMIN</span>}
           </div>
         </Panel>
 
@@ -109,7 +109,7 @@ export default function Profile() {
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
-              className="w-24 h-24 rounded-[var(--radius)] bg-[var(--brand-accent)] border-[2.5px] border-[var(--brand-ink)] overflow-hidden flex items-center justify-center text-white font-extrabold text-4xl flex-shrink-0"
+              className="w-24 h-24 rounded-[var(--radius)] bg-[var(--brand-accent)] border border-[var(--line)] overflow-hidden flex items-center justify-center text-[var(--navy)] font-extrabold text-4xl flex-shrink-0"
             >
               {form.profile_pic ? (
                 <img src={form.profile_pic} alt="" className="w-full h-full object-cover" />
@@ -167,6 +167,17 @@ export default function Profile() {
           </Field>
           <Field label="Bio" span>
             <Input as="textarea" rows="3" value={form.bio || ''} onChange={update('bio')} placeholder="Tell other alumni about yourself..." />
+          </Field>
+          <Field label="Privacy" span>
+            <label className="flex items-center gap-2 text-sm text-[var(--brand-ink)] font-semibold">
+              <input type="checkbox" checked={form.directory_visible !== false} onChange={(e) => setForm({ ...form, directory_visible: e.target.checked })} />
+              List me in the public alumni directory
+            </label>
+            <label className="flex items-center gap-2 text-sm text-[var(--brand-ink)] font-semibold mt-2">
+              <input type="checkbox" checked={!!form.show_location} onChange={(e) => setForm({ ...form, show_location: e.target.checked })} />
+              Show my address as my location in the directory
+            </label>
+            <p className="text-xs text-[var(--muted)] mt-1">Your email and phone number are never shown in the directory.</p>
           </Field>
           <Field label="Mentorship" span>
             <label className="flex items-center gap-2 text-sm text-[var(--brand-ink)] font-semibold">

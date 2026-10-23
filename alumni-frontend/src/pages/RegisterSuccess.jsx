@@ -57,7 +57,7 @@ export default function RegisterSuccess() {
         </div>
         {failed ? (
           <>
-            <div className="mx-auto mb-4 w-14 h-14 rounded-[var(--radius)] bg-[var(--brand-danger)] border-2 border-[var(--brand-ink)] flex items-center justify-center">
+            <div className="mx-auto mb-4 w-14 h-14 rounded-[var(--radius)] bg-[var(--brand-danger)] border border-[var(--line)] flex items-center justify-center">
               <XCircle className="text-white" size={26} />
             </div>
             <h1 className="font-display text-2xl text-[var(--brand-ink)] mb-2">Still processing</h1>
@@ -67,7 +67,7 @@ export default function RegisterSuccess() {
           </>
         ) : (
           <>
-            <Loader2 className="mx-auto mb-4 animate-spin text-[var(--brand-accent)]" size={32} />
+            <Loader2 className="mx-auto mb-4 animate-spin text-[var(--gold-deep)]" size={32} />
             <h1 className="font-display text-2xl text-[var(--brand-ink)] mb-2">Confirming your payment...</h1>
             <p className="text-slate-600">This usually takes a few seconds, but can take up to a minute if the server was idle.</p>
           </>

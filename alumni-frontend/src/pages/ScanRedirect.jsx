@@ -25,7 +25,7 @@ export default function ScanRedirect() {
     <div className="p-6 lg:p-10 max-w-3xl mx-auto">
       <div className="mb-6">
         <h1 className="font-display text-3xl text-[var(--brand-ink)] flex items-center gap-2">
-          <QrCode className="text-[var(--brand-accent)]" /> Scan Check-in
+          <QrCode className="text-[var(--gold-deep)]" /> Scan Check-in
         </h1>
         <p className="text-slate-500 mt-1">Pilia ang event nga inyo gi-man sa scanning.</p>
       </div>
@@ -38,10 +38,10 @@ export default function ScanRedirect() {
             key={ev.id}
             as="button"
             onClick={() => nav(`/events/${ev.id}/checkin`)}
-            className="w-full text-left p-5 hover:shadow-[4px_4px_0_var(--brand-accent)] hover:border-[var(--brand-accent)] transition-all"
+            className="w-full text-left p-5 hover:shadow-sm hover:border-[var(--brand-accent)] transition-all"
           >
             <div className="flex items-center gap-4">
-              <div className="bg-[var(--brand-accent)] border-2 border-[var(--brand-ink)] p-3 rounded-[var(--radius)]">
+              <div className="bg-[var(--brand-accent)] border border-[var(--line)] p-3 rounded-[var(--radius)]">
                 <Calendar className="text-white" size={22} />
               </div>
               <div className="flex-1">

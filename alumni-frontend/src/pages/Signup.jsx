@@ -58,13 +58,13 @@ export default function Signup() {
   return (
     <div className="min-h-screen bg-[var(--brand-surface)] py-12 px-6">
       <div className="max-w-2xl mx-auto">
-        <Link to="/" className="inline-flex items-center gap-2 text-[var(--brand-ink)] hover:text-[var(--brand-accent)] mb-6 text-sm font-bold">
+        <Link to="/" className="inline-flex items-center gap-2 text-[var(--brand-ink)] hover:text-[var(--gold-deep)] mb-6 text-sm font-bold">
           <ArrowLeft size={16} /> Back to home
         </Link>
 
         <Panel className="p-8 lg:p-10">
           <div className="flex items-center gap-2 mb-6">
-            <div className="bg-[var(--brand-accent)] border-2 border-[var(--brand-ink)] p-2 rounded-[var(--radius)]">
+            <div className="bg-[var(--brand-accent)] border border-[var(--line)] p-2 rounded-[var(--radius)]">
               <GraduationCap className="text-white" size={22} />
             </div>
             <Wordmark />
@@ -74,7 +74,7 @@ export default function Signup() {
           <p className="text-slate-500 mb-8">Start a 30-day free trial — no payment required.</p>
 
           {err && (
-            <div className="bg-white border-2 border-[var(--brand-danger)] text-[var(--brand-danger)] font-semibold p-3 rounded-[var(--radius)] mb-5 text-sm">
+            <div className="bg-white border border-[var(--brand-danger)] text-[var(--brand-danger)] font-semibold p-3 rounded-[var(--radius)] mb-5 text-sm">
               {err}
             </div>
           )}
@@ -96,8 +96,8 @@ export default function Signup() {
             <div>
               <label className="block text-sm font-bold text-[var(--brand-ink)] mb-1.5">Logo (optional)</label>
               <div className="flex items-center gap-3">
-                {logo && <img src={logo} alt="" className="w-12 h-12 rounded-[var(--radius)] border-2 border-[var(--brand-ink)] object-cover" />}
-                <label className="inline-flex items-center gap-2 cursor-pointer border-[2.5px] border-[var(--brand-ink)] rounded-[var(--radius)] font-bold text-xs uppercase tracking-wide px-4 py-2.5 bg-white text-[var(--brand-ink)] shadow-[3px_3px_0_var(--brand-ink)]">
+                {logo && <img src={logo} alt="" className="w-12 h-12 rounded-[var(--radius)] border border-[var(--line)] object-cover" />}
+                <label className="inline-flex items-center gap-2 cursor-pointer border border-[var(--line)] rounded-[var(--radius)] font-bold text-xs uppercase tracking-wide px-4 py-2.5 bg-white text-[var(--brand-ink)] shadow-sm">
                   <input type="file" accept="image/*" className="hidden" onChange={onFile} />
                   <Upload size={16} /> Upload
                 </label>
@@ -125,7 +125,7 @@ export default function Signup() {
           </form>
 
           <p className="text-center text-sm text-slate-500 mt-6">
-            Already have a school? <Link to="/login" className="text-[var(--brand-accent)] hover:underline font-bold">Sign in</Link>
+            Already have a school? <Link to="/login" className="text-[var(--gold-deep)] hover:underline font-bold">Sign in</Link>
           </p>
         </Panel>
       </div>
