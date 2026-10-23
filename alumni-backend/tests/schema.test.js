@@ -8,7 +8,7 @@ test('all expected tables exist after migration', async () => {
   );
   const names = rows.map((r) => r.table_name).sort();
   expect(names).toEqual([
-    'announcements', 'audit_logs', 'batch_comments', 'batch_likes', 'batch_memberships', 'batch_posts', 'batches', 'officers', 'partners', 'event_checkins', 'event_photos', 'event_rsvps', 'events',
+    'alumni_stories', 'announcements', 'audit_logs', 'batch_comments', 'batch_gallery', 'batch_likes', 'batch_memberships', 'batch_posts', 'batches', 'officers', 'partners', 'projects', 'sponsor_inquiries', 'event_checkins', 'event_photos', 'event_rsvps', 'events',
     'group_members', 'group_posts', 'groups', 'jobs',
     'messages', 'notifications', 'pending_signups', 'platform_admins', 'processed_webhook_events', 'schools', 'users',
   ].sort());
@@ -19,7 +19,7 @@ test('schools table exists with the expected columns', async () => {
     `SELECT column_name FROM information_schema.columns WHERE table_name = 'schools'`
   );
   const names = rows.map((r) => r.column_name).sort();
-  expect(names).toEqual(['about', 'active', 'contact_address', 'contact_email', 'contact_phone', 'created_at', 'facebook_url', 'id', 'logo', 'name', 'plan', 'registration_fee', 'registration_open', 'slug', 'trial_ends_at']);
+  expect(names).toEqual(['about', 'active', 'contact_address', 'contact_email', 'contact_phone', 'created_at', 'facebook_url', 'id', 'logo', 'name', 'overview_body', 'overview_image', 'overview_title', 'plan', 'registration_fee', 'registration_open', 'slug', 'trial_ends_at']);
 });
 
 test('every tenant table has a school_id column', async () => {
@@ -40,6 +40,7 @@ test('every tenant table has row-level security enabled', async () => {
   const tables = [
     'users', 'events', 'event_rsvps', 'event_checkins', 'event_photos', 'jobs',
     'announcements', 'messages', 'groups', 'group_members', 'group_posts', 'notifications', 'pending_signups',
+    'batch_gallery', 'projects', 'alumni_stories', 'sponsor_inquiries',
   ];
   for (const table of tables) {
     const { rows } = await pool.query(
@@ -58,4 +59,14 @@ test('users table has an is_bot column defaulting to false', async () => {
   expect(rows.length).toBe(1);
   expect(rows[0].data_type).toBe('boolean');
   expect(rows[0].column_default).toContain('false');
+});
+
+test('announcements has a jsonb agenda column defaulting to an empty array', async () => {
+  const { rows } = await pool.query(
+    `SELECT data_type, column_default FROM information_schema.columns
+     WHERE table_name = 'announcements' AND column_name = 'agenda'`
+  );
+  expect(rows.length).toBe(1);
+  expect(rows[0].data_type).toBe('jsonb');
+  expect(rows[0].column_default).toContain("'[]'");
 });

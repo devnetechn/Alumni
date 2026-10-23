@@ -83,6 +83,13 @@ app.use('/api/announcements', announcementsRoutes);
 const partnersRoutes = require('./routes/partners');
 app.use('/api/partners', partnersRoutes);
 
+const batchGalleryRoutes = require('./routes/batchGallery');
+app.use('/api/batch-gallery', batchGalleryRoutes);
+
+app.use('/api/sponsor', require('./routes/sponsor'));
+app.use('/api/projects', require('./routes/projects'));
+app.use('/api/alumni-stories', require('./routes/alumniStories'));
+
 const officersRoutes = require('./routes/officers');
 app.use('/api/officers', officersRoutes);
 

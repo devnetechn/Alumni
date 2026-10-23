@@ -1,7 +1,7 @@
 const request = require('supertest');
 const { app } = require('../src/server');
 const { pool, query } = require('../src/db');
-const { resetDb, createSchool, hostFor } = require('./helpers');
+const { resetDb, createSchool, hostFor, insertUser, authHeader, getDefaultSchool } = require('./helpers');
 
 afterAll(() => pool.end());
 
@@ -29,5 +29,33 @@ describe('GET /api/school', () => {
   test('unknown subdomain still returns 404, same as any other route', async () => {
     const res = await request(app).get('/api/school').set('Host', 'nonexistent-school.example.com');
     expect(res.status).toBe(404);
+  });
+});
+
+describe('overview fields', () => {
+  beforeEach(resetDb);
+
+  test('admin can set the overview and it is public on GET /api/school', async () => {
+    const admin = await insertUser({ role: 'admin' });
+    const patch = await request(app)
+      .patch('/api/school')
+      .set('Authorization', authHeader(admin))
+      .send({ overview_title: 'Reconnecting', overview_body: 'Proof of life' });
+    expect(patch.status).toBe(200);
+
+    const school = await getDefaultSchool();
+    const res = await request(app).get('/api/school').set('Host', hostFor(school));
+    expect(res.body.overview_title).toBe('Reconnecting');
+    expect(res.body.overview_body).toBe('Proof of life');
+    expect(res.body.overview_image).toBeNull();
+  });
+
+  test('alumni cannot set the overview', async () => {
+    const alumni = await insertUser({ role: 'alumni' });
+    const res = await request(app)
+      .patch('/api/school')
+      .set('Authorization', authHeader(alumni))
+      .send({ overview_title: 'Nope' });
+    expect(res.status).toBe(403);
   });
 });

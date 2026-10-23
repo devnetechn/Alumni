@@ -95,3 +95,45 @@ test('GET /highlights requires no auth and only returns past-event media', async
   expect(res.body.highlights[0].media).toBe('data:image/jpeg;base64,PAST');
   expect(res.body.highlights[0].event_title).toBe('Old Gala');
 });
+
+async function addPhoto(eventId, media) {
+  const school = await getDefaultSchool();
+  await pool.query(
+    `INSERT INTO event_photos (school_id, event_id, media, media_type) VALUES ($1,$2,$3,'image')`,
+    [school.id, eventId, media]
+  );
+}
+
+test('GET /recap returns null event when no past event has photos', async () => {
+  const school = await getDefaultSchool();
+  await makeEvent({ pastEvent: true });
+  const res = await request(app).get('/api/events/recap').set('Host', hostFor(school));
+  expect(res.status).toBe(200);
+  expect(res.body).toEqual({ event: null, photos: [] });
+});
+
+test('GET /recap returns the newest past public event with photos and ignores batch-scoped events', async () => {
+  const school = await getDefaultSchool();
+  const older = await makeEvent({ pastEvent: true });
+  await addPhoto(older, 'data:image/jpeg;base64,OLDER');
+
+  const batch = (await pool.query(
+    `INSERT INTO batches (school_id, year, name) VALUES ($1, 2010, 'Batch 2010') RETURNING id`, [school.id]
+  )).rows[0];
+  const privateEvent = (await pool.query(
+    `INSERT INTO events (school_id, title, event_date, batch_id) VALUES ($1,'Private Reunion','2023-01-01T18:00:00Z',$2) RETURNING id`,
+    [school.id, batch.id]
+  )).rows[0].id;
+  await addPhoto(privateEvent, 'data:image/jpeg;base64,PRIVATE');
+
+  const newer = (await pool.query(
+    `INSERT INTO events (school_id, title, event_date) VALUES ($1,'Newer Gala','2022-01-01T18:00:00Z') RETURNING id`, [school.id]
+  )).rows[0].id;
+  for (let i = 0; i < 8; i++) await addPhoto(newer, `data:image/jpeg;base64,N${i}`);
+
+  const res = await request(app).get('/api/events/recap').set('Host', hostFor(school));
+  expect(res.body.event.id).toBe(newer);
+  expect(res.body.event.title).toBe('Newer Gala');
+  expect(res.body.photos.length).toBe(6);
+  expect(res.body.photos.every((p) => p.media.includes('base64,N'))).toBe(true);
+});

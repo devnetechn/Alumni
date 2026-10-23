@@ -46,4 +46,22 @@ router.get('/highlights', asyncHandler(async (req, res) => {
   res.json({ highlights: rows });
 }));
 
+// Homepage recap: the most recent past public event that has photos, plus up to 6 of them.
+router.get('/recap', asyncHandler(async (req, res) => {
+  const events = await req.db(
+    `SELECT e.id, e.title, e.event_date, e.location
+     FROM events e
+     WHERE e.event_date < now() AND e.batch_id IS NULL
+       AND EXISTS (SELECT 1 FROM event_photos ep WHERE ep.event_id = e.id)
+     ORDER BY e.event_date DESC
+     LIMIT 1`
+  );
+  if (events.length === 0) return res.json({ event: null, photos: [] });
+  const photos = await req.db(
+    `SELECT id, media, media_type FROM event_photos WHERE event_id = $1 ORDER BY created_at DESC LIMIT 6`,
+    [events[0].id]
+  );
+  res.json({ event: events[0], photos });
+}));
+
 module.exports = router;

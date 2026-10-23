@@ -5,22 +5,44 @@ const { createNotification } = require('./notifications');
 
 const router = express.Router();
 
+// Returns a clean agenda array, or null when the input is malformed. Missing input means no agenda.
+function validateAgenda(agenda) {
+  if (agenda === undefined || agenda === null) return [];
+  if (!Array.isArray(agenda)) return null;
+  const items = [];
+  for (const item of agenda) {
+    if (!item || typeof item.activity !== 'string' || !item.activity.trim()) return null;
+    if (item.time !== undefined && typeof item.time !== 'string') return null;
+    items.push({ time: (item.time || '').trim(), activity: item.activity.trim() });
+  }
+  return items;
+}
+
+const ANNOUNCEMENT_SELECT = `
+  SELECT a.*, u.full_name AS poster_name, u.email AS poster_email, u.profile_pic AS poster_pic,
+         u.role AS poster_role, u.position AS poster_position
+  FROM announcements a LEFT JOIN users u ON u.id = a.posted_by`;
+
 router.get('/', asyncHandler(async (req, res) => {
-  const rows = await req.db(
-    `SELECT a.*, u.full_name AS poster_name, u.email AS poster_email, u.profile_pic AS poster_pic,
-            u.role AS poster_role, u.position AS poster_position
-     FROM announcements a LEFT JOIN users u ON u.id = a.posted_by
-     ORDER BY a.created_at DESC`
-  );
+  const rows = await req.db(`${ANNOUNCEMENT_SELECT} ORDER BY a.created_at DESC`);
   res.json({ announcements: rows });
+}));
+
+router.get('/:id', asyncHandler(async (req, res) => {
+  if (!/^\d+$/.test(req.params.id)) return res.status(404).json({ error: 'Announcement not found' });
+  const rows = await req.db(`${ANNOUNCEMENT_SELECT} WHERE a.id = $1`, [req.params.id]);
+  if (rows.length === 0) return res.status(404).json({ error: 'Announcement not found' });
+  res.json({ announcement: rows[0] });
 }));
 
 router.post('/', requireAuth, requireAdmin, asyncHandler(async (req, res) => {
   const { title, body } = req.body;
   if (!title) return res.status(400).json({ error: 'title is required' });
+  const agenda = validateAgenda(req.body.agenda);
+  if (agenda === null) return res.status(400).json({ error: 'agenda must be a list of { time, activity }' });
   const rows = await req.db(
-    `INSERT INTO announcements (school_id, title, body, posted_by) VALUES ($1,$2,$3,$4) RETURNING *`,
-    [req.school.id, title, body || null, req.user.id]
+    `INSERT INTO announcements (school_id, title, body, posted_by, agenda) VALUES ($1,$2,$3,$4,$5::jsonb) RETURNING *`,
+    [req.school.id, title, body || null, req.user.id, JSON.stringify(agenda)]
   );
   const announcement = rows[0];
 
@@ -31,7 +53,7 @@ router.post('/', requireAuth, requireAdmin, asyncHandler(async (req, res) => {
       type: 'announcement',
       title: 'New announcement',
       body: title,
-      link: '/announcements',
+      link: `/announcements/${announcement.id}`,
     });
   }
 

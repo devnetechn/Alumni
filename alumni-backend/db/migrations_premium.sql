@@ -191,3 +191,83 @@ ALTER TABLE schools ADD COLUMN IF NOT EXISTS contact_email TEXT;
 ALTER TABLE schools ADD COLUMN IF NOT EXISTS contact_phone TEXT;
 ALTER TABLE schools ADD COLUMN IF NOT EXISTS contact_address TEXT;
 ALTER TABLE schools ADD COLUMN IF NOT EXISTS facebook_url TEXT;
+
+-- Homepage redesign: admin-managed overview, agenda, gallery, projects, stories, sponsorship.
+ALTER TABLE schools ADD COLUMN IF NOT EXISTS overview_title TEXT;
+ALTER TABLE schools ADD COLUMN IF NOT EXISTS overview_body TEXT;
+ALTER TABLE schools ADD COLUMN IF NOT EXISTS overview_image TEXT;
+
+ALTER TABLE announcements ADD COLUMN IF NOT EXISTS agenda JSONB NOT NULL DEFAULT '[]';
+
+CREATE TABLE IF NOT EXISTS batch_gallery (
+  id SERIAL PRIMARY KEY,
+  school_id INTEGER REFERENCES schools(id) ON DELETE CASCADE,
+  batch_id INTEGER NOT NULL REFERENCES batches(id) ON DELETE CASCADE,
+  media TEXT NOT NULL,
+  caption TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS projects (
+  id SERIAL PRIMARY KEY,
+  school_id INTEGER REFERENCES schools(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  summary TEXT,
+  description TEXT,
+  image TEXT,
+  batch_id INTEGER REFERENCES batches(id) ON DELETE SET NULL,
+  lead_name TEXT,
+  featured BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS alumni_stories (
+  id SERIAL PRIMARY KEY,
+  school_id INTEGER REFERENCES schools(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  batch_label TEXT,
+  role_title TEXT,
+  photo TEXT,
+  quote TEXT,
+  story TEXT,
+  featured BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS sponsor_inquiries (
+  id SERIAL PRIMARY KEY,
+  school_id INTEGER REFERENCES schools(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  organization TEXT,
+  message TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+ALTER TABLE batch_gallery ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON batch_gallery;
+CREATE POLICY tenant_isolation ON batch_gallery
+  USING (school_id = current_setting('app.school_id', true)::int)
+  WITH CHECK (school_id = current_setting('app.school_id', true)::int);
+GRANT ALL ON batch_gallery, batch_gallery_id_seq TO alumni_app;
+
+ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON projects;
+CREATE POLICY tenant_isolation ON projects
+  USING (school_id = current_setting('app.school_id', true)::int)
+  WITH CHECK (school_id = current_setting('app.school_id', true)::int);
+GRANT ALL ON projects, projects_id_seq TO alumni_app;
+
+ALTER TABLE alumni_stories ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON alumni_stories;
+CREATE POLICY tenant_isolation ON alumni_stories
+  USING (school_id = current_setting('app.school_id', true)::int)
+  WITH CHECK (school_id = current_setting('app.school_id', true)::int);
+GRANT ALL ON alumni_stories, alumni_stories_id_seq TO alumni_app;
+
+ALTER TABLE sponsor_inquiries ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON sponsor_inquiries;
+CREATE POLICY tenant_isolation ON sponsor_inquiries
+  USING (school_id = current_setting('app.school_id', true)::int)
+  WITH CHECK (school_id = current_setting('app.school_id', true)::int);
+GRANT ALL ON sponsor_inquiries, sponsor_inquiries_id_seq TO alumni_app;

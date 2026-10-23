@@ -11,6 +11,9 @@ function publicSchool(school) {
     name: school.name,
     logo: school.logo,
     about: school.about,
+    overview_title: school.overview_title,
+    overview_body: school.overview_body,
+    overview_image: school.overview_image,
     contact_email: school.contact_email,
     contact_phone: school.contact_phone,
     contact_address: school.contact_address,
@@ -24,7 +27,7 @@ router.get('/school', asyncHandler(async (req, res) => {
   res.json(publicSchool(req.school));
 }));
 
-const EDITABLE = ['about', 'contact_email', 'contact_phone', 'contact_address', 'facebook_url'];
+const EDITABLE = ['about', 'overview_title', 'overview_body', 'overview_image', 'contact_email', 'contact_phone', 'contact_address', 'facebook_url'];
 
 router.patch('/school', requireAuth, requireAdmin, asyncHandler(async (req, res) => {
   const cols = EDITABLE.filter((c) => c in req.body);
