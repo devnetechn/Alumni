@@ -12,6 +12,22 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true });
 });
 
+// Connectivity probe: reports whether each pool can reach the database.
+// Only error codes/messages are returned, never connection strings.
+app.get('/api/health/db', async (req, res) => {
+  const { pool, appPool, platformPool } = require('./db');
+  const result = {};
+  for (const [name, p] of [['pool', pool], ['appPool', appPool], ['platformPool', platformPool]]) {
+    try {
+      await p.query('SELECT 1');
+      result[name] = 'ok';
+    } catch (err) {
+      result[name] = `${err.code || ''} ${err.message || ''}`.trim() || String(err);
+    }
+  }
+  res.json(result);
+});
+
 const platformRoutes = require('./routes/platform');
 app.use('/api/platform', platformRoutes);
 
