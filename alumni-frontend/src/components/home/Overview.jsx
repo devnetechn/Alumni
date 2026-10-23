@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Section } from '../PageHeader';
-import heroImg from '../../assets/hero.png';
+import communityImg from '../../assets/community.jpg';
 
 const DEFAULT_BODY =
   'This website is where our alumni find each other again. Every batch has its own community, every reunion has its own story, and every number below is proof that the family is alive and still growing.';
@@ -18,12 +18,11 @@ function Stat({ value, label }) {
 export default function Overview({ school }) {
   const title = school?.overview_title || 'Reconnecting our alumni, one batch at a time';
   const body = school?.overview_body || DEFAULT_BODY;
-  const image = school?.overview_image || heroImg;
 
   return (
     <Section eyebrow="Our Story" title={title}>
       <div className="grid md:grid-cols-2 gap-10 items-center">
-        <img src={image} alt="" className="w-full aspect-[4/3] object-cover rounded-[var(--radius)]" loading="lazy" />
+        <img src={communityImg} alt="" className="w-full aspect-[4/3] object-cover rounded-[var(--radius)]" loading="lazy" />
         <div>
           <p className="text-[var(--muted)] leading-relaxed text-lg whitespace-pre-wrap">{body}</p>
           <Link to="/about" className="inline-flex items-center gap-2 mt-6 font-semibold text-[var(--navy)] border-b-2 border-[var(--gold)] pb-0.5">About the association <ArrowRight size={16} /></Link>
