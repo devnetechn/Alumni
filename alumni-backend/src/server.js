@@ -104,7 +104,10 @@ const PORT = process.env.PORT || 4000;
 if (require.main === module || process.env.NODE_ENV !== 'test') {
   pool.query('SELECT 1 FROM users LIMIT 1').catch((err) => {
     console.error('Database not migrated or unreachable. Run: npm run migrate');
-    console.error(err.message);
+    // AggregateError (multi-address connect failures) has an empty message,
+    // so surface the code and each underlying error too.
+    console.error(err.code || '', err.message || '');
+    for (const e of err.errors || []) console.error(' -', e.code, e.address, e.port, e.message);
     process.exit(1);
   });
 
