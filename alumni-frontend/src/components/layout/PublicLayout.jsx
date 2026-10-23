@@ -27,16 +27,16 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 bg-[var(--navy)] border-b border-[var(--gold)]/30 on-dark">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-[68px] flex items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-[68px] flex items-center gap-4">
         <Link to="/" className="shrink-0 min-w-0" aria-label="Home">
           <Wordmark school={school} size={38} className="[&>span]:max-w-[170px] [&>span]:truncate" />
         </Link>
 
-        <nav aria-label="Primary" className="hidden xl:flex items-center gap-6">
+        <nav aria-label="Primary" className="hidden xl:flex items-center gap-6 ml-auto">
           {LINKS.map(([label, to, end]) => <NavLink key={to} to={to} end={end} className={linkClass}>{label}</NavLink>)}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 ml-auto xl:ml-2">
           {user ? (
             <>
               <NotificationBell className="text-white" />

@@ -1,70 +1,23 @@
-import { motion } from 'framer-motion';
-import { Megaphone } from 'lucide-react';
-import PosterBadge from '../PosterBadge';
-import { Panel } from '../ui';
+import { Link } from 'react-router-dom';
+import { ListChecks } from 'lucide-react';
+import { Section } from '../PageHeader';
 
-const sectionFade = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.25, ease: 'easeOut' } },
-};
-
-const cardFade = {
-  hidden: { opacity: 0, y: 12 },
-  visible: (i = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.2, delay: i * 0.05, ease: 'easeOut' },
-  }),
-};
-
-export default function AnnouncementsSection({ announcements }) {
+export default function AnnouncementsSection({ items }) {
+  if (!items || items.length === 0) return null;
   return (
-    <motion.section
-      className="max-w-7xl mx-auto px-6 py-16"
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.2 }}
-      variants={sectionFade}
-    >
-      <div className="flex items-center gap-3 mb-8">
-        <Megaphone className="text-[var(--gold-deep)]" size={26} />
-        <h2 className="font-editorial text-3xl md:text-4xl text-[var(--brand-ink)]">
-          Latest Announcements
-        </h2>
+    <Section tone="paper" eyebrow="Announcements" title="What's coming up">
+      <div className="grid md:grid-cols-3 gap-6">
+        {items.map((a) => (
+          <Link key={a.id} to={`/announcements/${a.id}`} className="card card-hover p-6 border-t-2 !border-t-[var(--gold)] block">
+            <p className="text-xs text-[var(--muted)]">{new Date(a.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+            <h3 className="serif text-xl text-[var(--navy)] mt-2">{a.title}</h3>
+            {a.body && <p className="text-sm text-[var(--muted)] mt-2 line-clamp-3">{a.body}</p>}
+            {a.agenda?.length > 0 && (
+              <p className="mt-4 text-sm font-semibold text-[var(--navy)] inline-flex items-center gap-1.5"><ListChecks size={14} aria-hidden="true" /> See agenda</p>
+            )}
+          </Link>
+        ))}
       </div>
-      {announcements.length === 0 ? (
-        <Panel className="p-8 text-slate-500">No announcements yet.</Panel>
-      ) : (
-        <div className="grid md:grid-cols-2 gap-5">
-          {announcements.map((a, i) => (
-            <motion.article
-              key={a.id}
-              custom={i}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.3 }}
-              variants={cardFade}
-              className="group bg-white border border-[var(--line)] rounded-[var(--radius)] p-6 hover:shadow-sm transition-shadow min-w-0"
-            >
-              <div className="mb-4">
-                <PosterBadge
-                  name={a.poster_name}
-                  email={a.poster_email}
-                  pic={a.poster_pic}
-                  role={a.poster_role}
-                  subtitle={a.poster_position}
-                  date={new Date(a.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                  size="sm"
-                />
-              </div>
-              <h3 className="font-display text-xl mb-2 text-[var(--brand-ink)]">
-                {a.title}
-              </h3>
-              <p className="text-slate-600 leading-relaxed">{a.body}</p>
-            </motion.article>
-          ))}
-        </div>
-      )}
-    </motion.section>
+    </Section>
   );
 }

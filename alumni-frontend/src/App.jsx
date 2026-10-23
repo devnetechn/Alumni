@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate, NavLink, Link, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Calendar, Megaphone, UserCircle, IdCard, LogOut, Menu, MessageSquare, Shield, FileText, Bell, QrCode, Sparkles, Handshake, Users, Layers, ShieldCheck, Home, BadgeCheck, UsersRound } from 'lucide-react';
+import { LayoutDashboard, Calendar, Megaphone, UserCircle, IdCard, LogOut, Menu, MessageSquare, Shield, FileText, Bell, QrCode, Sparkles, Handshake, Users, Layers, ShieldCheck, Home, BadgeCheck, UsersRound, BookOpen, Images, Hammer, GraduationCap, HeartHandshake } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from './auth';
 import { Wordmark, Button } from './components/ui';
@@ -42,6 +42,15 @@ import EventRegistrations from './pages/EventRegistrations';
 import ScanRedirect from './pages/ScanRedirect';
 import AdminHighlights from './pages/AdminHighlights';
 import AdminPartnerships from './pages/AdminPartnerships';
+import AdminOverview from './pages/AdminOverview';
+import Sponsor from './pages/Sponsor';
+import AdminSponsorInquiries from './pages/AdminSponsorInquiries';
+import AdminProjects from './pages/AdminProjects';
+import AdminAlumniStories from './pages/AdminAlumniStories';
+import ProjectDetail from './pages/ProjectDetail';
+import AlumniStoryDetail from './pages/AlumniStoryDetail';
+import AdminBatchGallery from './pages/AdminBatchGallery';
+import AnnouncementDetail from './pages/AnnouncementDetail';
 import AdminOfficers from './pages/AdminOfficers';
 import Officers from './pages/Officers';
 
@@ -69,6 +78,11 @@ function navFor(user, managedBatches, membership) {
     { to: '/admin/users', label: 'Users & roles', icon: Shield, admin: true },
     { to: '/admin/postings', label: 'Posts', icon: FileText, admin: true },
     { to: '/admin/highlights', label: 'Gallery photos', icon: Sparkles, admin: true },
+    { to: '/admin/overview', label: 'Homepage overview', icon: BookOpen, admin: true },
+    { to: '/admin/batch-gallery', label: 'Batch gallery', icon: Images, admin: true },
+    { to: '/admin/projects', label: 'Projects', icon: Hammer, admin: true },
+    { to: '/admin/alumni-stories', label: 'Alumni stories', icon: GraduationCap, admin: true },
+    { to: '/admin/sponsor-inquiries', label: 'Sponsor inquiries', icon: HeartHandshake, admin: true },
     { to: '/admin/partnerships', label: 'Partnerships', icon: Handshake, admin: true },
     { to: '/admin/officers', label: 'Officers', icon: Users, admin: true },
   ];
@@ -173,6 +187,10 @@ export default function App() {
         <Route path="/events/:id/checkin" element={<Protected><EventCheckin /></Protected>} />
         <Route path="/events/:id/registrations" element={<Protected admin><EventRegistrations /></Protected>} />
         <Route path="/scan" element={<Protected admin><ScanRedirect /></Protected>} />
+        <Route path="/sponsor" element={<Sponsor />} />
+        <Route path="/projects/:id" element={<ProjectDetail />} />
+        <Route path="/alumni-stories/:id" element={<AlumniStoryDetail />} />
+        <Route path="/announcements/:id" element={<AnnouncementDetail />} />
         <Route path="/announcements" element={<Protected><Announcements /></Protected>} />
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/profile" element={<Protected><Profile /></Protected>} />
@@ -184,6 +202,11 @@ export default function App() {
         <Route path="/admin/users" element={<Protected admin><AdminUsers /></Protected>} />
         <Route path="/admin/postings" element={<Protected admin><AdminPostings /></Protected>} />
         <Route path="/admin/highlights" element={<Protected admin><AdminHighlights /></Protected>} />
+        <Route path="/admin/overview" element={<Protected admin><AdminOverview /></Protected>} />
+        <Route path="/admin/batch-gallery" element={<Protected admin><AdminBatchGallery /></Protected>} />
+        <Route path="/admin/projects" element={<Protected admin><AdminProjects /></Protected>} />
+        <Route path="/admin/alumni-stories" element={<Protected admin><AdminAlumniStories /></Protected>} />
+        <Route path="/admin/sponsor-inquiries" element={<Protected admin><AdminSponsorInquiries /></Protected>} />
         <Route path="/admin/partnerships" element={<Protected admin><AdminPartnerships /></Protected>} />
         <Route path="/admin/officers" element={<Protected admin><AdminOfficers /></Protected>} />
         <Route path="*" element={<Navigate to="/" />} />
