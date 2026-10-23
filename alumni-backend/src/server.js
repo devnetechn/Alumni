@@ -99,6 +99,10 @@ initSocket(server);
 
 const PORT = process.env.PORT || 4000;
 
+// Log (rather than silently die on) anything that escapes request handling.
+process.on('unhandledRejection', (reason) => console.error('unhandledRejection:', reason));
+process.on('uncaughtException', (err) => console.error('uncaughtException:', err));
+
 // Hosts like Hostinger load the entry file through a wrapper, so
 // require.main !== module there; only skip listening under tests.
 if (require.main === module || process.env.NODE_ENV !== 'test') {

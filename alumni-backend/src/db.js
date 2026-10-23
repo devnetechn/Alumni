@@ -17,6 +17,12 @@ const pool = new Pool({ connectionString: resolveConnectionString('DATABASE_URL'
 const appPool = new Pool({ connectionString: resolveConnectionString('APP_DATABASE_URL') });
 const platformPool = new Pool({ connectionString: resolveConnectionString('PLATFORM_DATABASE_URL') });
 
+// A pooled idle client can error when the server (e.g. Supabase's pooler)
+// drops it; without a listener that 'error' event crashes the process.
+for (const [name, p] of [['pool', pool], ['appPool', appPool], ['platformPool', platformPool]]) {
+  p.on('error', (err) => console.error(`[${name}] idle client error:`, err.code || '', err.message));
+}
+
 async function query(text, params) {
   const result = await pool.query(text, params);
   return result.rows;
