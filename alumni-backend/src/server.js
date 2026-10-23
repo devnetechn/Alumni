@@ -12,6 +12,16 @@ app.get('/api/health', (req, res) => {
   res.json({ ok: true });
 });
 
+// Process probe: no database access. A shrinking uptime between calls means
+// the process was restarted.
+app.get('/api/health/info', (req, res) => {
+  res.json({
+    uptimeSeconds: Math.round(process.uptime()),
+    rssMB: Math.round(process.memoryUsage().rss / 1048576),
+    node: process.version,
+  });
+});
+
 // Connectivity probe: reports whether each pool can reach the database.
 // Only error codes/messages are returned, never connection strings.
 app.get('/api/health/db', async (req, res) => {
