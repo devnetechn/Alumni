@@ -271,3 +271,67 @@ CREATE POLICY tenant_isolation ON sponsor_inquiries
   USING (school_id = current_setting('app.school_id', true)::int)
   WITH CHECK (school_id = current_setting('app.school_id', true)::int);
 GRANT ALL ON sponsor_inquiries, sponsor_inquiries_id_seq TO alumni_app;
+
+-- ===== T-shirt shop =====
+CREATE TABLE IF NOT EXISTS shop_settings (
+  school_id INTEGER PRIMARY KEY REFERENCES schools(id) ON DELETE CASCADE,
+  enabled BOOLEAN NOT NULL DEFAULT false,
+  fee_percent NUMERIC(5,2) NOT NULL DEFAULT 2 CHECK (fee_percent >= 0 AND fee_percent < 50),
+  fulfillment TEXT NOT NULL DEFAULT 'pickup' CHECK (fulfillment IN ('pickup','delivery')),
+  pickup_info TEXT
+);
+
+CREATE TABLE IF NOT EXISTS shop_products (
+  id SERIAL PRIMARY KEY,
+  school_id INTEGER NOT NULL REFERENCES schools(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  description TEXT,
+  image TEXT,
+  price INTEGER NOT NULL CHECK (price > 0),
+  sizes JSONB NOT NULL DEFAULT '["S","M","L","XL","2XL"]',
+  active BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS shop_orders (
+  id SERIAL PRIMARY KEY,
+  school_id INTEGER NOT NULL REFERENCES schools(id) ON DELETE CASCADE,
+  product_id INTEGER REFERENCES shop_products(id) ON DELETE SET NULL,
+  product_name TEXT NOT NULL,
+  session_token TEXT NOT NULL UNIQUE,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  contact TEXT NOT NULL,
+  size TEXT NOT NULL,
+  quantity INTEGER NOT NULL CHECK (quantity >= 1),
+  address TEXT,
+  fulfillment TEXT NOT NULL,
+  subtotal INTEGER NOT NULL,
+  fee INTEGER NOT NULL,
+  total INTEGER NOT NULL,
+  paid BOOLEAN NOT NULL DEFAULT false,
+  paid_at TIMESTAMPTZ,
+  fulfilled BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+ALTER TABLE shop_settings ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON shop_settings;
+CREATE POLICY tenant_isolation ON shop_settings
+  USING (school_id = current_setting('app.school_id', true)::int)
+  WITH CHECK (school_id = current_setting('app.school_id', true)::int);
+GRANT ALL ON shop_settings TO alumni_app;
+
+ALTER TABLE shop_products ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON shop_products;
+CREATE POLICY tenant_isolation ON shop_products
+  USING (school_id = current_setting('app.school_id', true)::int)
+  WITH CHECK (school_id = current_setting('app.school_id', true)::int);
+GRANT ALL ON shop_products, shop_products_id_seq TO alumni_app;
+
+ALTER TABLE shop_orders ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tenant_isolation ON shop_orders;
+CREATE POLICY tenant_isolation ON shop_orders
+  USING (school_id = current_setting('app.school_id', true)::int)
+  WITH CHECK (school_id = current_setting('app.school_id', true)::int);
+GRANT ALL ON shop_orders, shop_orders_id_seq TO alumni_app;

@@ -8,7 +8,7 @@ test('all expected tables exist after migration', async () => {
   );
   const names = rows.map((r) => r.table_name).sort();
   expect(names).toEqual([
-    'alumni_stories', 'announcements', 'audit_logs', 'batch_comments', 'batch_gallery', 'batch_likes', 'batch_memberships', 'batch_posts', 'batches', 'officers', 'partners', 'projects', 'sponsor_inquiries', 'event_checkins', 'event_photos', 'event_rsvps', 'events',
+    'alumni_stories', 'announcements', 'audit_logs', 'batch_comments', 'batch_gallery', 'batch_likes', 'batch_memberships', 'batch_posts', 'batches', 'officers', 'partners', 'projects', 'sponsor_inquiries', 'shop_orders', 'shop_products', 'shop_settings', 'event_checkins', 'event_photos', 'event_rsvps', 'events',
     'group_members', 'group_posts', 'groups', 'jobs',
     'messages', 'notifications', 'pending_signups', 'platform_admins', 'processed_webhook_events', 'schools', 'users',
   ].sort());
@@ -40,7 +40,7 @@ test('every tenant table has row-level security enabled', async () => {
   const tables = [
     'users', 'events', 'event_rsvps', 'event_checkins', 'event_photos', 'jobs',
     'announcements', 'messages', 'groups', 'group_members', 'group_posts', 'notifications', 'pending_signups',
-    'batch_gallery', 'projects', 'alumni_stories', 'sponsor_inquiries',
+    'batch_gallery', 'projects', 'alumni_stories', 'sponsor_inquiries', 'shop_orders', 'shop_products', 'shop_settings',
   ];
   for (const table of tables) {
     const { rows } = await pool.query(

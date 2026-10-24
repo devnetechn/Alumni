@@ -91,6 +91,7 @@ app.use('/api/batch-gallery', batchGalleryRoutes);
 app.use('/api/sponsor', require('./routes/sponsor'));
 app.use('/api/projects', require('./routes/projects'));
 app.use('/api/alumni-stories', require('./routes/alumniStories'));
+app.use('/api/shop', require('./routes/shop'));
 
 const officersRoutes = require('./routes/officers');
 app.use('/api/officers', officersRoutes);

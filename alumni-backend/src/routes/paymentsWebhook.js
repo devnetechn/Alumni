@@ -78,6 +78,12 @@ router.post('/webhook', asyncHandler(async (req, res) => {
       `UPDATE users SET registration_paid_until = GREATEST(registration_paid_until, now()) + interval '2 years' WHERE id = $1`,
       [Number(metadata.user_id)]
     );
+  } else if (metadata.kind === 'shop') {
+    await queryForSchool(
+      schoolId,
+      `UPDATE shop_orders SET paid = true, paid_at = COALESCE(paid_at, now()) WHERE session_token = $1`,
+      [metadata.session_token]
+    );
   }
 
   res.status(200).json({ received: true });
