@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate, NavLink, Link, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Calendar, Megaphone, UserCircle, IdCard, LogOut, Menu, MessageSquare, Shield, FileText, Bell, QrCode, Sparkles, Handshake, Users, Layers, ShieldCheck, Home, BadgeCheck, UsersRound, BookOpen, Images, Hammer, GraduationCap, HeartHandshake } from 'lucide-react';
+import { LayoutDashboard, Calendar, Megaphone, UserCircle, IdCard, LogOut, Menu, MessageSquare, Shield, FileText, Bell, QrCode, Sparkles, Handshake, Users, Layers, ShieldCheck, Home, BadgeCheck, UsersRound, BookOpen, Images, Hammer, GraduationCap, HeartHandshake, ShoppingBag } from 'lucide-react';
 import { useState, lazy, Suspense } from 'react';
 import { useAuth } from './auth';
 import { Wordmark, Button } from './components/ui';
@@ -45,6 +45,9 @@ const AdminHighlights = lazy(() => import('./pages/AdminHighlights'));
 const AdminPartnerships = lazy(() => import('./pages/AdminPartnerships'));
 const AdminOverview = lazy(() => import('./pages/AdminOverview'));
 const Sponsor = lazy(() => import('./pages/Sponsor'));
+const Shop = lazy(() => import('./pages/Shop'));
+const ShopThanks = lazy(() => import('./pages/ShopThanks'));
+const AdminShop = lazy(() => import('./pages/AdminShop'));
 const AdminSponsorInquiries = lazy(() => import('./pages/AdminSponsorInquiries'));
 const AdminProjects = lazy(() => import('./pages/AdminProjects'));
 const AdminAlumniStories = lazy(() => import('./pages/AdminAlumniStories'));
@@ -84,6 +87,7 @@ function navFor(user, managedBatches, membership) {
     { to: '/admin/projects', label: 'Projects', icon: Hammer, admin: true },
     { to: '/admin/alumni-stories', label: 'Alumni stories', icon: GraduationCap, admin: true },
     { to: '/admin/sponsor-inquiries', label: 'Sponsor inquiries', icon: HeartHandshake, admin: true },
+    { to: '/admin/shop', label: 'T-shirt shop', icon: ShoppingBag, admin: true },
     { to: '/admin/partnerships', label: 'Partnerships', icon: Handshake, admin: true },
     { to: '/admin/officers', label: 'Officers', icon: Users, admin: true },
   ];
@@ -195,6 +199,8 @@ export default function App() {
         <Route path="/events/:id/registrations" element={<Protected admin><EventRegistrations /></Protected>} />
         <Route path="/scan" element={<Protected admin><ScanRedirect /></Protected>} />
         <Route path="/sponsor" element={<Sponsor />} />
+        <Route path="/shop" element={<Shop />} />
+        <Route path="/shop/thanks" element={<ShopThanks />} />
         <Route path="/projects/:id" element={<ProjectDetail />} />
         <Route path="/alumni-stories/:id" element={<AlumniStoryDetail />} />
         <Route path="/announcements/:id" element={<AnnouncementDetail />} />
@@ -210,6 +216,7 @@ export default function App() {
         <Route path="/admin/postings" element={<Protected admin><AdminPostings /></Protected>} />
         <Route path="/admin/highlights" element={<Protected admin><AdminHighlights /></Protected>} />
         <Route path="/admin/overview" element={<Protected admin><AdminOverview /></Protected>} />
+        <Route path="/admin/shop" element={<Protected admin><AdminShop /></Protected>} />
         <Route path="/admin/batch-gallery" element={<Protected admin><AdminBatchGallery /></Protected>} />
         <Route path="/admin/projects" element={<Protected admin><AdminProjects /></Protected>} />
         <Route path="/admin/alumni-stories" element={<Protected admin><AdminAlumniStories /></Protected>} />

@@ -14,6 +14,7 @@ const LINKS = [
   ['Events', '/events'],
   ['Alumni Directory', '/directory'],
   ['Gallery', '/gallery'],
+  ['Shop', '/shop'],
   ['Contact', '/contact'],
 ];
 

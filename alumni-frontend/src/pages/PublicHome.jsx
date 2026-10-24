@@ -10,6 +10,7 @@ import RecapGallery from '../components/home/RecapGallery';
 import ProjectsSection from '../components/home/ProjectsSection';
 import AlumniFaces from '../components/home/AlumniFaces';
 import SponsorBand from '../components/home/SponsorBand';
+import ShopBand from '../components/home/ShopBand';
 import Partnerships from '../components/home/Partnerships';
 import Lightbox from '../components/Lightbox';
 import ChatWidget from '../components/ChatWidget';
@@ -32,6 +33,7 @@ export default function PublicHome() {
   const [projects, setProjects] = useState([]);
   const [faces, setFaces] = useState([]);
   const [partners, setPartners] = useState([]);
+  const [shop, setShop] = useState(null);
   const [lightbox, setLightbox] = useState(null);
 
   useEffect(() => {
@@ -41,6 +43,7 @@ export default function PublicHome() {
     api.get('/events/recap').then((r) => setRecap(r.data)).catch(() => {});
     api.get('/projects').then((r) => setProjects([...r.data.projects].sort((a, b) => Number(b.featured) - Number(a.featured)))).catch(() => {});
     api.get('/alumni-stories').then((r) => setFaces([...r.data.stories].sort((a, b) => Number(b.featured) - Number(a.featured)))).catch(() => {});
+    api.get('/shop').then((r) => setShop(r.data)).catch(() => {});
     api.get('/partners').then((r) => setPartners(r.data.partners)).catch(() => {});
   }, []);
 
@@ -79,6 +82,7 @@ export default function PublicHome() {
       <ProjectsSection items={projects} />
       <AnnouncementsSection items={announcements} />
       <RecapGallery recap={recap} batches={batches} onOpen={setLightbox} />
+      <ShopBand data={shop} />
       <SponsorBand />
       <Partnerships items={partners} />
 
