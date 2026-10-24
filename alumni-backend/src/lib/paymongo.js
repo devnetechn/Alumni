@@ -2,6 +2,13 @@ const crypto = require('crypto');
 
 const API_BASE = 'https://api.paymongo.com/v1';
 
+// Methods offered at checkout. Only list methods activated on the PayMongo account,
+// e.g. PAYMONGO_PAYMENT_METHODS=qrph while GCash/Maya are still pending.
+function paymentMethods() {
+  const fromEnv = (process.env.PAYMONGO_PAYMENT_METHODS || '').split(',').map((s) => s.trim()).filter(Boolean);
+  return fromEnv.length ? fromEnv : ['card', 'gcash', 'paymaya', 'grab_pay', 'qrph'];
+}
+
 async function createCheckoutSession({ lineItems, paymentMethodTypes, successUrl, cancelUrl, metadata, referenceNumber }) {
   const secretKey = process.env.PAYMONGO_SECRET_KEY;
   if (!secretKey) {
@@ -65,4 +72,4 @@ function verifyWebhookSignature(rawBody, signatureHeader, secret) {
   return matches(te) || matches(li);
 }
 
-module.exports = { createCheckoutSession, verifyWebhookSignature };
+module.exports = { createCheckoutSession, verifyWebhookSignature, paymentMethods };

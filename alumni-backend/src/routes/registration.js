@@ -92,7 +92,7 @@ router.post('/signup-checkout', asyncHandler(async (req, res) => {
       name: 'Alumni Registration Fee',
       quantity: 1,
     }],
-    paymentMethodTypes: ['card', 'gcash', 'paymaya', 'grab_pay'],
+    paymentMethodTypes: paymongo.paymentMethods(),
     successUrl: `${frontendOrigin(req)}/register/success?session_id=${sessionToken}`,
     cancelUrl: `${frontendOrigin(req)}/register`,
     metadata: {
@@ -129,7 +129,7 @@ router.post('/renew-checkout', requireAuth, asyncHandler(async (req, res) => {
       name: 'Alumni Registration Renewal',
       quantity: 1,
     }],
-    paymentMethodTypes: ['card', 'gcash', 'paymaya', 'grab_pay'],
+    paymentMethodTypes: paymongo.paymentMethods(),
     successUrl: `${frontendOrigin(req)}/dashboard`,
     cancelUrl: `${frontendOrigin(req)}/dashboard`,
     metadata: {
