@@ -59,6 +59,7 @@ test('POST /api/registration/signup-checkout creates a checkout session and retu
 
   expect(res.status).toBe(200);
   expect(res.body.checkoutUrl).toBe('https://checkout.paymongo.com/cs_test123');
+  expect(res.body.sessionToken).toMatch(/^[0-9a-f-]{36}$/);
   expect(paymongo.createCheckoutSession).toHaveBeenCalledTimes(1);
   const callArgs = paymongo.createCheckoutSession.mock.calls[0][0];
   expect(callArgs.lineItems[0].amount).toBe(20000);

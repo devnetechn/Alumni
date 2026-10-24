@@ -8,7 +8,7 @@ import { Panel, Wordmark } from '../components/ui';
 // The backend can be a cold Render free-tier instance that takes up to ~50s
 // to wake from sleep, so this window needs to comfortably outlast that
 // instead of the few-seconds case it was originally sized for.
-const MAX_ATTEMPTS = 45;
+const MAX_ATTEMPTS = 150;
 const POLL_INTERVAL_MS = 2000;
 
 export default function RegisterSuccess() {
@@ -18,6 +18,7 @@ export default function RegisterSuccess() {
   const nav = useNavigate();
   const [failed, setFailed] = useState(!sessionId);
   const attemptsRef = useRef(0);
+  const [payUrl] = useState(() => { try { return sessionStorage.getItem('pay_url'); } catch { return null; } });
 
   useEffect(() => {
     if (!sessionId) return;
@@ -69,7 +70,8 @@ export default function RegisterSuccess() {
           <>
             <Loader2 className="mx-auto mb-4 animate-spin text-[var(--gold-deep)]" size={32} />
             <h1 className="font-display text-2xl text-[var(--brand-ink)] mb-2">Confirming your payment...</h1>
-            <p className="text-slate-600">This usually takes a few seconds, but can take up to a minute if the server was idle.</p>
+            <p className="text-slate-600">Complete your payment in the payment tab. This page signs you in automatically as soon as it is confirmed, so you can keep it open.</p>
+            {payUrl && <a href={payUrl} target="_blank" rel="noopener noreferrer" className="inline-block mt-4 text-sm font-semibold text-[var(--navy)] underline decoration-[var(--gold)] underline-offset-4">Open the payment page again</a>}
           </>
         )}
       </Panel>

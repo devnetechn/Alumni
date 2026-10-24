@@ -102,7 +102,7 @@ router.post('/signup-checkout', asyncHandler(async (req, res) => {
     },
   });
 
-  res.json({ checkoutUrl: session.checkoutUrl });
+  res.json({ checkoutUrl: session.checkoutUrl, sessionToken });
 }));
 
 router.get('/signup-checkout/:sessionId/status', asyncHandler(async (req, res) => {
