@@ -5,6 +5,8 @@ import { useAuth } from '../../auth';
 import { Wordmark, Button } from '../ui';
 import NotificationBell from '../NotificationBell';
 
+const BRAND_NAME = 'IHES Alumni Association';
+
 const LINKS = [
   ['Home', '/', true],
   ['About', '/about'],
@@ -29,7 +31,7 @@ export function Navbar() {
     <header className="sticky top-0 z-40 bg-[var(--navy)] border-b border-[var(--gold)]/30 on-dark">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-[68px] flex items-center gap-4">
         <Link to="/" className="shrink-0 min-w-0" aria-label="Home">
-          <Wordmark school={school} size={38} className="[&>span]:max-w-[170px] [&>span]:truncate" />
+          <Wordmark school={{ ...school, name: BRAND_NAME }} size={38} className="[&>span]:max-w-[190px]" />
         </Link>
 
         <nav aria-label="Primary" className="hidden xl:flex items-center gap-6 ml-auto">
@@ -87,7 +89,7 @@ export function Footer() {
       <div className="h-px bg-[var(--gold)]/40" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 grid gap-10 md:grid-cols-3">
         <div>
-          <Wordmark school={school} size={46} />
+          <Wordmark school={{ ...school, name: BRAND_NAME }} size={46} />
           <p className="mt-4 text-sm leading-relaxed text-white/65 max-w-xs">Once a student, always a part of the family.</p>
         </div>
         <div>
