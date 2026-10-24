@@ -9,6 +9,7 @@ export default function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [savingSettings, setSavingSettings] = useState(false);
   const feeInputRef = useRef(null);
+  const [feeMsg, setFeeMsg] = useState('');
 
   const load = () => api.get('/admin/users').then((r) => setUsers(r.data.users));
   useEffect(() => { load(); }, []);
@@ -24,8 +25,14 @@ export default function AdminUsers() {
     const pesos = parseFloat(feeInputRef.current.value);
     if (isNaN(pesos) || pesos < 0) return;
     setSavingSettings(true);
-    await api.patch('/admin/school', { registration_fee: Math.round(pesos * 100) });
-    await refreshSchool();
+    setFeeMsg('');
+    try {
+      const { data } = await api.patch('/admin/school', { registration_fee: Math.round(pesos * 100) });
+      await refreshSchool();
+      setFeeMsg(`Saved. Registrants will be charged ₱${(data.school.registration_fee / 100).toFixed(2)}.`);
+    } catch (e) {
+      setFeeMsg(e.response?.data?.error || 'Could not save the fee. Please try again.');
+    }
     setSavingSettings(false);
   };
 
@@ -85,6 +92,7 @@ export default function AdminUsers() {
               placeholder="200.00"
             />
             <Button type="button" variant="secondary" onClick={saveFee} disabled={savingSettings}>Save</Button>
+            {feeMsg && <p role="status" className="text-sm text-[var(--muted)]">{feeMsg}</p>}
           </div>
         </div>
       </Panel>
