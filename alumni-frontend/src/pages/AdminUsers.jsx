@@ -31,7 +31,7 @@ export default function AdminUsers() {
       await refreshSchool();
       setFeeMsg(`Saved. Registrants will be charged ₱${(data.school.registration_fee / 100).toFixed(2)}.`);
     } catch (e) {
-      setFeeMsg(e.response?.data?.error || 'Could not save the fee. Please try again.');
+      setFeeMsg(`Could not save the fee (${e.response?.status || e.message}). ${e.response?.data?.error || 'Please try again.'}`);
     }
     setSavingSettings(false);
   };
