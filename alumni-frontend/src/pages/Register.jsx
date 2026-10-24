@@ -15,7 +15,7 @@ export default function Register() {
   const nav = useNavigate();
   const fileRef = useRef(null);
   const [batches, setBatches] = useState(null);
-  const [form, setForm] = useState({ full_name: '', email: '', password: '', confirm: '', batch_id: '', requested_year: '', course: '', contact: '', profile_pic: '' });
+  const [form, setForm] = useState({ full_name: '', email: '', password: '', confirm: '', batch_id: '', requested_year: '', contact: '', profile_pic: '' });
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -44,7 +44,6 @@ export default function Register() {
     if (form.confirm !== form.password) e.confirm = 'Passwords do not match.';
     if (!form.batch_id) e.batch_id = 'Select your graduation batch.';
     if (notListed && !/^(19|20)\d{2}$/.test(form.requested_year)) e.requested_year = 'Enter a four-digit graduation year.';
-    if (!form.course.trim()) e.course = 'Enter your course or department.';
     if (!PHONE_RE.test(form.contact.trim())) e.contact = 'Enter a valid mobile number, e.g. 09171234567.';
     if (!form.profile_pic) e.photo = 'Upload a profile photo. It is printed on your alumni ID.';
     setErrors(e);
@@ -58,7 +57,7 @@ export default function Register() {
     setLoading(true);
     const payload = {
       full_name: form.full_name.trim(), email: form.email.trim(), password: form.password,
-      course: form.course.trim(), contact: form.contact.trim().replace(/\s|-/g, ''), profile_pic: form.profile_pic,
+      contact: form.contact.trim().replace(/\s|-/g, ''), profile_pic: form.profile_pic,
       ...(notListed ? { requested_batch_year: form.requested_year } : { batch_id: Number(form.batch_id) }),
     };
     try {
@@ -136,10 +135,6 @@ export default function Register() {
               </Field>
             </div>
           )}
-
-          <Field label="Course or department" id="course" error={err('course')}>
-            <Input id="course" value={form.course} onChange={set('course')} {...aria('course')} />
-          </Field>
 
           <Field label="Mobile number" id="contact" error={err('contact')} hint="Philippine mobile number, e.g. 09171234567.">
             <Input id="contact" type="tel" inputMode="tel" autoComplete="tel" value={form.contact} onChange={set('contact')} {...aria('contact')} />
