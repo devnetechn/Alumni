@@ -1,58 +1,59 @@
 import { Routes, Route, Navigate, NavLink, Link, useNavigate, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Calendar, Megaphone, UserCircle, IdCard, LogOut, Menu, MessageSquare, Shield, FileText, Bell, QrCode, Sparkles, Handshake, Users, Layers, ShieldCheck, Home, BadgeCheck, UsersRound, BookOpen, Images, Hammer, GraduationCap, HeartHandshake } from 'lucide-react';
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { useAuth } from './auth';
 import { Wordmark, Button } from './components/ui';
 import PublicLayout from './components/layout/PublicLayout';
 import NotificationBell from './components/NotificationBell';
 import PublicHome from './pages/PublicHome';
-import About from './pages/About';
-import Batches from './pages/Batches';
-import BatchPage from './pages/BatchPage';
-import BatchCommunity from './pages/BatchCommunity';
-import Membership from './pages/Membership';
-import President from './pages/President';
-import AdminBatches from './pages/AdminBatches';
-import Gallery from './pages/Gallery';
-import Contact from './pages/Contact';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import RegisterSuccess from './pages/RegisterSuccess';
-import Signup from './pages/Signup';
-import TrialExpired from './pages/TrialExpired';
-import RenewRegistration from './pages/RenewRegistration';
-import PlatformSignup from './pages/PlatformSignup';
-import PlatformLogin from './pages/PlatformLogin';
-import PlatformDashboard from './pages/PlatformDashboard';
-import Dashboard from './pages/Dashboard';
-import Directory, { DirectoryProfile } from './pages/Directory';
-import Events from './pages/Events';
-import EventDetail from './pages/EventDetail';
-import EventCheckin from './pages/EventCheckin';
-import Announcements from './pages/Announcements';
-import Jobs from './pages/Jobs';
-import Profile from './pages/Profile';
-import AlumniId from './pages/AlumniId';
-import Messages from './pages/Messages';
-import AdminUsers from './pages/AdminUsers';
-import AdminPostings from './pages/AdminPostings';
-import Groups from './pages/Groups';
-import Notifications from './pages/Notifications';
-import EventRegistrations from './pages/EventRegistrations';
-import ScanRedirect from './pages/ScanRedirect';
-import AdminHighlights from './pages/AdminHighlights';
-import AdminPartnerships from './pages/AdminPartnerships';
-import AdminOverview from './pages/AdminOverview';
-import Sponsor from './pages/Sponsor';
-import AdminSponsorInquiries from './pages/AdminSponsorInquiries';
-import AdminProjects from './pages/AdminProjects';
-import AdminAlumniStories from './pages/AdminAlumniStories';
-import ProjectDetail from './pages/ProjectDetail';
-import AlumniStoryDetail from './pages/AlumniStoryDetail';
-import AdminBatchGallery from './pages/AdminBatchGallery';
-import AnnouncementDetail from './pages/AnnouncementDetail';
-import AdminOfficers from './pages/AdminOfficers';
-import Officers from './pages/Officers';
+const About = lazy(() => import('./pages/About'));
+const Batches = lazy(() => import('./pages/Batches'));
+const BatchPage = lazy(() => import('./pages/BatchPage'));
+const BatchCommunity = lazy(() => import('./pages/BatchCommunity'));
+const Membership = lazy(() => import('./pages/Membership'));
+const President = lazy(() => import('./pages/President'));
+const AdminBatches = lazy(() => import('./pages/AdminBatches'));
+const Gallery = lazy(() => import('./pages/Gallery'));
+const Contact = lazy(() => import('./pages/Contact'));
+const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
+const RegisterSuccess = lazy(() => import('./pages/RegisterSuccess'));
+const Signup = lazy(() => import('./pages/Signup'));
+const TrialExpired = lazy(() => import('./pages/TrialExpired'));
+const RenewRegistration = lazy(() => import('./pages/RenewRegistration'));
+const PlatformSignup = lazy(() => import('./pages/PlatformSignup'));
+const PlatformLogin = lazy(() => import('./pages/PlatformLogin'));
+const PlatformDashboard = lazy(() => import('./pages/PlatformDashboard'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Directory = lazy(() => import('./pages/Directory'));
+const DirectoryProfile = lazy(() => import('./pages/Directory').then((m) => ({ default: m.DirectoryProfile })));
+const Events = lazy(() => import('./pages/Events'));
+const EventDetail = lazy(() => import('./pages/EventDetail'));
+const EventCheckin = lazy(() => import('./pages/EventCheckin'));
+const Announcements = lazy(() => import('./pages/Announcements'));
+const Jobs = lazy(() => import('./pages/Jobs'));
+const Profile = lazy(() => import('./pages/Profile'));
+const AlumniId = lazy(() => import('./pages/AlumniId'));
+const Messages = lazy(() => import('./pages/Messages'));
+const AdminUsers = lazy(() => import('./pages/AdminUsers'));
+const AdminPostings = lazy(() => import('./pages/AdminPostings'));
+const Groups = lazy(() => import('./pages/Groups'));
+const Notifications = lazy(() => import('./pages/Notifications'));
+const EventRegistrations = lazy(() => import('./pages/EventRegistrations'));
+const ScanRedirect = lazy(() => import('./pages/ScanRedirect'));
+const AdminHighlights = lazy(() => import('./pages/AdminHighlights'));
+const AdminPartnerships = lazy(() => import('./pages/AdminPartnerships'));
+const AdminOverview = lazy(() => import('./pages/AdminOverview'));
+const Sponsor = lazy(() => import('./pages/Sponsor'));
+const AdminSponsorInquiries = lazy(() => import('./pages/AdminSponsorInquiries'));
+const AdminProjects = lazy(() => import('./pages/AdminProjects'));
+const AdminAlumniStories = lazy(() => import('./pages/AdminAlumniStories'));
+const ProjectDetail = lazy(() => import('./pages/ProjectDetail'));
+const AlumniStoryDetail = lazy(() => import('./pages/AlumniStoryDetail'));
+const AdminBatchGallery = lazy(() => import('./pages/AdminBatchGallery'));
+const AnnouncementDetail = lazy(() => import('./pages/AnnouncementDetail'));
+const AdminOfficers = lazy(() => import('./pages/AdminOfficers'));
+const Officers = lazy(() => import('./pages/Officers'));
 
 function Protected({ children, admin, president }) {
   const { user, loading, managedBatches, meReady } = useAuth();
@@ -135,6 +136,10 @@ function MobileHeader({ onMenu }) {
 const DASHBOARD_PREFIXES = ['/dashboard', '/membership', '/president', '/notifications', '/messages', '/profile', '/my-id', '/scan', '/admin', '/groups', '/jobs'];
 const BARE = ['/login', '/register', '/register/success', '/signup'];
 
+function PageFallback() {
+  return <div className="min-h-[60vh] flex items-center justify-center text-sm text-[var(--muted)]" role="status">Loading…</div>;
+}
+
 function Shell({ children }) {
   const { user, trialExpired, registrationExpired } = useAuth();
   const [open, setOpen] = useState(false);
@@ -160,7 +165,9 @@ function Shell({ children }) {
 
 export default function App() {
   return (
+    <Suspense fallback={<PageFallback />}>
     <Shell>
+      <Suspense fallback={<PageFallback />}>
       <Routes>
         <Route path="/" element={<PublicHome />} />
         <Route path="/about" element={<About />} />
@@ -211,6 +218,8 @@ export default function App() {
         <Route path="/admin/officers" element={<Protected admin><AdminOfficers /></Protected>} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
+      </Suspense>
     </Shell>
+    </Suspense>
   );
 }
