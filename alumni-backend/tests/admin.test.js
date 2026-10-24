@@ -148,3 +148,16 @@ test('admin can update registration_open and registration_fee', async () => {
   expect(res.body.school.registration_open).toBe(false);
   expect(res.body.school.registration_fee).toBe(20000);
 });
+
+test('PATCH /api/admin/school rejects a negative or non-integer registration_fee', async () => {
+  const school = await getDefaultSchool();
+  const admin = await insertUser({ role: 'admin' });
+  for (const bad of [-1, 10.5, 'abc']) {
+    const res = await request(app)
+      .patch('/api/admin/school')
+      .set('Host', hostFor(school))
+      .set('Authorization', authHeader(admin))
+      .send({ registration_fee: bad });
+    expect(res.status).toBe(400);
+  }
+});

@@ -2,6 +2,7 @@ const express = require('express');
 const { requireAuth, requireAdmin } = require('../middleware/auth');
 const { asyncHandler } = require('../lib/asyncHandler');
 const { audit } = require('../lib/batchAccess');
+const { query } = require('../db');
 
 const router = express.Router();
 router.use(requireAuth, requireAdmin);
@@ -13,13 +14,20 @@ router.patch('/school', asyncHandler(async (req, res) => {
   }
   const columns = Object.keys(updates);
   if (columns.length === 0) return res.status(400).json({ error: 'No valid fields to update' });
+  if ('registration_fee' in updates && !(Number.isInteger(updates.registration_fee) && updates.registration_fee >= 0)) {
+    return res.status(400).json({ error: 'registration_fee must be a whole number of centavos' });
+  }
 
   const setClause = columns.map((col, i) => `${col} = $${i + 1}`).join(', ');
   const values = columns.map((col) => updates[col]);
-  const rows = await req.db(
+  // The schools table has no tenant RLS policy, so a restricted app role can
+  // silently update zero rows (e.g. when the host auto-enables RLS). Use the
+  // owner connection, as routes/school.js does, and fail loudly on no match.
+  const rows = await query(
     `UPDATE schools SET ${setClause} WHERE id = $${columns.length + 1} RETURNING id, slug, name, registration_open, registration_fee`,
     [...values, req.school.id]
   );
+  if (rows.length === 0) return res.status(404).json({ error: 'School not found' });
   res.json({ school: rows[0] });
 }));
 
