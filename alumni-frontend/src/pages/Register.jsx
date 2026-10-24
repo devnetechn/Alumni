@@ -8,13 +8,14 @@ import AuthSplit, { Field, FormAlert } from '../components/layout/AuthSplit';
 import { resizeImage } from '../lib/media';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_RE = /^(\+?63|0)9\d{9}$/;
 
 export default function Register() {
   const { school, register } = useAuth();
   const nav = useNavigate();
   const fileRef = useRef(null);
   const [batches, setBatches] = useState(null);
-  const [form, setForm] = useState({ full_name: '', email: '', password: '', confirm: '', batch_id: '', requested_year: '', course: '', profile_pic: '' });
+  const [form, setForm] = useState({ full_name: '', email: '', password: '', confirm: '', batch_id: '', requested_year: '', course: '', contact: '', profile_pic: '' });
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -43,6 +44,9 @@ export default function Register() {
     if (form.confirm !== form.password) e.confirm = 'Passwords do not match.';
     if (!form.batch_id) e.batch_id = 'Select your graduation batch.';
     if (notListed && !/^(19|20)\d{2}$/.test(form.requested_year)) e.requested_year = 'Enter a four-digit graduation year.';
+    if (!form.course.trim()) e.course = 'Enter your course or department.';
+    if (!PHONE_RE.test(form.contact.trim())) e.contact = 'Enter a valid mobile number, e.g. 09171234567.';
+    if (!form.profile_pic) e.photo = 'Upload a profile photo. It is printed on your alumni ID.';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -54,13 +58,29 @@ export default function Register() {
     setLoading(true);
     const payload = {
       full_name: form.full_name.trim(), email: form.email.trim(), password: form.password,
-      course: form.course.trim() || undefined, profile_pic: form.profile_pic || undefined,
+      course: form.course.trim(), contact: form.contact.trim().replace(/\s|-/g, ''), profile_pic: form.profile_pic,
       ...(notListed ? { requested_batch_year: form.requested_year } : { batch_id: Number(form.batch_id) }),
     };
     try {
       if (paid) {
-        const { data } = await api.post('/registration/signup-checkout', payload);
-        window.location.href = data.checkoutUrl;
+        // Open the payment tab synchronously (popup blockers allow it inside the
+        // click handler) so this tab can stay here and sign the user in once the
+        // payment is confirmed. QR Ph does not redirect back from PayMongo.
+        const payTab = window.open('', '_blank');
+        let data;
+        try {
+          ({ data } = await api.post('/registration/signup-checkout', payload));
+        } catch (e) {
+          payTab?.close();
+          throw e;
+        }
+        try { sessionStorage.setItem('pay_url', data.checkoutUrl); } catch { /* optional */ }
+        if (payTab) {
+          payTab.location.href = data.checkoutUrl;
+          nav(`/register/success?session_id=${data.sessionToken}`);
+        } else {
+          window.location.href = data.checkoutUrl;
+        }
         return;
       }
       await register(payload);
@@ -117,11 +137,15 @@ export default function Register() {
             </div>
           )}
 
-          <Field label="Course or department (optional)" id="course">
-            <Input id="course" value={form.course} onChange={set('course')} />
+          <Field label="Course or department" id="course" error={err('course')}>
+            <Input id="course" value={form.course} onChange={set('course')} {...aria('course')} />
           </Field>
 
-          <Field label="Profile photo (optional)" id="photo" error={errors.photo}>
+          <Field label="Mobile number" id="contact" error={err('contact')} hint="Philippine mobile number, e.g. 09171234567.">
+            <Input id="contact" type="tel" inputMode="tel" autoComplete="tel" value={form.contact} onChange={set('contact')} {...aria('contact')} />
+          </Field>
+
+          <Field label="Profile photo" id="photo" error={errors.photo} hint="Required. This photo appears on your alumni ID.">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-full bg-[var(--paper-2)] border border-[var(--line)] overflow-hidden flex items-center justify-center text-xs text-[var(--muted)] shrink-0">
                 {form.profile_pic ? <img src={form.profile_pic} alt="Your profile preview" className="w-full h-full object-cover" /> : 'No photo'}
