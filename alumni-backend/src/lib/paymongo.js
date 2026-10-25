@@ -49,6 +49,24 @@ async function createCheckoutSession({ lineItems, paymentMethodTypes, successUrl
   return { id: body.data.id, checkoutUrl: body.data.attributes.checkout_url };
 }
 
+async function getCheckoutSession(id) {
+  const secretKey = process.env.PAYMONGO_SECRET_KEY;
+  if (!secretKey) throw new Error('PAYMONGO_SECRET_KEY is not set');
+
+  const res = await fetch(`${API_BASE}/checkout_sessions/${encodeURIComponent(id)}`, {
+    headers: { Authorization: `Basic ${Buffer.from(`${secretKey}:`).toString('base64')}` },
+  });
+  const body = await res.json();
+  if (!res.ok) throw new Error(body?.errors?.[0]?.detail || 'PayMongo checkout session lookup failed');
+  return body.data;
+}
+
+function isCheckoutPaid(session) {
+  const attrs = session?.attributes || {};
+  return (attrs.payments || []).some((p) => p?.attributes?.status === 'paid')
+    || attrs.payment_intent?.attributes?.status === 'succeeded';
+}
+
 function verifyWebhookSignature(rawBody, signatureHeader, secret) {
   if (!signatureHeader || !secret) return false;
 
@@ -72,4 +90,4 @@ function verifyWebhookSignature(rawBody, signatureHeader, secret) {
   return matches(te) || matches(li);
 }
 
-module.exports = { createCheckoutSession, verifyWebhookSignature, paymentMethods };
+module.exports = { createCheckoutSession, getCheckoutSession, isCheckoutPaid, verifyWebhookSignature, paymentMethods };

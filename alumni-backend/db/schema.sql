@@ -309,6 +309,10 @@ CREATE TABLE IF NOT EXISTS pending_signups (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- The real PayMongo checkout session id, so the status poll can ask PayMongo
+-- directly whether it was paid instead of waiting for the webhook.
+ALTER TABLE pending_signups ADD COLUMN IF NOT EXISTS paymongo_session_id TEXT;
+
 ALTER TABLE pending_signups ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS tenant_isolation ON pending_signups;
 CREATE POLICY tenant_isolation ON pending_signups

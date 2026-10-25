@@ -143,6 +143,52 @@ test('GET /api/registration/signup-checkout/:sessionId/status returns a token on
   expect(res.body.user.id).toBe(user.id);
 });
 
+async function stagePendingSignup(school, token, paymongoSessionId) {
+  await query(
+    `INSERT INTO pending_signups (session_token, school_id, email, password_hash, full_name, member_type, paymongo_session_id)
+     VALUES ($1,$2,$3,'hash','Poll User','alumnus',$4)`,
+    [token, school.id, `${token}@test.com`, paymongoSessionId]
+  );
+}
+
+test('status poll creates the user itself when PayMongo says the checkout is paid but the webhook has not arrived', async () => {
+  const school = await getDefaultSchool();
+  await stagePendingSignup(school, 'tok-paid', 'cs_paid');
+  jest.spyOn(paymongo, 'getCheckoutSession').mockResolvedValue({
+    attributes: { payments: [{ attributes: { status: 'paid' } }] },
+  });
+
+  const res = await request(app).get('/api/registration/signup-checkout/tok-paid/status').set('Host', hostFor(school));
+
+  expect(paymongo.getCheckoutSession).toHaveBeenCalledWith('cs_paid');
+  expect(res.body.ready).toBe(true);
+  expect(res.body.user.email).toBe('tok-paid@test.com');
+  expect((await query('SELECT 1 FROM pending_signups WHERE session_token = $1', ['tok-paid'])).length).toBe(0);
+});
+
+test('status poll stays not ready while PayMongo reports the checkout unpaid', async () => {
+  const school = await getDefaultSchool();
+  await stagePendingSignup(school, 'tok-unpaid', 'cs_unpaid');
+  jest.spyOn(paymongo, 'getCheckoutSession').mockResolvedValue({ attributes: { payments: [] } });
+
+  const res = await request(app).get('/api/registration/signup-checkout/tok-unpaid/status').set('Host', hostFor(school));
+
+  expect(res.body.ready).toBe(false);
+  expect((await query('SELECT 1 FROM users WHERE email = $1', ['tok-unpaid@test.com'])).length).toBe(0);
+});
+
+test('status poll stays not ready (no 500) when the PayMongo lookup fails', async () => {
+  const school = await getDefaultSchool();
+  await stagePendingSignup(school, 'tok-err', 'cs_err');
+  jest.spyOn(paymongo, 'getCheckoutSession').mockRejectedValue(new Error('boom'));
+  jest.spyOn(console, 'error').mockImplementation(() => {});
+
+  const res = await request(app).get('/api/registration/signup-checkout/tok-err/status').set('Host', hostFor(school));
+
+  expect(res.status).toBe(200);
+  expect(res.body.ready).toBe(false);
+});
+
 test('POST /api/registration/renew-checkout requires auth', async () => {
   const school = await getDefaultSchool();
   const res = await request(app)

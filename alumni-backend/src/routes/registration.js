@@ -5,6 +5,7 @@ const { hashPassword } = require('../lib/password');
 const { signToken } = require('../lib/token');
 const { requireAuth } = require('../middleware/auth');
 const paymongo = require('../lib/paymongo');
+const { fulfilPendingSignup } = require('../lib/signupFulfilment');
 
 const router = express.Router();
 
@@ -102,11 +103,39 @@ router.post('/signup-checkout', asyncHandler(async (req, res) => {
     },
   });
 
+  await req.db('UPDATE pending_signups SET paymongo_session_id = $1 WHERE session_token = $2', [session.id, sessionToken]);
+
   res.json({ checkoutUrl: session.checkoutUrl, sessionToken });
 }));
 
+// Webhooks can arrive late (or after a cold start), so the status poll also
+// asks PayMongo directly, at most once per interval per signup (so duplicate tabs don't spam it).
+const PAYMONGO_CHECK_INTERVAL_MS = 1500; // just under the frontend's 2s poll so every poll checks
+const lastPaymongoCheck = new Map();
+
+async function confirmSignupWithPaymongo(req, sessionToken) {
+  const last = lastPaymongoCheck.get(sessionToken) || 0;
+  if (Date.now() - last < PAYMONGO_CHECK_INTERVAL_MS) return;
+  lastPaymongoCheck.set(sessionToken, Date.now());
+  if (lastPaymongoCheck.size > 1000) lastPaymongoCheck.delete(lastPaymongoCheck.keys().next().value);
+
+  const [pending] = await req.db('SELECT paymongo_session_id FROM pending_signups WHERE session_token = $1', [sessionToken]);
+  if (!pending || !pending.paymongo_session_id) return;
+  try {
+    const session = await paymongo.getCheckoutSession(pending.paymongo_session_id);
+    if (paymongo.isCheckoutPaid(session)) await fulfilPendingSignup(req.school.id, sessionToken);
+  } catch (err) {
+    console.error('PayMongo signup status check failed:', err.message); // the webhook is still the backstop
+  }
+}
+
 router.get('/signup-checkout/:sessionId/status', asyncHandler(async (req, res) => {
-  const rows = await req.db('SELECT * FROM users WHERE paymongo_checkout_session_id = $1', [req.params.sessionId]);
+  const findUser = () => req.db('SELECT * FROM users WHERE paymongo_checkout_session_id = $1', [req.params.sessionId]);
+  let rows = await findUser();
+  if (rows.length === 0) {
+    await confirmSignupWithPaymongo(req, req.params.sessionId);
+    rows = await findUser();
+  }
   if (rows.length === 0) return res.json({ ready: false });
 
   const user = rows[0];
